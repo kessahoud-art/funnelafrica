@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choisir un template — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* TOPBAR */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .back-btn{color:var(--muted);font-size:.82rem;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);transition:all .2s;}
+  .back-btn:hover{background:var(--surface2);color:var(--text);}
+  .page-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;}
+  .btn-primary{background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+  .btn-primary:hover{background:#00dea8;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+  /* HERO */
+  .hero{text-align:center;padding:48px 20px 32px;position:relative;}
+  .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,#00c89610 0%,transparent 70%);pointer-events:none;}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#00c89615;border:1px solid #00c89630;color:var(--green);padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:16px;}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,4vw,2.2rem);margin-bottom:10px;}
+  .hero-sub{color:var(--muted);font-size:.9rem;max-width:480px;margin:0 auto;}
+
+  /* FILTERS */
+  .filters{display:flex;align-items:center;gap:8px;padding:0 24px 24px;flex-wrap:wrap;justify-content:center;}
+  .filter-btn{padding:7px 16px;border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;}
+  .filter-btn:hover{border-color:#00c89640;color:var(--text);}
+  .filter-btn.active{background:#00c89618;border-color:var(--green);color:var(--green);font-weight:600;}
+
+  /* GRID */
+  .templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding:0 24px 80px;max-width:1200px;margin:0 auto;}
+
+  /* CARD */
+  .template-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .25s;position:relative;animation:fadeUp .4s ease both;}
+  .template-card:hover{border-color:#00c89650;transform:translateY(-4px);box-shadow:0 16px 40px #00000050;}
+  .template-card.selected{border-color:var(--green);box-shadow:0 0 0 3px #00c89625,0 16px 40px #00000050;}
+  .template-card:nth-child(1){animation-delay:.05s;}.template-card:nth-child(2){animation-delay:.10s;}.template-card:nth-child(3){animation-delay:.15s;}.template-card:nth-child(4){animation-delay:.20s;}.template-card:nth-child(5){animation-delay:.25s;}.template-card:nth-child(6){animation-delay:.30s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+  .selected-check{display:none;position:absolute;top:12px;right:12px;width:28px;height:28px;background:var(--green);border-radius:50%;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#0a0f14;z-index:10;}
+  .template-card.selected .selected-check{display:flex;}
+
+  /* PREVIEW */
+  .template-preview{height:200px;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
+  .mini-page{width:100%;height:100%;display:flex;flex-direction:column;font-family:'DM Sans',sans-serif;font-size:10px;line-height:1.3;}
+  .mini-hero{padding:16px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;}
+  .mini-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:7px;font-weight:700;width:fit-content;}
+  .mini-h1{font-weight:800;font-size:11px;line-height:1.2;}
+  .mini-sub{font-size:7px;opacity:.7;}
+  .mini-cta{display:inline-block;padding:4px 10px;border-radius:5px;font-size:7px;font-weight:800;width:fit-content;margin-top:3px;}
+  .mini-section{padding:8px 16px;display:flex;flex-direction:column;gap:3px;}
+  .mini-section-title{font-size:8px;font-weight:700;}
+  .mini-items{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+  .mini-item{padding:3px 5px;border-radius:3px;font-size:6px;display:flex;gap:3px;align-items:center;}
+  .mini-price-box{margin:6px 16px;padding:8px;border-radius:6px;text-align:center;border-width:1px;border-style:solid;}
+  .mini-price-val{font-size:13px;font-weight:800;}
+  .mini-price-label{font-size:6px;opacity:.7;}
+
+  /* INFO */
+  .template-info{padding:16px 18px;}
+  .template-type-badge{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;font-family:'Syne',sans-serif;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+  .template-name{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:5px;}
+  .template-desc{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+  .template-meta{display:flex;align-items:center;gap:12px;font-size:.72rem;color:var(--muted);}
+
+  /* ACTIONS */
+  .template-actions{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;}
+  .btn-preview{flex:1;padding:9px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;text-align:center;}
+  .btn-preview:hover{background:var(--surface2);color:var(--text);}
+  .btn-use{flex:2;padding:9px;background:var(--green);border:none;border-radius:8px;color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;text-align:center;}
+  .btn-use:hover{background:#00dea8;}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:#000000c0;z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:860px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:fadeUp .3s ease;}
+  .modal-topbar{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .modal-actions-bar{display:flex;gap:8px;}
+  .modal-close{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:7px 14px;font-size:.8rem;cursor:pointer;}
+  .modal-use-btn{background:var(--green);border:none;border-radius:8px;color:#0a0f14;padding:7px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
+  .modal-preview-area{flex:1;overflow:auto;background:#080d12;padding:24px;display:flex;justify-content:center;}
+  .modal-iframe-wrap{background:white;border-radius:8px;overflow:hidden;width:100%;max-width:700px;min-height:500px;box-shadow:0 10px 40px #00000060;}
+
+  /* LOADING OVERLAY */
+  .loading-overlay{display:none;position:fixed;inset:0;background:#00000090;z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+  .loading-overlay.open{display:flex;}
+  .spinner{width:44px;height:44px;border:3px solid #1e2a38;border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{color:var(--text);font-size:.9rem;font-family:'Syne',sans-serif;font-weight:600;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
+
+  @media(max-width:640px){.templates-grid{grid-template-columns:1fr;padding:0 16px 80px;}.hero{padding:32px 16px 20px;}.filters{padding:0 16px 20px;}}
+</style>
+</head>
+<body>
+
+<div id="__toast"></div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Création de votre tunnel...</div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="back-btn" onclick="window.location.href='/funnelafrica-dashboard.html'">← Dashboard</div>
+    <span class="page-title">Choisir un template</span>
+  </div>
+  <button class="btn-primary" id="useSelectedBtn" disabled onclick="useSelected()">
+    Utiliser ce template →
+  </button>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">⚡ 6 templates prêts à l'emploi</div>
+  <h1 class="hero-title">Choisissez votre template</h1>
+  <p class="hero-sub">Des pages de vente optimisées pour le marché africain. Personnalisez en quelques clics.</p>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="filter-btn active" onclick="filterTemplates('all',this)">Tous</button>
+  <button class="filter-btn" onclick="filterTemplates('formation',this)">📘 Formation</button>
+  <button class="filter-btn" onclick="filterTemplates('coaching',this)">🎯 Coaching</button>
+  <button class="filter-btn" onclick="filterTemplates('physique',this)">📦 Produit physique</button>
+  <button class="filter-btn" onclick="filterTemplates('ebook',this)">📄 Ebook / PDF</button>
+  <button class="filter-btn" onclick="filterTemplates('service',this)">🛠 Service</button>
+  <button class="filter-btn" onclick="filterTemplates('leadmagnet',this)">🎁 Lead magnet</button>
+</div>
+
+<!-- GRID -->
+<div class="templates-grid" id="templatesGrid">
+
+  <!-- FORMATION -->
+  <div class="template-card" data-type="formation" data-id="1" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#0d2a1a,#0a1520);color:white;flex:1;">
+          <div class="mini-badge" style="background:#00c89625;color:#00c896;border:1px solid #00c89640;">📘 Formation en ligne</div>
+          <div class="mini-h1">Maîtrisez <span style="color:#00c896;">Excel</span> en 30 jours</div>
+          <div class="mini-sub">La formation pour les professionnels africains</div>
+          <div class="mini-cta" style="background:#00c896;color:#0a0f14;">💳 Accéder maintenant →</div>
+        </div>
+        <div class="mini-section" style="background:#f8fafc;">
+          <div class="mini-section-title" style="color:#111;">✅ Ce que vous apprendrez</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#00c89610;">✓ Formules avancées</div>
+            <div class="mini-item" style="background:#00c89610;">✓ Tableaux de bord</div>
+            <div class="mini-item" style="background:#00c89610;">✓ Automatisation</div>
+            <div class="mini-item" style="background:#00c89610;">✓ Macros VBA</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#00c896;">
+          <div style="font-size:7px;color:#888;text-decoration:line-through;">19 900 FCFA</div>
+          <div class="mini-price-val" style="color:#00c896;">9 900</div>
+          <div class="mini-price-label">FCFA · Accès à vie</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#00c89615;color:#00c896;border:1px solid #00c89630;">📘 Formation / Cours en ligne</div>
+      <div class="template-name">Formation Pro</div>
+      <div class="template-desc">Idéal pour vendre des cours en ligne, formations vidéo, ou programmes d'apprentissage. Inclut programme, témoignages et FAQ.</div>
+      <div class="template-meta"><span>📄 8 sections</span><span>⭐ Le plus utilisé</span><span>💰 Conv. 4.2%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,1)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,1)">Utiliser →</button>
+    </div>
+  </div>
+
+  <!-- COACHING -->
+  <div class="template-card" data-type="coaching" data-id="2" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#1a0d2a,#0f0a20);color:white;flex:1;">
+          <div class="mini-badge" style="background:#a78bfa25;color:#a78bfa;border:1px solid #a78bfa40;">🎯 Coaching individuel</div>
+          <div class="mini-h1">Atteignez vos <span style="color:#a78bfa;">objectifs</span> en 90 jours</div>
+          <div class="mini-sub">Accompagnement personnalisé expert</div>
+          <div class="mini-cta" style="background:#a78bfa;color:#0a0f14;">📞 Réserver ma session →</div>
+        </div>
+        <div class="mini-section" style="background:#f8f5ff;">
+          <div class="mini-section-title" style="color:#111;">🏆 Résultats obtenus</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#a78bfa15;">✓ +300% revenus</div>
+            <div class="mini-item" style="background:#a78bfa15;">✓ Suivi hebdo</div>
+            <div class="mini-item" style="background:#a78bfa15;">✓ 6 mois de plan</div>
+            <div class="mini-item" style="background:#a78bfa15;">✓ Accès WhatsApp</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#a78bfa;">
+          <div class="mini-price-val" style="color:#a78bfa;">150 000</div>
+          <div class="mini-price-label">FCFA · Programme 90 jours</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#a78bfa15;color:#a78bfa;border:1px solid #a78bfa30;">🎯 Coaching / Consulting</div>
+      <div class="template-name">Coaching Premium</div>
+      <div class="template-desc">Parfait pour les coachs et consultants. Met en avant les résultats clients, le processus d'accompagnement et une session découverte.</div>
+      <div class="template-meta"><span>📄 7 sections</span><span>🔥 Haute valeur</span><span>💰 Conv. 3.1%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,2)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,2)">Utiliser →</button>
+    </div>
+  </div>
+
+  <!-- PRODUIT PHYSIQUE -->
+  <div class="template-card" data-type="physique" data-id="3" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#1a1000,#201500);color:white;flex:1;">
+          <div class="mini-badge" style="background:#f5a62325;color:#f5a623;border:1px solid #f5a62340;">📦 Livraison rapide</div>
+          <div class="mini-h1">Shea Butter <span style="color:#f5a623;">100% naturel</span></div>
+          <div class="mini-sub">Directement du producteur. Livraison 48h.</div>
+          <div class="mini-cta" style="background:#f5a623;color:#0a0f14;">🛒 Commander →</div>
+        </div>
+        <div class="mini-section" style="background:#fffef8;">
+          <div class="mini-section-title" style="color:#111;">📦 Ce que vous recevez</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#f5a62310;">✓ 500g premium</div>
+            <div class="mini-item" style="background:#f5a62310;">✓ Certifié bio</div>
+            <div class="mini-item" style="background:#f5a62310;">✓ Livraison 48h</div>
+            <div class="mini-item" style="background:#f5a62310;">✓ Satisfait garanti</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#f5a623;">
+          <div class="mini-price-val" style="color:#f5a623;">7 500</div>
+          <div class="mini-price-label">FCFA · Livraison incluse</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#f5a62315;color:#f5a623;border:1px solid #f5a62330;">📦 Produit physique</div>
+      <div class="template-name">Boutique Express</div>
+      <div class="template-desc">Conçu pour vendre des produits physiques avec livraison. Inclut galerie produit, options de livraison, avis clients et garantie.</div>
+      <div class="template-meta"><span>📄 6 sections</span><span>🚚 Livraison</span><span>💰 Conv. 5.8%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,3)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,3)">Utiliser →</button>
+    </div>
+  </div>
+
+  <!-- EBOOK -->
+  <div class="template-card" data-type="ebook" data-id="4" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#0a1a2a,#0d2035);color:white;flex:1;">
+          <div class="mini-badge" style="background:#4da6ff25;color:#4da6ff;border:1px solid #4da6ff40;">📄 Téléchargement immédiat</div>
+          <div class="mini-h1"><span style="color:#4da6ff;">50 stratégies</span> pour vendre sur WhatsApp</div>
+          <div class="mini-sub">Le guide complet — 127 pages</div>
+          <div class="mini-cta" style="background:#4da6ff;color:#0a0f14;">📥 Télécharger →</div>
+        </div>
+        <div class="mini-section" style="background:#f5f8ff;">
+          <div class="mini-section-title" style="color:#111;">📚 Au programme</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#4da6ff10;">✓ 127 pages</div>
+            <div class="mini-item" style="background:#4da6ff10;">✓ Scripts prêts</div>
+            <div class="mini-item" style="background:#4da6ff10;">✓ Cas pratiques</div>
+            <div class="mini-item" style="background:#4da6ff10;">✓ PDF + Audio</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#4da6ff;">
+          <div style="font-size:7px;color:#888;text-decoration:line-through;">9 900 FCFA</div>
+          <div class="mini-price-val" style="color:#4da6ff;">4 900</div>
+          <div class="mini-price-label">FCFA · Accès immédiat</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#4da6ff15;color:#4da6ff;border:1px solid #4da6ff30;">📄 Ebook / PDF</div>
+      <div class="template-name">Digital Download</div>
+      <div class="template-desc">Optimisé pour vendre des ebooks, guides PDF, templates. Accès immédiat après paiement, zéro livraison physique.</div>
+      <div class="template-meta"><span>📄 5 sections</span><span>⚡ Accès immédiat</span><span>💰 Conv. 6.4%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,4)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,4)">Utiliser →</button>
+    </div>
+  </div>
+
+  <!-- SERVICE -->
+  <div class="template-card" data-type="service" data-id="5" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#0d1a10,#0a1f15);color:white;flex:1;">
+          <div class="mini-badge" style="background:#00e87a25;color:#00e87a;border:1px solid #00e87a40;">🛠 Service professionnel</div>
+          <div class="mini-h1">Création de <span style="color:#00e87a;">site web</span> pro</div>
+          <div class="mini-sub">Livré en 7 jours. Satisfait ou remboursé.</div>
+          <div class="mini-cta" style="background:#00e87a;color:#0a0f14;">📞 Devis gratuit →</div>
+        </div>
+        <div class="mini-section" style="background:#f5fff8;">
+          <div class="mini-section-title" style="color:#111;">⚙️ Ce qui est inclus</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#00e87a10;">✓ Design sur mesure</div>
+            <div class="mini-item" style="background:#00e87a10;">✓ Mobile friendly</div>
+            <div class="mini-item" style="background:#00e87a10;">✓ 3 révisions</div>
+            <div class="mini-item" style="background:#00e87a10;">✓ Support 1 an</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#00e87a;">
+          <div class="mini-price-val" style="color:#00e87a;">75 000</div>
+          <div class="mini-price-label">FCFA · Site complet</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#00c89615;color:#00c896;border:1px solid #00c89630;">🛠 Service / Prestation</div>
+      <div class="template-name">Service Pro</div>
+      <div class="template-desc">Pour les freelances et agences. Présente votre offre, portfolio, processus de travail et formulaire de contact.</div>
+      <div class="template-meta"><span>📄 7 sections</span><span>📋 Formulaire devis</span><span>💰 Conv. 2.8%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,5)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,5)">Utiliser →</button>
+    </div>
+  </div>
+
+  <!-- LEAD MAGNET -->
+  <div class="template-card" data-type="leadmagnet" data-id="6" onclick="selectCard(this)">
+    <div class="selected-check">✓</div>
+    <div class="template-preview">
+      <div class="mini-page">
+        <div class="mini-hero" style="background:linear-gradient(135deg,#1a0a10,#200d15);color:white;flex:1;">
+          <div class="mini-badge" style="background:#ff6b9d25;color:#ff6b9d;border:1px solid #ff6b9d40;">🎁 100% Gratuit</div>
+          <div class="mini-h1">Télécharge ton <span style="color:#ff6b9d;">kit gratuit</span> business</div>
+          <div class="mini-sub">5 outils pour lancer sans budget</div>
+          <div class="mini-cta" style="background:#ff6b9d;color:white;">🎁 Recevoir le kit →</div>
+        </div>
+        <div class="mini-section" style="background:#fff5f8;">
+          <div class="mini-section-title" style="color:#111;">🎁 Ce que tu reçois</div>
+          <div class="mini-items">
+            <div class="mini-item" style="background:#ff6b9d10;">✓ Checklist PDF</div>
+            <div class="mini-item" style="background:#ff6b9d10;">✓ Tableau Excel</div>
+            <div class="mini-item" style="background:#ff6b9d10;">✓ Script WhatsApp</div>
+            <div class="mini-item" style="background:#ff6b9d10;">✓ Formation vidéo</div>
+          </div>
+        </div>
+        <div class="mini-price-box" style="background:white;border-color:#ff6b9d;">
+          <div class="mini-price-val" style="color:#ff6b9d;">GRATUIT</div>
+          <div class="mini-price-label">Entrez votre email</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-info">
+      <div class="template-type-badge" style="background:#ff6b9d15;color:#ff6b9d;border:1px solid #ff6b9d30;">🎁 Lead Magnet</div>
+      <div class="template-name">Capture Gratuite</div>
+      <div class="template-desc">Parfait pour collecter des emails en offrant quelque chose de gratuit. Formulaire simple, pas de checkout. Idéal pour votre liste.</div>
+      <div class="template-meta"><span>📄 4 sections</span><span>📧 Capture email</span><span>💰 Conv. 12%</span></div>
+    </div>
+    <div class="template-actions">
+      <button class="btn-preview" onclick="previewTemplate(event,6)">👁 Aperçu</button>
+      <button class="btn-use" onclick="useTemplate(event,6)">Utiliser →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL APERÇU -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-topbar">
+      <span class="modal-title" id="modalTitle">Aperçu</span>
+      <div class="modal-actions-bar">
+        <button class="modal-close" onclick="closePreview()">✕ Fermer</button>
+        <button class="modal-use-btn" onclick="useFromModal()">Utiliser ce template →</button>
+      </div>
+    </div>
+    <div class="modal-preview-area">
+      <div class="modal-iframe-wrap" id="modalContent"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ══════════════════════════════
+  //  CONFIG — remplace tes clés
+  // ══════════════════════════════
+  const SUPABASE_URL      = 'https://VOTRE_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  const supabase          = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const params     = new URLSearchParams(window.location.search);
+  const isNew      = params.get('new');
+  const tunnelId   = params.get('tunnel');
+
+  let selectedId   = null;
+  let previewingId = null;
+
+  const TEMPLATES = {
+    1: { type:'formation',  name:'Ma Formation',    color:'#00c896', defaultName:'Ma Formation' },
+    2: { type:'coaching',   name:'Mon Coaching',    color:'#a78bfa', defaultName:'Mon Coaching' },
+    3: { type:'physique',   name:'Mon Produit',     color:'#f5a623', defaultName:'Mon Produit' },
+    4: { type:'ebook',      name:'Mon Ebook',       color:'#4da6ff', defaultName:'Mon Ebook' },
+    5: { type:'service',    name:'Mon Service',     color:'#00e87a', defaultName:'Mon Service' },
+    6: { type:'leadmagnet', name:'Mon Lead Magnet', color:'#ff6b9d', defaultName:'Mon Lead Magnet' },
+  };
+
+  const DEFAULT_CONFIGS = {
+    formation:  { hero:{ badge:'📘 Formation en ligne · Accès immédiat', title:'Maîtrisez [SUJET] en 30 jours', subtitle:'La formation conçue pour les professionnels africains.', cta:'💳 Je veux accéder maintenant →' }},
+    coaching:   { hero:{ badge:'🎯 Coaching individuel · Places limitées', title:'Atteignez vos objectifs en 90 jours', subtitle:'Accompagnement personnalisé avec un expert certifié.', cta:'📞 Réserver ma session découverte →' }},
+    physique:   { hero:{ badge:'📦 Livraison rapide · Partout en Afrique', title:'[PRODUIT] 100% naturel', subtitle:'Directement du producteur. Livraison sous 48h.', cta:'🛒 Commander maintenant →' }},
+    ebook:      { hero:{ badge:'📄 Téléchargement immédiat', title:'[TITRE] — Le guide complet', subtitle:'Tout ce qu\'il faut savoir en un seul guide.', cta:'📥 Télécharger maintenant →' }},
+    service:    { hero:{ badge:'🛠 Service professionnel · Livré en 7 jours', title:'[VOTRE SERVICE] professionnel', subtitle:'Livré en 7 jours ou remboursé.', cta:'📞 Demander un devis gratuit →' }},
+    leadmagnet: { hero:{ badge:'🎁 100% Gratuit · Accès immédiat', title:'Télécharge ton kit gratuit pour [OBJECTIF]', subtitle:'Des outils essentiels pour démarrer sans budget.', cta:'🎁 Je veux mon kit gratuit →' }},
+  };
+
+  // Toast
+  function showToast(msg, type = 'success') {
+    const colors = {
+      success: { bg:'#00c89618', border:'#00c89640', color:'#00c896' },
+      error:   { bg:'#ff4d6d18', border:'#ff4d6d40', color:'#ff4d6d' }
+    };
+    const c = colors[type] || colors.success;
+    const t = document.getElementById('__toast');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:${c.bg};border:1px solid ${c.border};color:${c.color};display:block;`;
+    t.textContent = msg;
+    setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 10);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; }, 3500);
+  }
+
+  // ── SÉLECTIONNER UNE CARD ──
+  window.selectCard = (el) => {
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedId = parseInt(el.dataset.id);
+    document.getElementById('useSelectedBtn').disabled = false;
+  };
+
+  // ── FILTER ──
+  window.filterTemplates = (type, btn) => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.template-card').forEach(card => {
+      card.style.display = (type === 'all' || card.dataset.type === type) ? 'block' : 'none';
+    });
+  };
+
+  // ── UTILISER UN TEMPLATE ──
+  window.useTemplate = async (e, id) => {
+    if (e) e.stopPropagation();
+    const t = TEMPLATES[id];
+
+    if (tunnelId) {
+      // Changer le template d'un tunnel existant
+      window.location.href = `/funnelafrica-editor.html?tunnel=${tunnelId}&template=${t.type}`;
+      return;
+    }
+
+    if (isNew) {
+      // Vérifier auth
+      const { data:{ user } } = await supabase.auth.getUser();
+      if (!user) { window.location.href = '/funnelafrica-auth.html'; return; }
+
+      // Afficher loading
+      document.getElementById('loadingOverlay').classList.add('open');
+
+      try {
+        const slug = t.type + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2,5);
+
+        const { data, error } = await supabase
+          .from('tunnels')
+          .insert({
+            user_id:     user.id,
+            name:        t.defaultName,
+            slug:        slug,
+            template:    t.type,
+            status:      'draft',
+            page_config: DEFAULT_CONFIGS[t.type] || {}
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        showToast('✓ Tunnel créé ! Ouverture de l\'éditeur...', 'success');
+        setTimeout(() => {
+          window.location.href = `/funnelafrica-editor.html?tunnel=${data.id}&template=${t.type}`;
+        }, 800);
+
+      } catch (err) {
+        document.getElementById('loadingOverlay').classList.remove('open');
+        showToast('Erreur lors de la création. Réessayez.', 'error');
+        console.error(err);
+      }
+    }
+  };
+
+  window.useSelected   = () => { if (selectedId) window.useTemplate(null, selectedId); };
+  window.useFromModal  = () => { closePreview(); window.useTemplate(null, previewingId); };
+
+  // ── PREVIEW MODAL ──
+  window.previewTemplate = (e, id) => {
+    e.stopPropagation();
+    previewingId = id;
+    const t = TEMPLATES[id];
+    document.getElementById('modalTitle').textContent = `Aperçu — ${t.name}`;
+    document.getElementById('modalContent').innerHTML = buildPreview(id);
+    document.getElementById('previewModal').classList.add('open');
+  };
+
+  window.closePreview = () => document.getElementById('previewModal').classList.remove('open');
+
+  document.getElementById('previewModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('previewModal')) window.closePreview();
+  });
+
+  // ── BUILD PREVIEW ──
+  function buildPreview(id) {
+    const previews = {
+      1:`<div style="font-family:'DM Sans',sans-serif;color:#111;"><div style="background:linear-gradient(135deg,#0d2a1a,#0a1520);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#00c89625;border:1px solid #00c89650;color:#00c896;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">📘 Formation en ligne · Accès immédiat</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;line-height:1.2;">Maîtrisez <span style="color:#00c896;">Excel</span> en 30 jours</h1><p style="color:#8fa5bc;font-size:.9rem;margin-bottom:20px;">La seule formation Excel conçue pour les professionnels africains.</p><div style="display:inline-block;background:#00c896;color:#0a0f14;font-weight:800;padding:14px 28px;border-radius:10px;">💳 Je veux accéder maintenant →</div></div><div style="background:#f8fafc;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;">✅ Ce que vous allez apprendre</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">${['Formules avancées','Tableaux de bord','Automatisation','Macros VBA','Analyse de données','Gestion business'].map(b=>`<div style="background:white;border:1px solid #e0e8f0;border-radius:8px;padding:10px;font-size:.82rem;display:flex;gap:6px;"><span style="color:#00c896;font-weight:800;">✓</span>${b}</div>`).join('')}</div><div style="background:white;border:2px solid #00c896;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:.8rem;color:#999;text-decoration:line-through;">19 900 FCFA</div><div style="font-size:2.5rem;font-weight:800;color:#00c896;line-height:1;">9 900</div><div style="color:#888;font-size:.78rem;margin-bottom:14px;">FCFA · Paiement unique à vie</div><div style="background:#00c896;color:#0a0f14;font-weight:800;padding:14px;border-radius:10px;">💳 Accéder maintenant →</div></div></div></div>`,
+      2:`<div style="font-family:'DM Sans',sans-serif;"><div style="background:linear-gradient(135deg,#1a0d2a,#0f0a20);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#a78bfa25;border:1px solid #a78bfa50;color:#a78bfa;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">🎯 Coaching individuel · Places limitées</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;line-height:1.2;">Atteignez vos <span style="color:#a78bfa;">objectifs</span> en 90 jours</h1><p style="color:#b8a5d8;font-size:.9rem;margin-bottom:20px;">Accompagnement personnalisé avec un expert certifié.</p><div style="display:inline-block;background:#a78bfa;color:#0a0f14;font-weight:800;padding:14px 28px;border-radius:10px;">📞 Réserver ma session →</div></div><div style="background:#f8f5ff;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;color:#111;">🏆 Résultats de mes clients</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">${[['300%','Augmentation revenus'],['90 jours','Pour voir résultats'],['47','Clients transformés'],['4.9/5','Satisfaction']].map(([v,l])=>`<div style="background:white;border:1px solid #e8e0f8;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:#a78bfa;">${v}</div><div style="font-size:.75rem;color:#888;">${l}</div></div>`).join('')}</div><div style="background:white;border:2px solid #a78bfa;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:2rem;font-weight:800;color:#a78bfa;">150 000</div><div style="color:#888;font-size:.78rem;margin-bottom:14px;">FCFA · Programme 90 jours</div><div style="background:#a78bfa;color:#0a0f14;font-weight:800;padding:14px;border-radius:10px;">📞 Je réserve ma place →</div></div></div></div>`,
+      3:`<div style="font-family:'DM Sans',sans-serif;"><div style="background:linear-gradient(135deg,#1a1000,#201500);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#f5a62325;border:1px solid #f5a62350;color:#f5a623;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">📦 Livraison rapide · Partout en Afrique</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;">Shea Butter <span style="color:#f5a623;">100% naturel</span></h1><p style="color:#d4b896;font-size:.9rem;margin-bottom:20px;">Directement du producteur. Livraison sous 48h.</p><div style="display:inline-block;background:#f5a623;color:#0a0f14;font-weight:800;padding:14px 28px;border-radius:10px;">🛒 Commander maintenant →</div></div><div style="background:#fffef8;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;color:#111;">📦 Ce que vous recevez</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">${['500g Shea Butter premium','Certifié 100% biologique','Livraison 48h incluse','Emballage soigné','Facture incluse','Satisfaction garantie'].map(b=>`<div style="background:white;border:1px solid #f0e8d0;border-radius:8px;padding:10px;font-size:.82rem;display:flex;gap:6px;color:#111;"><span style="color:#f5a623;font-weight:800;">✓</span>${b}</div>`).join('')}</div><div style="background:white;border:2px solid #f5a623;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:2.5rem;font-weight:800;color:#f5a623;">7 500</div><div style="color:#888;font-size:.78rem;margin-bottom:14px;">FCFA · Livraison incluse</div><div style="background:#f5a623;color:#0a0f14;font-weight:800;padding:14px;border-radius:10px;">🛒 Commander →</div></div></div></div>`,
+      4:`<div style="font-family:'DM Sans',sans-serif;"><div style="background:linear-gradient(135deg,#0a1a2a,#0d2035);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#4da6ff25;border:1px solid #4da6ff50;color:#4da6ff;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">📄 Téléchargement immédiat · PDF + Audio</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;"><span style="color:#4da6ff;">50 stratégies</span> pour vendre sur WhatsApp</h1><p style="color:#8ab8d8;font-size:.9rem;margin-bottom:20px;">Le guide complet — 127 pages de contenu actionnable.</p><div style="display:inline-block;background:#4da6ff;color:#0a0f14;font-weight:800;padding:14px 28px;border-radius:10px;">📥 Télécharger maintenant →</div></div><div style="background:#f5f8ff;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;color:#111;">📚 Au programme</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">${['127 pages de contenu','50 stratégies prouvées','Scripts prêts à utiliser','Cas pratiques africains','Fichiers bonus Excel','Accès à vie garanti'].map(b=>`<div style="background:white;border:1px solid #d0e0f8;border-radius:8px;padding:10px;font-size:.82rem;display:flex;gap:6px;color:#111;"><span style="color:#4da6ff;font-weight:800;">✓</span>${b}</div>`).join('')}</div><div style="background:white;border:2px solid #4da6ff;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:.85rem;color:#999;text-decoration:line-through;">9 900 FCFA</div><div style="font-size:2.5rem;font-weight:800;color:#4da6ff;">4 900</div><div style="color:#888;font-size:.78rem;margin-bottom:14px;">FCFA · Accès immédiat</div><div style="background:#4da6ff;color:#0a0f14;font-weight:800;padding:14px;border-radius:10px;">📥 Je télécharge →</div></div></div></div>`,
+      5:`<div style="font-family:'DM Sans',sans-serif;"><div style="background:linear-gradient(135deg,#0d1a10,#0a1f15);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#00e87a25;border:1px solid #00e87a50;color:#00e87a;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">🛠 Service professionnel · Livré en 7 jours</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;">Création de <span style="color:#00e87a;">site web</span> professionnel</h1><p style="color:#8ab8a0;font-size:.9rem;margin-bottom:20px;">Design moderne, mobile-friendly. Livré en 7 jours ou remboursé.</p><div style="display:inline-block;background:#00e87a;color:#0a0f14;font-weight:800;padding:14px 28px;border-radius:10px;">📞 Demander un devis gratuit →</div></div><div style="background:#f5fff8;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;color:#111;">⚙️ Ce qui est inclus</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">${['Design sur mesure','100% Mobile friendly','3 révisions incluses','Support 1 an','Hébergement 1 an','Formation utilisation'].map(b=>`<div style="background:white;border:1px solid #d0f0e0;border-radius:8px;padding:10px;font-size:.82rem;display:flex;gap:6px;color:#111;"><span style="color:#00e87a;font-weight:800;">✓</span>${b}</div>`).join('')}</div><div style="background:white;border:2px solid #00e87a;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:2.5rem;font-weight:800;color:#00e87a;">75 000</div><div style="color:#888;font-size:.78rem;margin-bottom:14px;">FCFA · Site complet en 7 jours</div><div style="background:#00e87a;color:#0a0f14;font-weight:800;padding:14px;border-radius:10px;">📞 Je demande mon devis →</div></div></div></div>`,
+      6:`<div style="font-family:'DM Sans',sans-serif;"><div style="background:linear-gradient(135deg,#1a0a10,#200d15);padding:48px 32px;text-align:center;color:white;"><div style="display:inline-block;background:#ff6b9d25;border:1px solid #ff6b9d50;color:#ff6b9d;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;">🎁 100% Gratuit · Accès immédiat</div><h1 style="font-size:1.8rem;font-weight:800;margin-bottom:10px;">Télécharge ton <span style="color:#ff6b9d;">kit gratuit</span> pour lancer ton business</h1><p style="color:#d8a0b8;font-size:.9rem;margin-bottom:20px;">5 outils essentiels pour démarrer sans budget.</p><div style="display:inline-block;background:#ff6b9d;color:white;font-weight:800;padding:14px 28px;border-radius:10px;">🎁 Je veux mon kit gratuit →</div></div><div style="background:#fff5f8;padding:32px;"><h2 style="font-size:1.1rem;font-weight:800;margin-bottom:14px;color:#111;">🎁 Dans ce kit gratuit</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">${['Checklist lancement PDF','Tableau de bord Excel','20 scripts WhatsApp','Formation vidéo 2h','Modèles posts Facebook','Accès groupe privé'].map(b=>`<div style="background:white;border:1px solid #f8d0e0;border-radius:8px;padding:10px;font-size:.82rem;display:flex;gap:6px;color:#111;"><span style="color:#ff6b9d;font-weight:800;">✓</span>${b}</div>`).join('')}</div><div style="background:white;border:2px solid #ff6b9d;border-radius:14px;padding:24px;text-align:center;max-width:380px;margin:0 auto;"><div style="font-size:2rem;font-weight:800;color:#ff6b9d;">GRATUIT</div><input type="email" placeholder="Votre email..." style="width:100%;padding:11px;border:1px solid #f0d0e0;border-radius:8px;font-size:.88rem;margin:10px 0;outline:none;"><div style="background:#ff6b9d;color:white;font-weight:800;padding:14px;border-radius:10px;">🎁 Envoyer mon kit →</div></div></div></div>`
+    };
+    return previews[id] || '<div style="padding:40px;text-align:center;color:#888;">Aperçu non disponible</div>';
+  }
+</script>
+</body>
+</html>
