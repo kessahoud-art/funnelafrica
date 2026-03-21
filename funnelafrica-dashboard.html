@@ -5,20 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — FunnelAfrica</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-  :root {
-    --bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2a3342;
-    --green:#00c896;--green-dim:#00c89620;--gold:#f5a623;--gold-dim:#f5a62320;
-    --text:#e6edf3;--muted:#7d8fa3;--danger:#ff4d6d;--radius:14px;
-  }
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2a3342;--green:#00c896;--green-dim:#00c89620;--gold:#f5a623;--gold-dim:#f5a62320;--text:#e6edf3;--muted:#7d8fa3;--danger:#ff4d6d;--radius:14px;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;}
 
   /* SIDEBAR */
   .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s ease;}
   .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
-  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--green);display:flex;align-items:center;gap:10px;}
-  .logo-mark span{width:32px;height:32px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#0d1117;font-weight:800;}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--green);display:flex;align-items:center;gap:10px;}
+  .logo-mark span{width:32px;height:32px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#0d1117;font-weight:800;flex-shrink:0;}
   .plan-badge{margin-top:10px;font-size:.72rem;color:var(--gold);background:var(--gold-dim);border:1px solid #f5a62340;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Syne',sans-serif;font-weight:600;}
   .nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;}
   .nav-section-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:12px 8px 6px;font-family:'Syne',sans-serif;}
@@ -47,6 +44,13 @@
   .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
   .btn-ghost:hover{background:var(--surface2);color:var(--text);}
   .content{padding:28px;flex:1;}
+
+  /* UPGRADE BANNER */
+  .upgrade-banner{background:linear-gradient(135deg,#1a1000,#201800);border:1px solid #f5a62340;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;animation:fadeUp .4s ease;}
+  .upgrade-banner-text{font-size:.83rem;color:#d4a843;}
+  .upgrade-banner-text strong{color:var(--gold);}
+  .upgrade-banner-btn{background:var(--gold);color:#0d1117;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+  .upgrade-banner-btn:hover{background:#ffc040;}
 
   /* STATS */
   .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
@@ -113,14 +117,13 @@
   .notif-btn{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--muted);}
   .notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--green);border-radius:50%;border:2px solid var(--surface);}
 
-  /* MODAL */
+  /* MODALS */
   .modal-overlay{display:none;position:fixed;inset:0;background:#00000090;z-index:200;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.open{display:flex;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;padding:28px;animation:fadeUp .3s ease;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:420px;padding:28px;animation:fadeUp .3s ease;}
   .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px;}
-  .modal-sub{color:var(--muted);font-size:.85rem;margin-bottom:24px;line-height:1.7;}
-  .modal-feature{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;font-size:.83rem;}
-  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .modal-sub{color:var(--muted);font-size:.83rem;margin-bottom:24px;line-height:1.6;}
+  .modal-actions{display:flex;gap:10px;margin-top:8px;}
 
   /* TABS */
   .tabs{display:flex;gap:4px;padding:4px;background:var(--surface2);border-radius:10px;width:fit-content;}
@@ -186,10 +189,9 @@
       Contacts
     </div>
     <div class="nav-section-label">Paramètres</div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="window.location.href='/abonnement.html'">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-     <div class="nav-item" onclick="window.location.href='/abonnement.html'">
-      Paiements
+      Paiements & Plans
     </div>
     <div class="nav-item" onclick="logout()">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -224,6 +226,17 @@
   </div>
 
   <div class="content">
+
+    <!-- UPGRADE BANNER (affiché si plan starter et 1+ tunnel) -->
+    <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
+      <div class="upgrade-banner-text">
+        ⚡ <strong>Limite Starter atteinte</strong> — Passez au plan Pro pour des tunnels illimités
+      </div>
+      <button class="upgrade-banner-btn" onclick="window.location.href='/abonnement.html'">
+        Upgrader →
+      </button>
+    </div>
+
     <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card green">
@@ -244,7 +257,7 @@
       <div class="stat-card pink">
         <div class="stat-label">Taux conversion</div>
         <div class="stat-value" id="statConv">—</div>
-        <div class="stat-trend" style="color:#ff6b9d;">moyenne tunnels</div>
+        <div class="stat-trend" style="color:#ff6b9d;">moyenne</div>
       </div>
     </div>
 
@@ -318,17 +331,17 @@
                 <div class="quick-btn-icon">🚀</div>
                 <div class="quick-btn-label">Nouveau tunnel</div>
               </div>
-              <div class="quick-btn">
-                <div class="quick-btn-icon">📦</div>
-                <div class="quick-btn-label">Ajouter produit</div>
+              <div class="quick-btn" onclick="window.location.href='/abonnement.html'">
+                <div class="quick-btn-icon">⚡</div>
+                <div class="quick-btn-label">Upgrader plan</div>
               </div>
               <div class="quick-btn">
                 <div class="quick-btn-icon">📧</div>
                 <div class="quick-btn-label">Envoyer email</div>
               </div>
               <div class="quick-btn">
-                <div class="quick-btn-icon">💳</div>
-                <div class="quick-btn-label">Paiements</div>
+                <div class="quick-btn-icon">📊</div>
+                <div class="quick-btn-label">Statistiques</div>
               </div>
             </div>
           </div>
@@ -354,10 +367,7 @@
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-title">🚀 Créer un nouveau tunnel</div>
-    <div class="modal-sub">Choisissez parmi nos 6 templates optimisés pour le marché africain. Personnalisez en quelques clics, publiez en 1 minute.</div>
-    <div class="modal-feature">🎨 <span>6 templates prêts : Formation, Coaching, Produit, Ebook, Service, Lead magnet</span></div>
-    <div class="modal-feature">💳 <span>Wave, Orange Money, MTN MoMo intégrés</span></div>
-    <div class="modal-feature">⚡ <span>De la création au premier paiement en 15 min</span></div>
+    <div class="modal-sub">Choisissez parmi nos 6 templates optimisés pour le marché africain.</div>
     <div class="modal-actions">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal()">Annuler</button>
       <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="goToTemplates()">
@@ -367,162 +377,218 @@
   </div>
 </div>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+<!-- MODAL UPGRADE -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal">
+    <div style="text-align:center;margin-bottom:16px;font-size:2.5rem;">🚀</div>
+    <div class="modal-title" style="text-align:center;">Limite du plan Starter atteinte</div>
+    <div class="modal-sub" style="text-align:center;">
+      Le plan Starter est limité à <strong style="color:var(--text);">1 tunnel de vente</strong>.
+      Passez au plan Pro pour créer des tunnels illimités.
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--green);border-radius:12px;padding:18px;margin-bottom:20px;text-align:center;">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Plan Pro</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--green);">9 900 <span style="font-size:.9rem;">FCFA</span><span style="font-size:.8rem;color:var(--muted);font-weight:400;">/mois</span></div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.6;">
+        ✓ Tunnels illimités &nbsp;·&nbsp; ✓ Email marketing<br>
+        ✓ 5 000 contacts &nbsp;·&nbsp; ✓ Support prioritaire
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeUpgradeModal()">Plus tard</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="window.location.href='/abonnement.html'">
+        ⚡ Passer au plan Pro →
+      </button>
+    </div>
+  </div>
+</div>
 
-  // ══════════════════════════════
-  //  CONFIG — remplace tes clés
-  // ══════════════════════════════
-  const SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
-  const supabase          = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  // ══════════════════════════════════════════
+  //  CONFIG — remplace par tes vraies clés
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const METHODS = { wave:'📱 Wave', orange:'📱 Orange Money', mtn:'📱 MTN MoMo', cinetpay:'💳 CinetPay', card:'💳 Carte' };
-  const ICONS   = { formation:'📘', coaching:'🎯', physique:'📦', ebook:'📄', service:'🛠', leadmagnet:'🎁' };
+  var METHODS = { wave:'📱 Wave', orange:'📱 Orange Money', mtn:'📱 MTN MoMo', cinetpay:'💳 CinetPay', card:'💳 Carte', fedapay:'📱 FedaPay' };
+  var ICONS   = { formation:'📘', coaching:'🎯', physique:'📦', ebook:'📄', service:'🛠', leadmagnet:'🎁' };
 
-  // ══════════════════════════════
-  //  INIT — vérif auth + chargement
-  // ══════════════════════════════
-  document.addEventListener('DOMContentLoaded', async () => {
-    const { data:{ user } } = await supabase.auth.getUser();
+  var currentUser    = null;
+  var currentProfile = null;
+  var tunnelCount    = 0;
+
+  // ── INIT ──
+  sb.auth.getUser().then(function(result) {
+    var user = result.data.user;
     if (!user) { window.location.href = '/funnelafrica-auth.html'; return; }
-
-    await Promise.all([
-      loadProfile(user),
-      loadStats(user.id),
-      loadTunnels(user.id),
-      loadOrders(user.id)
-    ]);
+    currentUser = user;
+    loadProfile(user);
+    loadStats(user.id);
+    loadTunnels(user.id);
+    loadOrders(user.id);
   });
 
-  // ══════════════════════════════
-  //  PROFIL
-  // ══════════════════════════════
-  async function loadProfile(user) {
-    const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    if (!p) return;
-    const name     = p.full_name || user.email?.split('@')[0] || 'Vendeur';
-    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    document.getElementById('userAvatar').textContent = initials;
-    document.getElementById('userName').textContent   = name;
-    document.getElementById('userPlan').textContent   = `Plan ${p.plan || 'starter'} · Actif`;
-    document.getElementById('planBadge').textContent  = `⚡ Plan ${(p.plan||'starter').charAt(0).toUpperCase()+(p.plan||'starter').slice(1)}`;
+  // ── PROFIL ──
+  function loadProfile(user) {
+    sb.from('profiles').select('*').eq('id', user.id).single().then(function(r) {
+      var p = r.data;
+      if (!p) return;
+      currentProfile = p;
+      var name     = p.full_name || user.email.split('@')[0] || 'Vendeur';
+      var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+      document.getElementById('userAvatar').textContent = initials;
+      document.getElementById('userName').textContent   = name;
+      document.getElementById('userPlan').textContent   = 'Plan ' + (p.plan||'starter') + ' · Actif';
+      var planName = (p.plan||'starter');
+      planName = planName.charAt(0).toUpperCase() + planName.slice(1);
+      document.getElementById('planBadge').textContent  = '⚡ Plan ' + planName;
+    });
   }
 
-  // ══════════════════════════════
-  //  STATS
-  // ══════════════════════════════
-  async function loadStats(userId) {
-    const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
+  // ── STATS ──
+  function loadStats(userId) {
+    var start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
 
-    const [{ data: orders }, { data: tunnels }] = await Promise.all([
-      supabase.from('orders').select('amount').eq('user_id', userId).eq('payment_status', 'paid').gte('created_at', start.toISOString()),
-      supabase.from('tunnels').select('views,orders').eq('user_id', userId)
-    ]);
+    sb.from('orders').select('amount').eq('user_id', userId).eq('payment_status','paid').gte('created_at', start.toISOString()).then(function(r) {
+      var orders  = r.data || [];
+      var revenue = orders.reduce(function(s,o){return s+(o.amount||0);},0);
+      var count   = orders.length;
 
-    const revenue     = (orders||[]).reduce((s,o) => s+(o.amount||0), 0);
-    const orderCount  = (orders||[]).length;
-    const totalViews  = (tunnels||[]).reduce((s,t) => s+(t.views||0), 0);
-    const totalOrders = (tunnels||[]).reduce((s,t) => s+(t.orders||0), 0);
-    const conv        = totalViews > 0 ? ((totalOrders/totalViews)*100).toFixed(1) : '0';
+      sb.from('tunnels').select('views,orders').eq('user_id', userId).then(function(r2) {
+        var tunnels     = r2.data || [];
+        var totalViews  = tunnels.reduce(function(s,t){return s+(t.views||0);},0);
+        var totalOrders = tunnels.reduce(function(s,t){return s+(t.orders||0);},0);
+        var conv        = totalViews > 0 ? ((totalOrders/totalViews)*100).toFixed(1) : '0';
 
-    document.getElementById('statRevenue').textContent    = revenue > 999 ? (revenue/1000).toFixed(0)+'K' : revenue.toLocaleString('fr');
-    document.getElementById('statOrders').textContent     = orderCount;
-    document.getElementById('statViews').textContent      = totalViews > 999 ? (totalViews/1000).toFixed(1)+'K' : totalViews;
-    document.getElementById('statConv').textContent       = conv+'%';
-    document.getElementById('chartTotal').textContent     = revenue.toLocaleString('fr')+' FCFA';
-    document.getElementById('chartBadge').textContent     = orderCount > 0 ? `+${orderCount} ventes` : 'Aucune vente';
-    document.getElementById('tunnelCount').textContent    = (tunnels||[]).length;
+        document.getElementById('statRevenue').textContent = revenue > 999 ? (revenue/1000).toFixed(0)+'K' : revenue.toLocaleString('fr');
+        document.getElementById('statOrders').textContent  = count;
+        document.getElementById('statViews').textContent   = totalViews > 999 ? (totalViews/1000).toFixed(1)+'K' : totalViews;
+        document.getElementById('statConv').textContent    = conv + '%';
+        document.getElementById('chartTotal').textContent  = revenue.toLocaleString('fr') + ' FCFA';
+        document.getElementById('chartBadge').textContent  = count > 0 ? '+' + count + ' ventes' : 'Aucune vente';
+      });
+    });
   }
 
-  // ══════════════════════════════
-  //  TUNNELS
-  // ══════════════════════════════
-  async function loadTunnels(userId) {
-    const { data: tunnels } = await supabase.from('tunnels').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(5);
-    const el = document.getElementById('tunnelsList');
+  // ── TUNNELS ──
+  function loadTunnels(userId) {
+    sb.from('tunnels').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(5).then(function(r) {
+      var tunnels = r.data || [];
+      tunnelCount = tunnels.length;
+      document.getElementById('tunnelCount').textContent = tunnelCount;
 
-    if (!tunnels?.length) {
-      el.innerHTML = `
-        <div style="text-align:center;padding:40px 20px;color:var(--muted);">
-          <div style="font-size:2rem;margin-bottom:10px;">🚀</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucun tunnel encore</div>
-          <div style="font-size:.82rem;">Cliquez "Créer un nouveau tunnel" pour démarrer</div>
-        </div>`;
+      // Afficher la bannière upgrade si starter et tunnel existant
+      if (currentProfile && currentProfile.plan === 'starter' && tunnelCount >= 1) {
+        document.getElementById('upgradeBanner').style.display = 'flex';
+      }
+
+      var el = document.getElementById('tunnelsList');
+      if (!tunnels.length) {
+        el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted);"><div style="font-size:2rem;margin-bottom:10px;">🚀</div><div style="font-family:\'Syne\',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucun tunnel encore</div><div style="font-size:.82rem;">Créez votre premier tunnel en cliquant le bouton ci-dessous</div></div>';
+        return;
+      }
+
+      el.innerHTML = tunnels.map(function(t) {
+        var conv   = t.views > 0 ? ((t.orders/t.views)*100).toFixed(1) : '0';
+        var icon   = ICONS[t.template] || '📘';
+        var isLive = t.status === 'live';
+        return '<div class="tunnel-item" onclick="window.location.href=\'/funnelafrica-editor.html?tunnel='+t.id+'\'">' +
+          '<div class="tunnel-icon">' + icon + '</div>' +
+          '<div class="tunnel-info">' +
+            '<div class="tunnel-name">' + t.name + '</div>' +
+            '<div class="tunnel-meta">' +
+              '<span><span class="status-dot ' + (isLive?'':'off') + '"></span>' + (isLive?'Actif':'Brouillon') + '</span>' +
+              '<span>' + (t.views||0).toLocaleString('fr') + ' vues</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tunnel-stats">' +
+            '<div class="tunnel-revenue">' + (t.revenue||0).toLocaleString('fr') + ' F</div>' +
+            '<div class="tunnel-conv">Conv. ' + conv + '%</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    });
+  }
+
+  // ── COMMANDES ──
+  function loadOrders(userId) {
+    sb.from('orders').select('*,tunnels(name)').eq('user_id', userId).eq('payment_status','paid').order('created_at',{ascending:false}).limit(5).then(function(r) {
+      var orders = r.data || [];
+      var feed   = document.getElementById('ordersFeed');
+
+      if (!orders.length) {
+        feed.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:.82rem;">Aucune commande pour le moment</div>';
+        return;
+      }
+
+      feed.innerHTML = orders.map(function(o) {
+        var initials = (o.buyer_name||'?').split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+        var date     = new Date(o.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+        return '<div class="order-item">' +
+          '<div class="order-avatar">' + initials + '</div>' +
+          '<div class="order-info">' +
+            '<div class="order-name">' + o.buyer_name + '</div>' +
+            '<div class="order-product">' + (o.tunnels&&o.tunnels.name?o.tunnels.name:'—') + ' · ' + date + '</div>' +
+          '</div>' +
+          '<div>' +
+            '<div class="order-amount">' + (o.amount||0).toLocaleString('fr') + ' F</div>' +
+            '<div class="order-method">' + (METHODS[o.payment_method]||o.payment_method||'—') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    });
+  }
+
+  // ── CRÉER TUNNEL — avec vérification plan ──
+  function goToTemplates() {
+    closeModal();
+
+    // Vérifier le plan actuel
+    var plan = currentProfile ? currentProfile.plan : 'starter';
+
+    // Restriction Starter : 1 tunnel max
+    if (plan === 'starter' && tunnelCount >= 1) {
+      document.getElementById('upgradeModal').classList.add('open');
       return;
     }
 
-    el.innerHTML = tunnels.map(t => {
-      const conv   = t.views > 0 ? ((t.orders/t.views)*100).toFixed(1) : '0';
-      const icon   = ICONS[t.template] || '📘';
-      const isLive = t.status === 'live';
-      return `
-        <div class="tunnel-item" onclick="window.location.href='/funnelafrica-editor.html?tunnel=${t.id}'">
-          <div class="tunnel-icon">${icon}</div>
-          <div class="tunnel-info">
-            <div class="tunnel-name">${t.name}</div>
-            <div class="tunnel-meta">
-              <span><span class="status-dot ${isLive?'':'off'}"></span>${isLive?'Actif':'Brouillon'}</span>
-              <span>${(t.views||0).toLocaleString('fr')} vues</span>
-            </div>
-          </div>
-          <div class="tunnel-stats">
-            <div class="tunnel-revenue">${(t.revenue||0).toLocaleString('fr')} F</div>
-            <div class="tunnel-conv">Conv. ${conv}%</div>
-          </div>
-        </div>`;
-    }).join('');
+    // Pro et Scale : illimité
+    window.location.href = '/funnelafrica-templates.html?new=1';
   }
 
-  // ══════════════════════════════
-  //  COMMANDES
-  // ══════════════════════════════
-  async function loadOrders(userId) {
-    const { data: orders } = await supabase.from('orders').select('*,tunnels(name)').eq('user_id', userId).eq('payment_status','paid').order('created_at',{ascending:false}).limit(5);
-    const el = document.getElementById('ordersFeed');
-
-    if (!orders?.length) {
-      el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.82rem;">Aucune commande pour le moment</div>`;
-      return;
-    }
-
-    el.innerHTML = orders.map(o => {
-      const initials = (o.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
-      const date     = new Date(o.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
-      return `
-        <div class="order-item">
-          <div class="order-avatar">${initials}</div>
-          <div class="order-info">
-            <div class="order-name">${o.buyer_name}</div>
-            <div class="order-product">${o.tunnels?.name||'—'} · ${date}</div>
-          </div>
-          <div>
-            <div class="order-amount">${(o.amount||0).toLocaleString('fr')} F</div>
-            <div class="order-method">${METHODS[o.payment_method]||o.payment_method||'—'}</div>
-          </div>
-        </div>`;
-    }).join('');
+  // ── MODALS ──
+  function openNewTunnelModal() {
+    document.getElementById('modalOverlay').classList.add('open');
   }
 
-  // ══════════════════════════════
-  //  ACTIONS GLOBALES
-  // ══════════════════════════════
-  window.toggleSidebar = () => {
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function closeUpgradeModal() {
+    document.getElementById('upgradeModal').classList.remove('open');
+  }
+
+  // ── SIDEBAR ──
+  function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('open');
-  };
+  }
 
-  window.openNewTunnelModal = () => document.getElementById('modalOverlay').classList.add('open');
-  window.closeModal         = () => document.getElementById('modalOverlay').classList.remove('open');
-  window.goToTemplates      = () => window.location.href = '/funnelafrica-templates.html?new=1';
+  // ── LOGOUT ──
+  function logout() {
+    sb.auth.signOut().then(function() {
+      window.location.href = '/funnelafrica-auth.html';
+    });
+  }
 
-  window.logout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/funnelafrica-auth.html';
-  };
-
-  document.getElementById('modalOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('modalOverlay')) window.closeModal();
+  // Fermer modals en cliquant dehors
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('upgradeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeUpgradeModal();
   });
 </script>
 </body>
