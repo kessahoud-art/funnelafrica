@@ -359,8 +359,10 @@
   // ── INIT ──
   document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await sb.auth.getUser();
-    if (!user) { window.location.href = '/funnelafrica-auth.html'; return; }
-    currentUser = user;
+    if (!user) {
+  window.location.href = '/funnelafrica-auth.html?redirect=/abonnement.html';
+  return;
+}
 
     const { data: profile } = await sb
       .from('profiles')
