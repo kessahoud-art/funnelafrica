@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offre spéciale — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* URGENCY BAR */
+  .urgency-bar{background:linear-gradient(135deg,#1a0800,#200d00);border-bottom:1px solid #ff6b3040;padding:12px 20px;text-align:center;font-size:.82rem;color:#ff8c42;font-weight:600;}
+  .urgency-bar strong{color:var(--gold);}
+  #ubTimer{color:var(--gold);font-weight:800;}
+
+  /* HERO */
+  .hero{max-width:760px;margin:0 auto;padding:48px 20px 32px;text-align:center;position:relative;}
+  .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,#f5a62312 0%,transparent 70%);pointer-events:none;}
+
+  .congrats-badge{display:inline-flex;align-items:center;gap:8px;background:#00c89618;border:1px solid #00c89640;color:var(--green);padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:20px;animation:fadeDown .5s ease both;}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.15;margin-bottom:16px;animation:fadeUp .5s ease .1s both;}
+  .hero-title .accent{color:var(--gold);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+  .hero-sub{font-size:.95rem;color:#a0b4c8;max-width:540px;margin:0 auto 32px;line-height:1.6;animation:fadeUp .5s ease .2s both;}
+
+  /* OFFER CARD */
+  .offer-card{max-width:760px;margin:0 auto;padding:0 20px 32px;}
+
+  .offer-box{background:var(--surface);border:2px solid var(--gold);border-radius:20px;overflow:hidden;box-shadow:0 0 60px #f5a62318;animation:fadeUp .5s ease .3s both;}
+
+  .offer-header{background:linear-gradient(135deg,#1a1000,#201800);padding:24px 28px;border-bottom:1px solid #f5a62330;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .offer-badge{background:var(--gold);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.75rem;padding:5px 14px;border-radius:20px;white-space:nowrap;}
+  .offer-header-text{flex:1;}
+  .offer-header-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--gold);margin-bottom:4px;}
+  .offer-header-sub{font-size:.78rem;color:#d4a843;}
+
+  .offer-body{padding:28px;}
+
+  /* WHAT YOU GET */
+  .includes-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+  .includes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+  .include-item{display:flex;align-items:flex-start;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+  .include-icon{font-size:1.2rem;flex-shrink:0;}
+  .include-text{font-size:.82rem;line-height:1.4;}
+  .include-text strong{display:block;color:var(--text);margin-bottom:2px;}
+  .include-text span{color:var(--muted);}
+
+  /* TESTIMONIAL */
+  .testimonial{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:10px;padding:16px;margin-bottom:24px;}
+  .testi-text{font-size:.85rem;color:#a0b4c8;line-height:1.6;font-style:italic;margin-bottom:10px;}
+  .testi-author{display:flex;align-items:center;gap:8px;}
+  .testi-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2a3a5f,#3a4a7f);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;}
+  .testi-name{font-size:.75rem;font-weight:600;}
+  .testi-role{font-size:.68rem;color:var(--muted);}
+
+  /* PRICING */
+  .pricing-wrap{text-align:center;margin-bottom:24px;}
+  .price-old{font-size:.9rem;color:var(--muted);text-decoration:line-through;margin-bottom:4px;}
+  .price-main{font-family:'Syne',sans-serif;font-weight:800;font-size:2.8rem;color:var(--gold);line-height:1;}
+  .price-currency{font-size:.9rem;color:var(--muted);margin-bottom:6px;}
+  .price-save{display:inline-block;background:#f5a62320;border:1px solid #f5a62440;color:var(--gold);font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;font-family:'Syne',sans-serif;}
+
+  /* BUTTONS */
+  .btn-yes{width:100%;padding:18px;background:linear-gradient(135deg,var(--gold),#e09000);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;border:none;border-radius:14px;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 30px #f5a62340;margin-bottom:12px;position:relative;overflow:hidden;}
+  .btn-yes::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff25,transparent);transform:translateX(-100%);transition:transform .5s;}
+  .btn-yes:hover::after{transform:translateX(100%);}
+  .btn-yes:hover{transform:translateY(-2px);box-shadow:0 12px 40px #f5a62360;}
+  .btn-yes:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+  .btn-no{width:100%;padding:12px;background:transparent;color:var(--muted);font-size:.82rem;border:none;cursor:pointer;text-decoration:underline;transition:color .2s;}
+  .btn-no:hover{color:var(--text);}
+
+  .guarantee{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;font-size:.75rem;color:var(--muted);}
+
+  .spinner{display:none;width:18px;height:18px;border:2px solid #0a0f1450;border-top-color:#0a0f14;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ORDER BUMP (petit bloc avant bouton) */
+  .order-bump{background:#00c89610;border:2px dashed #00c89650;border-radius:12px;padding:16px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;}
+  .bump-check{width:22px;height:22px;border:2px solid var(--green);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all .2s;}
+  .bump-check.checked{background:var(--green);}
+  .bump-text{flex:1;}
+  .bump-title{font-size:.85rem;font-weight:600;margin-bottom:3px;}
+  .bump-desc{font-size:.75rem;color:var(--muted);line-height:1.4;}
+  .bump-price{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--green);margin-top:4px;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
+
+  @media(max-width:600px){.includes-grid{grid-template-columns:1fr;}.offer-header{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+
+<div id="__toast"></div>
+
+<!-- URGENCY BAR -->
+<div class="urgency-bar">
+  ⏰ Cette offre expire dans <strong id="ubTimer">09:59</strong> — Réservée aux nouveaux acheteurs uniquement
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="congrats-badge">🎉 Paiement confirmé · Offre exclusive</div>
+
+  <h1 class="hero-title" id="heroTitle">
+    Attendez ! Une offre <span class="accent">unique</span><br>
+    vous a été réservée
+  </h1>
+
+  <p class="hero-sub" id="heroSub">
+    En tant que nouveau client, vous avez accès à cette offre exclusive
+    une seule fois. Elle disparaît dès que vous quittez cette page.
+  </p>
+</div>
+
+<!-- OFFER CARD -->
+<div class="offer-card">
+  <div class="offer-box">
+
+    <div class="offer-header">
+      <div class="offer-header-text">
+        <div class="offer-header-title" id="offerTitle">Coaching 1-on-1 Express</div>
+        <div class="offer-header-sub">Session privée de 60 minutes avec l'expert</div>
+      </div>
+      <div class="offer-badge">🔥 -60%</div>
+    </div>
+
+    <div class="offer-body">
+
+      <!-- CE QUE TU REÇOIS -->
+      <div class="includes-title">Ce qui est inclus</div>
+      <div class="includes-grid" id="includesGrid">
+        <div class="include-item">
+          <div class="include-icon">🎯</div>
+          <div class="include-text"><strong>Session 1-on-1 de 60 min</strong><span>Appel vidéo avec l'expert</span></div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">📋</div>
+          <div class="include-text"><strong>Plan d'action personnalisé</strong><span>Adapté à votre situation</span></div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">🔁</div>
+          <div class="include-text"><strong>Suivi pendant 30 jours</strong><span>Questions illimitées sur WhatsApp</span></div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">📱</div>
+          <div class="include-text"><strong>Ressources exclusives</strong><span>Templates et outils bonus</span></div>
+        </div>
+      </div>
+
+      <!-- TÉMOIGNAGE -->
+      <div class="testimonial">
+        <div class="testi-text">"J'ai fait ma première vente le jour même du coaching. Le plan d'action était clair et adapté au marché béninois. Je recommande à 100%."</div>
+        <div class="testi-author">
+          <div class="testi-av">AM</div>
+          <div>
+            <div class="testi-name">Amadou Mensah</div>
+            <div class="testi-role">Entrepreneur · Cotonou</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER BUMP (optionnel) -->
+      <div class="order-bump" id="orderBump">
+        <div class="bump-check" id="bumpCheck" onclick="toggleBump()"></div>
+        <div class="bump-text">
+          <div class="bump-title">➕ Ajouter : Accès aux templates premium</div>
+          <div class="bump-desc">50+ templates de posts Facebook et WhatsApp prêts à utiliser pour promouvoir votre formation.</div>
+          <div class="bump-price">+ 2 500 FCFA seulement</div>
+        </div>
+      </div>
+
+      <!-- PRIX -->
+      <div class="pricing-wrap">
+        <div class="price-old" id="priceOld">75 000 FCFA</div>
+        <div class="price-main" id="priceMain">29 900</div>
+        <div class="price-currency">FCFA · Paiement unique</div>
+        <div class="price-save">Vous économisez 45 100 FCFA (60%)</div>
+      </div>
+
+      <!-- BOUTONS -->
+      <button class="btn-yes" id="btnYes" onclick="acceptUpsell()">
+        <span id="btnYesText">⚡ Oui ! Je veux cette offre →</span>
+        <div class="spinner" id="btnSpinner"></div>
+      </button>
+
+      <button class="btn-no" onclick="declineUpsell()">
+        Non merci, je ne veux pas de cette offre
+      </button>
+
+      <div class="guarantee">
+        🛡️ Satisfait ou remboursé 7 jours · Paiement sécurisé
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Récupérer les paramètres de l'URL
+  var params      = new URLSearchParams(window.location.search);
+  var orderId     = params.get('order')  || '';
+  var tunnelSlug  = params.get('tunnel') || '';
+  var buyerEmail  = params.get('email')  || '';
+  var buyerName   = params.get('name')   || '';
+
+  // Config upsell (peut être chargée depuis la config du tunnel)
+  var UPSELL_CONFIG = {
+    title:       'Coaching 1-on-1 Express',
+    description: 'Session privée de 60 minutes avec l\'expert',
+    price:       29900,
+    oldPrice:    75000,
+    bumpPrice:   2500,
+    currency:    'XOF'
+  };
+
+  var bumpSelected = false;
+  var totalAmount  = UPSELL_CONFIG.price;
+
+  // ── TIMER URGENCE ──
+  var timeLeft = 10 * 60 - 1; // 9:59
+  var timerInterval = setInterval(function() {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      declineUpsell();
+      return;
+    }
+    timeLeft--;
+    var m = Math.floor(timeLeft / 60);
+    var s = timeLeft % 60;
+    var fmt = function(n) { return n < 10 ? '0'+n : n; };
+    var timeStr = fmt(m) + ':' + fmt(s);
+    document.getElementById('ubTimer').textContent  = timeStr;
+  }, 1000);
+
+  // ── CHARGER CONFIG DEPUIS LE TUNNEL ──
+  if (tunnelSlug) {
+    sb.from('tunnels')
+      .select('page_config, name')
+      .eq('slug', tunnelSlug)
+      .single()
+      .then(function(r) {
+        if (r.data && r.data.page_config && r.data.page_config.upsell) {
+          var upsell = r.data.page_config.upsell;
+          UPSELL_CONFIG.title    = upsell.title    || UPSELL_CONFIG.title;
+          UPSELL_CONFIG.price    = upsell.price    || UPSELL_CONFIG.price;
+          UPSELL_CONFIG.oldPrice = upsell.oldPrice || UPSELL_CONFIG.oldPrice;
+
+          document.getElementById('offerTitle').textContent = UPSELL_CONFIG.title;
+          document.getElementById('priceMain').textContent  = UPSELL_CONFIG.price.toLocaleString('fr');
+          document.getElementById('priceOld').textContent   = UPSELL_CONFIG.oldPrice.toLocaleString('fr') + ' FCFA';
+          totalAmount = UPSELL_CONFIG.price;
+        }
+      });
+  }
+
+  // ── TOGGLE ORDER BUMP ──
+  function toggleBump() {
+    bumpSelected = !bumpSelected;
+    var check = document.getElementById('bumpCheck');
+    check.classList.toggle('checked', bumpSelected);
+    check.textContent = bumpSelected ? '✓' : '';
+    check.style.color = bumpSelected ? '#0a0f14' : 'transparent';
+
+    totalAmount = bumpSelected
+      ? UPSELL_CONFIG.price + UPSELL_CONFIG.bumpPrice
+      : UPSELL_CONFIG.price;
+
+    document.getElementById('btnYesText').textContent =
+      '⚡ Oui ! Je veux cette offre (' + totalAmount.toLocaleString('fr') + ' FCFA) →';
+  }
+
+  // ── ACCEPTER L'UPSELL ──
+  function acceptUpsell() {
+    var btn     = document.getElementById('btnYes');
+    var spinner = document.getElementById('btnSpinner');
+    var text    = document.getElementById('btnYesText');
+
+    btn.disabled          = true;
+    spinner.style.display = 'block';
+    text.textContent      = 'Traitement...';
+
+    var upsellOrderId = 'UP-' + Date.now() + '-' +
+      Math.random().toString(36).substring(2, 5).toUpperCase();
+
+    // Créer la commande upsell dans Supabase
+    sb.from('orders').insert({
+      buyer_name:     buyerName || 'Client',
+      buyer_email:    buyerEmail || '',
+      amount:         totalAmount,
+      currency:       UPSELL_CONFIG.currency,
+      payment_method: 'fedapay',
+      payment_status: 'pending',
+      payment_ref:    upsellOrderId
+    }).then(function() {
+
+      // Initier le paiement FedaPay
+      fetch('/api/payment/initiate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount:      totalAmount,
+          currency:    UPSELL_CONFIG.currency,
+          buyer_name:  buyerName || 'Client',
+          buyer_email: buyerEmail || '',
+          order_id:    upsellOrderId,
+          tunnel_slug: tunnelSlug,
+          description: 'Upsell : ' + UPSELL_CONFIG.title +
+            (bumpSelected ? ' + Templates Premium' : '')
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Erreur paiement');
+        clearInterval(timerInterval);
+        window.location.href = data.payment_url;
+      })
+      .catch(function(err) {
+        showToast(err.message || 'Erreur. Réessayez.', 'error');
+        btn.disabled          = false;
+        spinner.style.display = 'none';
+        text.textContent      = '⚡ Oui ! Je veux cette offre →';
+      });
+    });
+  }
+
+  // ── REFUSER L'UPSELL ──
+  function declineUpsell() {
+    clearInterval(timerInterval);
+    // Rediriger vers merci.html avec les paramètres originaux
+    var merciUrl = '/merci.html?order=' + orderId;
+    if (tunnelSlug) merciUrl += '&tunnel=' + tunnelSlug;
+    window.location.href = merciUrl;
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type) {
+    var c = type === 'error'
+      ? {bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}
+      : {bg:'#00c89618',border:'#00c89640',color:'#00c896'};
+    var t = document.getElementById('__toast');
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(10px);';
+    t.textContent = msg;
+    setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(10px)';},3500);
+  }
+</script>
+</body>
+</html>

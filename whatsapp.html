@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Automation — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--wa:#25d366;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-dot{width:28px;height:28px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#0a0f14;font-weight:800;}
+  .back-btn{color:var(--muted);font-size:.82rem;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;transition:all .2s;}
+  .back-btn:hover{background:var(--surface2);color:var(--text);}
+
+  .content{max-width:960px;margin:0 auto;padding:32px 20px;}
+
+  /* HERO */
+  .hero{text-align:center;padding:20px 0 36px;}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#25d36618;border:1px solid #25d36640;color:var(--wa);padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:16px;}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:10px;}
+  .hero-sub{color:var(--muted);font-size:.9rem;max-width:520px;margin:0 auto;}
+
+  /* STATS */
+  .wa-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+  .wa-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;animation:fadeUp .4s ease both;}
+  .wa-stat:nth-child(1){animation-delay:.05s;}.wa-stat:nth-child(2){animation-delay:.10s;}.wa-stat:nth-child(3){animation-delay:.15s;}.wa-stat:nth-child(4){animation-delay:.20s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .wa-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:4px;color:var(--wa);}
+  .wa-stat-label{font-size:.72rem;color:var(--muted);}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;animation:fadeUp .5s ease .25s both;}
+  .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .card-body{padding:22px;}
+
+  /* PHONE PREVIEW */
+  .phone-preview{background:#0b141a;border-radius:16px;padding:12px;max-width:320px;margin:0 auto;}
+  .phone-header{background:#1f2c34;border-radius:10px 10px 0 0;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:2px;}
+  .phone-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--wa),#1da851);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+  .phone-contact{font-size:.82rem;font-weight:600;}
+  .phone-status{font-size:.65rem;color:#8fa5bc;}
+  .phone-msgs{padding:8px 4px;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+  .msg-bubble{background:#1f2c34;border-radius:8px 8px 8px 0;padding:10px 12px;max-width:85%;font-size:.78rem;line-height:1.5;color:#d1dde8;position:relative;}
+  .msg-bubble.sent{background:#005c4b;border-radius:8px 8px 0 8px;align-self:flex-end;}
+  .msg-time{font-size:.6rem;color:#6b7e93;text-align:right;margin-top:4px;}
+
+  /* SÉQUENCES */
+  .sequences-list{display:flex;flex-direction:column;gap:14px;}
+  .sequence-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s;}
+  .sequence-item.active{border-color:var(--wa);}
+  .sequence-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .sequence-left{display:flex;align-items:center;gap:12px;}
+  .seq-icon{width:38px;height:38px;border-radius:10px;background:#25d36620;border:1px solid #25d36640;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+  .seq-name{font-weight:600;font-size:.88rem;margin-bottom:3px;}
+  .seq-trigger{font-size:.72rem;color:var(--muted);}
+  .sequence-right{display:flex;align-items:center;gap:10px;}
+  .toggle-mini{width:38px;height:20px;border-radius:10px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+  .toggle-mini.on{background:var(--wa);}
+  .toggle-mini.off{background:var(--surface2);border:1px solid var(--border);}
+  .toggle-mini::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:3px;transition:left .2s;}
+  .toggle-mini.on::after{left:21px;}
+  .toggle-mini.off::after{left:3px;}
+  .sequence-body{padding:14px 16px;border-top:1px solid var(--border);display:none;}
+  .sequence-item.open .sequence-body{display:block;}
+  .msg-textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;resize:vertical;min-height:100px;outline:none;transition:border-color .2s;line-height:1.6;}
+  .msg-textarea:focus{border-color:var(--wa);}
+  .vars-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .var-tag{background:#25d36615;border:1px solid #25d36630;color:var(--wa);font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
+  .var-tag:hover{background:#25d36630;}
+  .delay-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.8rem;color:var(--muted);}
+  .delay-input{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:.83rem;outline:none;width:70px;text-align:center;}
+  .delay-select{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:.83rem;outline:none;}
+
+  /* CONTACTS */
+  .contact-row{display:grid;grid-template-columns:2fr 1fr 1fr 80px;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:.83rem;}
+  .contact-row:last-child{border-bottom:none;}
+  .contact-row.header{background:var(--surface2);font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+  .contact-row:not(.header):hover{background:var(--surface2);}
+  .contact-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#0d3a2a,#1a5a40);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;}
+  .contact-info{display:flex;align-items:center;gap:8px;}
+  .badge-wa{background:#25d36620;color:var(--wa);border:1px solid #25d36440;font-size:.65rem;padding:2px 8px;border-radius:20px;font-weight:700;}
+  .badge-sent{background:#00c89620;color:var(--green);border:1px solid #00c89440;font-size:.65rem;padding:2px 8px;border-radius:20px;font-weight:700;}
+  .send-btn{background:var(--wa);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;}
+  .send-btn:hover{background:#1da851;}
+
+  /* BROADCAST */
+  .broadcast-box{background:linear-gradient(135deg,#0a1f14,#0d2a1a);border:1px solid #25d36630;border-radius:12px;padding:22px;margin-bottom:20px;}
+  .broadcast-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--wa);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .broadcast-sub{font-size:.8rem;color:#8fa5bc;margin-bottom:16px;line-height:1.5;}
+  .broadcast-actions{display:flex;gap:10px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn-wa{background:var(--wa);color:white;}
+  .btn-wa:hover{background:#1da851;transform:translateY(-1px);}
+  .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--surface);border-color:var(--wa);color:var(--wa);}
+
+  /* PLAN LOCK */
+  .plan-lock{background:linear-gradient(135deg,#0a1a10,#0a1520);border:1px solid #25d36630;border-radius:14px;padding:32px;text-align:center;margin-bottom:24px;}
+  .plan-lock-icon{font-size:2.5rem;margin-bottom:12px;}
+  .plan-lock-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px;}
+  .plan-lock-sub{color:var(--muted);font-size:.85rem;margin-bottom:20px;line-height:1.6;}
+  .plan-lock-btn{background:var(--wa);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:13px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;}
+  .plan-lock-btn:hover{background:#1da851;transform:translateY(-2px);}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
+
+  @media(max-width:760px){.wa-stats{grid-template-columns:repeat(2,1fr);}.contact-row{grid-template-columns:1fr 1fr;}.contact-row .cell:last-child{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="__toast"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot">FA</div>FunnelAfrica</div>
+  <button class="back-btn" onclick="window.location.href='/funnelafrica-dashboard.html'">← Dashboard</button>
+</div>
+
+<div class="content">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">📱 WhatsApp Automation</div>
+    <h1 class="hero-title">Vendez sur WhatsApp automatiquement</h1>
+    <p class="hero-sub">Envoyez des messages personnalisés à vos contacts au bon moment. Suivis, relances, confirmations — tout en automatique.</p>
+  </div>
+
+  <!-- PLAN LOCK -->
+  <div class="plan-lock" id="planLock" style="display:none;">
+    <div class="plan-lock-icon">📱</div>
+    <div class="plan-lock-title">Fonctionnalité Plan Pro ou Scale</div>
+    <div class="plan-lock-sub">WhatsApp automation est disponible à partir du plan Pro.<br>Upgradez pour automatiser vos messages et augmenter vos ventes.</div>
+    <button class="plan-lock-btn" onclick="window.location.href='/abonnement.html'">⚡ Passer au plan Pro →</button>
+  </div>
+
+  <!-- CONTENU -->
+  <div id="waContent">
+
+    <!-- STATS -->
+    <div class="wa-stats">
+      <div class="wa-stat">
+        <div class="wa-stat-val" id="statMsgSent">0</div>
+        <div class="wa-stat-label">Messages envoyés</div>
+      </div>
+      <div class="wa-stat">
+        <div class="wa-stat-val" id="statContacts">0</div>
+        <div class="wa-stat-label">Contacts WhatsApp</div>
+      </div>
+      <div class="wa-stat">
+        <div class="wa-stat-val" id="statSequences">5</div>
+        <div class="wa-stat-label">Séquences actives</div>
+      </div>
+      <div class="wa-stat">
+        <div class="wa-stat-val" id="statConvWa">0%</div>
+        <div class="wa-stat-label">Taux de conversion</div>
+      </div>
+    </div>
+
+    <!-- BROADCAST RAPIDE -->
+    <div class="broadcast-box">
+      <div class="broadcast-title">📢 Broadcast WhatsApp</div>
+      <div class="broadcast-sub">Envoyez un message à tous vos contacts acheteurs en 1 clic. Idéal pour les annonces, promotions et nouveaux produits.</div>
+      <div style="margin-bottom:14px;">
+        <textarea class="msg-textarea" id="broadcastMsg" placeholder="Bonjour {prenom} ! 🎉&#10;&#10;J'ai une nouvelle offre exclusive pour vous...&#10;&#10;Lien : {lien_tunnel}"></textarea>
+        <div class="vars-row">
+          <span class="var-tag" onclick="insertVar('{prenom}')">+ {prenom}</span>
+          <span class="var-tag" onclick="insertVar('{nom}')">+ {nom}</span>
+          <span class="var-tag" onclick="insertVar('{produit}')">+ {produit}</span>
+          <span class="var-tag" onclick="insertVar('{lien_tunnel}')">+ {lien_tunnel}</span>
+          <span class="var-tag" onclick="insertVar('{montant}')">+ {montant}</span>
+        </div>
+      </div>
+      <div class="broadcast-actions">
+        <button class="btn btn-wa" onclick="previewBroadcast()">👁 Aperçu</button>
+        <button class="btn btn-wa" onclick="sendBroadcast()">📤 Envoyer à tous</button>
+        <button class="btn btn-ghost" onclick="scheduleBroadcast()">⏰ Programmer</button>
+      </div>
+    </div>
+
+    <!-- SÉQUENCES AUTOMATIQUES -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">⚡ Séquences automatiques</span>
+        <button onclick="saveSequences()" style="background:var(--wa);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;">💾 Sauvegarder</button>
+      </div>
+      <div class="card-body">
+        <div class="sequences-list">
+
+          <!-- S1 : Confirmation achat -->
+          <div class="sequence-item active open" id="seq1">
+            <div class="sequence-header" onclick="toggleSeq('seq1')">
+              <div class="sequence-left">
+                <div class="seq-icon">🎉</div>
+                <div>
+                  <div class="seq-name">Confirmation d'achat</div>
+                  <div class="seq-trigger">Déclencheur : après chaque vente · Immédiat</div>
+                </div>
+              </div>
+              <div class="sequence-right">
+                <div class="toggle-mini on" onclick="event.stopPropagation();toggleSeqActive(this)"></div>
+                <span style="font-size:.75rem;color:var(--wa);">Actif</span>
+              </div>
+            </div>
+            <div class="sequence-body">
+              <textarea class="msg-textarea" id="msg-seq1">Bonjour {prenom} ! 🎉
+
+Votre paiement de {montant} FCFA a bien été reçu.
+
+✅ Votre accès à "{produit}" est activé.
+👉 Accédez ici : {lien_acces}
+
+Merci pour votre confiance !
+— FunnelAfrica</textarea>
+              <div class="vars-row">
+                <span class="var-tag" onclick="insertVarTo('msg-seq1','{prenom}')">+ {prenom}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq1','{montant}')">+ {montant}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq1','{produit}')">+ {produit}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq1','{lien_acces}')">+ {lien_acces}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- S2 : Relance J+1 -->
+          <div class="sequence-item active" id="seq2">
+            <div class="sequence-header" onclick="toggleSeq('seq2')">
+              <div class="sequence-left">
+                <div class="seq-icon">👀</div>
+                <div>
+                  <div class="seq-name">Relance démarrage</div>
+                  <div class="seq-trigger">Déclencheur : J+1 si pas encore connecté</div>
+                </div>
+              </div>
+              <div class="sequence-right">
+                <div class="toggle-mini on" onclick="event.stopPropagation();toggleSeqActive(this)"></div>
+                <span style="font-size:.75rem;color:var(--wa);">Actif</span>
+              </div>
+            </div>
+            <div class="sequence-body">
+              <textarea class="msg-textarea" id="msg-seq2">Bonjour {prenom} 👋
+
+J'espère que vous allez bien !
+
+Je voulais m'assurer que vous avez bien accès à "{produit}".
+
+👉 Connectez-vous ici : {lien_acces}
+
+N'hésitez pas si vous avez des questions 😊</textarea>
+              <div class="vars-row">
+                <span class="var-tag" onclick="insertVarTo('msg-seq2','{prenom}')">+ {prenom}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq2','{produit}')">+ {produit}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq2','{lien_acces}')">+ {lien_acces}</span>
+              </div>
+              <div class="delay-row">
+                ⏰ Envoyer après :
+                <input class="delay-input" type="number" value="1" min="1">
+                <select class="delay-select"><option>jour(s)</option><option>heure(s)</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- S3 : Upsell J+3 -->
+          <div class="sequence-item" id="seq3">
+            <div class="sequence-header" onclick="toggleSeq('seq3')">
+              <div class="sequence-left">
+                <div class="seq-icon">⚡</div>
+                <div>
+                  <div class="seq-name">Offre complémentaire</div>
+                  <div class="seq-trigger">Déclencheur : J+3 après achat</div>
+                </div>
+              </div>
+              <div class="sequence-right">
+                <div class="toggle-mini off" onclick="event.stopPropagation();toggleSeqActive(this)"></div>
+                <span style="font-size:.75rem;color:var(--muted);">Inactif</span>
+              </div>
+            </div>
+            <div class="sequence-body">
+              <textarea class="msg-textarea" id="msg-seq3">Bonjour {prenom} ! 🔥
+
+Comment avancez-vous avec "{produit}" ?
+
+J'ai une offre EXCLUSIVE pour vous — valable 48h seulement :
+
+👉 {lien_upsell}
+
+Cette offre ne sera plus disponible après ça.
+
+— {vendeur}</textarea>
+              <div class="vars-row">
+                <span class="var-tag" onclick="insertVarTo('msg-seq3','{prenom}')">+ {prenom}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq3','{produit}')">+ {produit}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq3','{lien_upsell}')">+ {lien_upsell}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq3','{vendeur}')">+ {vendeur}</span>
+              </div>
+              <div class="delay-row">
+                ⏰ Envoyer après :
+                <input class="delay-input" type="number" value="3" min="1">
+                <select class="delay-select"><option>jour(s)</option><option>heure(s)</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- S4 : Relance panier abandonné -->
+          <div class="sequence-item" id="seq4">
+            <div class="sequence-header" onclick="toggleSeq('seq4')">
+              <div class="sequence-left">
+                <div class="seq-icon">🛒</div>
+                <div>
+                  <div class="seq-name">Panier abandonné</div>
+                  <div class="seq-trigger">Déclencheur : visiteur checkout sans paiement</div>
+                </div>
+              </div>
+              <div class="sequence-right">
+                <div class="toggle-mini off" onclick="event.stopPropagation();toggleSeqActive(this)"></div>
+                <span style="font-size:.75rem;color:var(--muted);">Inactif</span>
+              </div>
+            </div>
+            <div class="sequence-body">
+              <textarea class="msg-textarea" id="msg-seq4">Bonjour {prenom} 👋
+
+J'ai remarqué que vous n'avez pas finalisé votre inscription à "{produit}".
+
+Avez-vous rencontré un problème ?
+
+👉 Reprendre le paiement : {lien_checkout}
+
+Je suis là si vous avez des questions 😊</textarea>
+              <div class="vars-row">
+                <span class="var-tag" onclick="insertVarTo('msg-seq4','{prenom}')">+ {prenom}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq4','{produit}')">+ {produit}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq4','{lien_checkout}')">+ {lien_checkout}</span>
+              </div>
+              <div class="delay-row">
+                ⏰ Envoyer après :
+                <input class="delay-input" type="number" value="2" min="1">
+                <select class="delay-select"><option>heure(s)</option><option>jour(s)</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- S5 : Feedback J+7 -->
+          <div class="sequence-item" id="seq5">
+            <div class="sequence-header" onclick="toggleSeq('seq5')">
+              <div class="sequence-left">
+                <div class="seq-icon">⭐</div>
+                <div>
+                  <div class="seq-name">Demande de témoignage</div>
+                  <div class="seq-trigger">Déclencheur : J+7 après achat</div>
+                </div>
+              </div>
+              <div class="sequence-right">
+                <div class="toggle-mini off" onclick="event.stopPropagation();toggleSeqActive(this)"></div>
+                <span style="font-size:.75rem;color:var(--muted);">Inactif</span>
+              </div>
+            </div>
+            <div class="sequence-body">
+              <textarea class="msg-textarea" id="msg-seq5">Bonjour {prenom} ! ⭐
+
+Vous avez "{produit}" depuis une semaine maintenant.
+
+Comment s'est passé votre expérience ?
+
+Votre avis compte beaucoup pour nous et aide d'autres entrepreneurs africains à prendre leur décision.
+
+Pouvez-vous me dire en 2-3 phrases ce que vous avez apprécié ? 🙏</textarea>
+              <div class="vars-row">
+                <span class="var-tag" onclick="insertVarTo('msg-seq5','{prenom}')">+ {prenom}</span>
+                <span class="var-tag" onclick="insertVarTo('msg-seq5','{produit}')">+ {produit}</span>
+              </div>
+              <div class="delay-row">
+                ⏰ Envoyer après :
+                <input class="delay-input" type="number" value="7" min="1">
+                <select class="delay-select"><option>jour(s)</option><option>heure(s)</option></select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- APERÇU TÉLÉPHONE -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">📱 Aperçu du message</span></div>
+      <div class="card-body">
+        <div class="phone-preview">
+          <div class="phone-header">
+            <div class="phone-av">👤</div>
+            <div>
+              <div class="phone-contact" id="previewContactName">Moussa Koné</div>
+              <div class="phone-status">en ligne</div>
+            </div>
+          </div>
+          <div class="phone-msgs" id="previewMsgs">
+            <div class="msg-bubble">
+              Bonjour Moussa ! 🎉<br><br>
+              Votre paiement de 9 900 FCFA a bien été reçu.<br><br>
+              ✅ Votre accès est activé.<br>
+              👉 Accédez ici : funnelafrica.app/acces<br><br>
+              Merci pour votre confiance !
+              <div class="msg-time">14:32 ✓✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS WHATSAPP -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">👥 Contacts WhatsApp</span>
+        <button onclick="exportContacts()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:600;font-size:.72rem;padding:6px 12px;border-radius:7px;cursor:pointer;transition:all .2s;">⬇️ Exporter</button>
+      </div>
+      <div class="contact-row header">
+        <div>Contact</div>
+        <div>Produit</div>
+        <div>Statut</div>
+        <div>Action</div>
+      </div>
+      <div id="contactsRows">
+        <div style="text-align:center;padding:36px;color:var(--muted);">
+          <div style="font-size:2rem;margin-bottom:10px;">📱</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Chargement des contacts...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+  var contacts    = [];
+
+  // ── INIT ──
+  sb.auth.getUser().then(function(r) {
+    if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
+    currentUser = r.data.user;
+
+    sb.from('profiles').select('plan').eq('id', r.data.user.id).single().then(function(pr) {
+      var plan = pr.data ? pr.data.plan : 'starter';
+
+      if (plan === 'starter') {
+        document.getElementById('planLock').style.display = 'block';
+        document.getElementById('waContent').style.display = 'none';
+        return;
+      }
+
+      loadContacts();
+    });
+  });
+
+  // ── CONTACTS ──
+  function loadContacts() {
+    sb.from('contacts').select('*,tunnels(name)').eq('user_id', currentUser.id)
+      .not('phone','is',null).order('created_at',{ascending:false}).limit(30)
+      .then(function(r) {
+        contacts = r.data || [];
+        document.getElementById('statContacts').textContent = contacts.length;
+
+        if (!contacts.length) {
+          document.getElementById('contactsRows').innerHTML =
+            '<div style="text-align:center;padding:36px;color:var(--muted);"><div style="font-size:2rem;margin-bottom:10px;">📱</div><div style="font-family:\'Syne\',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucun contact WhatsApp</div><div style="font-size:.82rem;">Vos acheteurs apparaîtront ici</div></div>';
+          return;
+        }
+
+        document.getElementById('contactsRows').innerHTML = contacts.map(function(c) {
+          var initials = (c.name||'?').split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+          var phone    = (c.phone||'').replace(/\s/g,'');
+          return '<div class="contact-row">' +
+            '<div class="contact-info">' +
+              '<div class="contact-av">' + initials + '</div>' +
+              '<div><div style="font-size:.85rem;font-weight:500;">' + c.name + '</div>' +
+              '<div style="font-size:.7rem;color:var(--muted);">' + phone + '</div></div>' +
+            '</div>' +
+            '<div style="font-size:.78rem;color:var(--muted);">' + ((c.tunnels&&c.tunnels.name)||'—') + '</div>' +
+            '<div><span class="badge-wa">📱 WhatsApp</span></div>' +
+            '<button class="send-btn" onclick="sendDirectWA(\'' + phone + '\',\'' + (c.name||'').split(' ')[0] + '\')">📤 Envoyer</button>' +
+          '</div>';
+        }).join('');
+      });
+  }
+
+  // ── ENVOYER VIA WHATSAPP WEB ──
+  function sendDirectWA(phone, prenom) {
+    var msg  = document.getElementById('msg-seq1').value;
+    var text = msg
+      .replace(/\{prenom\}/g, prenom)
+      .replace(/\{nom\}/g, '')
+      .replace(/\{produit\}/g, 'votre formation')
+      .replace(/\{lien_acces\}/g, 'https://funnelafrica.vercel.app/espace-membre.html')
+      .replace(/\{montant\}/g, '—');
+
+    var url = 'https://wa.me/' + phone.replace(/\D/g,'') + '?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+    showToast('✓ WhatsApp ouvert pour ' + prenom, 'success');
+  }
+
+  // ── BROADCAST ──
+  function previewBroadcast() {
+    var msg = document.getElementById('broadcastMsg').value;
+    var preview = msg
+      .replace(/\{prenom\}/g, 'Moussa')
+      .replace(/\{nom\}/g, 'Koné')
+      .replace(/\{produit\}/g, 'Formation Excel Pro')
+      .replace(/\{lien_tunnel\}/g, 'funnelafrica.vercel.app/t/formation-excel')
+      .replace(/\{montant\}/g, '9 900 FCFA');
+
+    document.getElementById('previewMsgs').innerHTML =
+      '<div class="msg-bubble">' + preview.replace(/\n/g,'<br>') + '<div class="msg-time">maintenant ✓✓</div></div>';
+
+    showToast('✓ Aperçu mis à jour', 'success');
+  }
+
+  function sendBroadcast() {
+    if (!contacts.length) { showToast('Aucun contact à contacter', 'error'); return; }
+    var msg = document.getElementById('broadcastMsg').value;
+    if (!msg.trim()) { showToast('Message vide !', 'error'); return; }
+
+    // Ouvre WhatsApp Web pour chaque contact (1 par 1)
+    var count = 0;
+    contacts.slice(0,5).forEach(function(c, i) { // Limite à 5 pour éviter spam
+      setTimeout(function() {
+        var phone  = (c.phone||'').replace(/\D/g,'');
+        if (!phone) return;
+        var prenom = (c.name||'').split(' ')[0];
+        var text   = msg
+          .replace(/\{prenom\}/g, prenom)
+          .replace(/\{nom\}/g, c.name||'')
+          .replace(/\{produit\}/g, 'votre formation')
+          .replace(/\{lien_tunnel\}/g, 'https://funnelafrica.vercel.app');
+        window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(text), '_blank');
+        count++;
+      }, i * 2000);
+    });
+
+    showToast('📤 Envoi en cours pour ' + Math.min(contacts.length,5) + ' contacts...', 'success');
+  }
+
+  function scheduleBroadcast() {
+    showToast('⏰ Fonctionnalité programmée — bientôt disponible !', 'success');
+  }
+
+  // ── SÉQUENCES ──
+  function toggleSeq(id) {
+    var el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  function toggleSeqActive(toggle) {
+    var isOn = toggle.classList.contains('on');
+    toggle.classList.toggle('on', !isOn);
+    toggle.classList.toggle('off', isOn);
+    var label = toggle.nextElementSibling;
+    if (label) {
+      label.textContent = isOn ? 'Inactif' : 'Actif';
+      label.style.color = isOn ? 'var(--muted)' : 'var(--wa)';
+    }
+    var item = toggle.closest('.sequence-item');
+    if (item) item.classList.toggle('active', !isOn);
+  }
+
+  function saveSequences() {
+    var sequences = {
+      seq1: document.getElementById('msg-seq1').value,
+      seq2: document.getElementById('msg-seq2').value,
+      seq3: document.getElementById('msg-seq3').value,
+      seq4: document.getElementById('msg-seq4').value,
+      seq5: document.getElementById('msg-seq5').value
+    };
+    localStorage.setItem('fa_wa_sequences', JSON.stringify(sequences));
+    showToast('✓ Séquences sauvegardées !', 'success');
+  }
+
+  // ── INSERT VARIABLE ──
+  function insertVar(v) {
+    var ta = document.getElementById('broadcastMsg');
+    var pos = ta.selectionStart;
+    ta.value = ta.value.substring(0,pos) + v + ta.value.substring(pos);
+    ta.focus();
+  }
+
+  function insertVarTo(id, v) {
+    var ta = document.getElementById(id);
+    var pos = ta.selectionStart;
+    ta.value = ta.value.substring(0,pos) + v + ta.value.substring(pos);
+    ta.focus();
+  }
+
+  // ── EXPORT CONTACTS ──
+  function exportContacts() {
+    if (!contacts.length) { showToast('Aucun contact à exporter', 'error'); return; }
+    var csv = 'Nom,Téléphone,Email,Produit,Date\n';
+    contacts.forEach(function(c) {
+      csv += [
+        '"'+(c.name||'')+'"',
+        '"'+(c.phone||'')+'"',
+        '"'+(c.email||'')+'"',
+        '"'+((c.tunnels&&c.tunnels.name)||'')+'"',
+        '"'+new Date(c.created_at).toLocaleDateString('fr-FR')+'"'
+      ].join(',') + '\n';
+    });
+    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'contacts-whatsapp-funnelafrica.csv';
+    a.click();
+    showToast('✓ Contacts exportés !', 'success');
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type) {
+    var c = type === 'error'
+      ? {bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}
+      : {bg:'#25d36618',border:'#25d36640',color:'#25d366'};
+    var t = document.getElementById('__toast');
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(10px);';
+    t.textContent = msg;
+    setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(10px)';},3500);
+  }
+
+  // Charger les séquences sauvegardées
+  var saved = localStorage.getItem('fa_wa_sequences');
+  if (saved) {
+    var seqs = JSON.parse(saved);
+    Object.keys(seqs).forEach(function(k) {
+      var el = document.getElementById('msg-'+k);
+      if (el) el.value = seqs[k];
+    });
+  }
+</script>
+</body>
+</html>

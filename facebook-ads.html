@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook Ads — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--fb:#1877f2;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-dot{width:28px;height:28px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#0a0f14;font-weight:800;}
+  .back-btn{color:var(--muted);font-size:.82rem;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;transition:all .2s;}
+
+  .content{max-width:960px;margin:0 auto;padding:32px 20px;}
+
+  .hero{text-align:center;padding:20px 0 36px;}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#1877f218;border:1px solid #1877f240;color:var(--fb);padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:16px;}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:10px;}
+  .hero-sub{color:var(--muted);font-size:.9rem;max-width:520px;margin:0 auto;}
+
+  /* PIXEL STATUS */
+  .pixel-card{background:linear-gradient(135deg,#0a1020,#0d1830);border:1.5px solid var(--border);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .pixel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .pixel-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px;}
+  .pixel-status{display:flex;align-items:center;gap:6px;font-size:.75rem;}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);}
+  .status-dot.active{background:var(--green);box-shadow:0 0 8px var(--green);}
+  .pixel-input-row{display:flex;gap:10px;}
+  .pixel-input{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.88rem;outline:none;transition:border-color .2s;font-family:monospace;}
+  .pixel-input:focus{border-color:var(--fb);}
+  .pixel-btn{background:var(--fb);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;}
+  .pixel-btn:hover{background:#1565c0;}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;}
+  .tab{flex:1;text-align:center;padding:10px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--muted);transition:all .2s;}
+  .tab.active{background:var(--surface);color:var(--text);}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+  .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .card-body{padding:22px;}
+
+  /* CAMPAGNE */
+  .campagne-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;transition:border-color .2s;}
+  .campagne-item:hover{border-color:#1877f240;}
+  .campagne-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .campagne-type{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:8px;}
+  .campagne-budget{background:#1877f218;border:1px solid #1877f240;color:var(--fb);font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:3px 12px;border-radius:20px;}
+  .campagne-detail{font-size:.8rem;color:var(--muted);line-height:1.7;margin-bottom:12px;}
+  .campagne-detail strong{color:var(--text);}
+
+  /* AD COPY */
+  .ad-copy-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;position:relative;}
+  .ad-copy-label{font-size:.68rem;color:var(--fb);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+  .ad-copy-text{font-size:.83rem;line-height:1.7;color:#c0d0e0;white-space:pre-wrap;}
+  .copy-ad-btn{position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:4px 10px;border-radius:7px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;}
+  .copy-ad-btn:hover{background:var(--fb);color:white;border-color:var(--fb);}
+
+  /* CIBLAGE */
+  .targeting-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .targeting-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .targeting-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:10px;}
+  .targeting-items{display:flex;flex-wrap:wrap;gap:6px;}
+  .targeting-tag{background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:.75rem;padding:4px 10px;border-radius:20px;}
+  .targeting-tag.highlight{background:#00c89618;border-color:#00c89640;color:var(--green);}
+
+  /* BUDGET CALCULATOR */
+  .calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;}
+  .calc-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
+  .calc-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--green);margin-bottom:4px;}
+  .calc-label{font-size:.72rem;color:var(--muted);}
+  .calc-input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .calc-input-box label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:6px;}
+  .calc-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-size:.88rem;outline:none;text-align:center;}
+  .calc-input:focus{border-color:var(--green);}
+
+  /* PLANNING */
+  .planning-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center;}
+  .planning-row:last-child{border-bottom:none;}
+  .planning-row.header{font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+  .week-badge{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:4px 12px;border-radius:8px;text-align:center;}
+  .week-badge.active{background:#00c89618;border-color:var(--green);color:var(--green);}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
+
+  @media(max-width:760px){.targeting-grid{grid-template-columns:1fr;}.calc-grid{grid-template-columns:1fr 1fr;}.calc-input-row{grid-template-columns:1fr;}.planning-row{grid-template-columns:60px 1fr 1fr;}.planning-row .cell-last{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="__toast"></div>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-dot">FA</div>FunnelAfrica</div>
+  <button class="back-btn" onclick="window.location.href='/funnelafrica-dashboard.html'">← Dashboard</button>
+</div>
+
+<div class="content">
+
+  <div class="hero">
+    <div class="hero-tag">📢 Facebook Ads</div>
+    <h1 class="hero-title">Attirez vos premiers clients vendeurs</h1>
+    <p class="hero-sub">Guide complet pour lancer vos campagnes Facebook Ads et recruter des vendeurs sur FunnelAfrica.</p>
+  </div>
+
+  <!-- PIXEL -->
+  <div class="pixel-card">
+    <div class="pixel-header">
+      <div class="pixel-title">📡 Pixel Facebook
+        <div class="pixel-status">
+          <div class="status-dot" id="pixelDot"></div>
+          <span id="pixelStatusText">Non configuré</span>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Entrez votre Pixel ID pour tracker les inscriptions, paiements et conversions sur FunnelAfrica.</p>
+    <div class="pixel-input-row">
+      <input class="pixel-input" type="text" id="pixelId" placeholder="Ex: 1234567890123456" oninput="validatePixel()">
+      <button class="pixel-btn" onclick="savePixel()">💾 Installer le pixel</button>
+    </div>
+    <div style="margin-top:10px;font-size:.75rem;color:var(--muted);">
+      Où trouver votre Pixel ID : <strong style="color:var(--fb);">business.facebook.com → Gestionnaire d'événements → Créer un pixel</strong>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('campagnes',this)">🎯 Campagnes</div>
+    <div class="tab" onclick="showTab('copies',this)">✍️ Copies Ads</div>
+    <div class="tab" onclick="showTab('ciblage',this)">👥 Ciblage</div>
+    <div class="tab" onclick="showTab('budget',this)">💰 Budget & ROI</div>
+    <div class="tab" onclick="showTab('planning',this)">📅 Planning</div>
+  </div>
+
+  <!-- TAB : CAMPAGNES -->
+  <div id="tab-campagnes">
+
+    <div class="campagne-item">
+      <div class="campagne-header">
+        <div class="campagne-type">🎬 Campagne 1 — Notoriété (Semaine 1-2)</div>
+        <div class="campagne-budget">3 000 FCFA/jour</div>
+      </div>
+      <div class="campagne-detail">
+        <strong>Objectif :</strong> Faire connaître FunnelAfrica dans votre marché cible<br>
+        <strong>Format :</strong> Vidéo 45 secondes (vous en train de créer un tunnel)<br>
+        <strong>Public :</strong> Entrepreneurs africains 22-42 ans, 9 pays francophones<br>
+        <strong>Placements :</strong> Facebook Feed + Instagram Stories + Reels<br>
+        <strong>Message clé :</strong> "Enfin un outil qui accepte Wave et Orange Money"
+      </div>
+      <button class="copy-ad-btn" style="position:static;margin-top:4px;" onclick="showToast('✓ Guide copié — créez cette campagne sur business.facebook.com','success')">📋 Guide complet</button>
+    </div>
+
+    <div class="campagne-item">
+      <div class="campagne-header">
+        <div class="campagne-type">🎯 Campagne 2 — Acquisition (Semaine 2-4)</div>
+        <div class="campagne-budget">8 000 FCFA/jour</div>
+      </div>
+      <div class="campagne-detail">
+        <strong>Objectif :</strong> Générer des inscriptions sur FunnelAfrica<br>
+        <strong>Format :</strong> Image + texte (3 visuels en A/B test)<br>
+        <strong>Public :</strong> Personnes ayant interagi avec la campagne 1 + lookalike<br>
+        <strong>Landing page :</strong> funnelafrica.vercel.app (page d'inscription)<br>
+        <strong>Message clé :</strong> "Crée ta page de vente en 15 min — Essai gratuit"
+      </div>
+      <button class="copy-ad-btn" style="position:static;margin-top:4px;" onclick="showToast('✓ Config copiée !','success')">📋 Guide complet</button>
+    </div>
+
+    <div class="campagne-item">
+      <div class="campagne-header">
+        <div class="campagne-type">🔄 Campagne 3 — Retargeting (Semaine 3+)</div>
+        <div class="campagne-budget">5 000 FCFA/jour</div>
+      </div>
+      <div class="campagne-detail">
+        <strong>Objectif :</strong> Reconvertir les visiteurs qui ne se sont pas inscrits<br>
+        <strong>Format :</strong> Carrousel avec témoignages<br>
+        <strong>Public :</strong> Visiteurs du site (pixel) non convertis dans les 30 derniers jours<br>
+        <strong>Message clé :</strong> "Vous avez visité FunnelAfrica... Voici ce que vous ratez"
+      </div>
+      <button class="copy-ad-btn" style="position:static;margin-top:4px;" onclick="showToast('✓ Config copiée !','success')">📋 Guide complet</button>
+    </div>
+
+  </div>
+
+  <!-- TAB : COPIES ADS -->
+  <div id="tab-copies" style="display:none;">
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">✍️ Copies publicitaires prêtes à utiliser</span></div>
+      <div class="card-body">
+
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Version A — Problème/Solution</div>
+        <div class="ad-copy-box">
+          <div class="ad-copy-label">Accroche Facebook · Version A</div>
+          <div class="ad-copy-text">🚫 Marre de perdre des ventes parce que vos clients ne peuvent pas payer par carte ?
+
+Avec FunnelAfrica, vos acheteurs paient par :
+📱 Wave · Orange Money · MTN MoMo · Moov Money
+
+✅ Crée ta page de vente en 15 minutes
+✅ Encaisse immédiatement
+✅ Aucune compétence technique requise
+
+👉 Commence gratuitement aujourd'hui :</div>
+          <button class="copy-ad-btn" onclick="copyText(this.previousElementSibling.textContent)">📋 Copier</button>
+        </div>
+
+        <div class="ad-copy-box">
+          <div class="ad-copy-label">Accroche Facebook · Version B — Résultat</div>
+          <div class="ad-copy-text">💰 Comment Amadou a fait 485 000 FCFA en 30 jours depuis son téléphone.
+
+Il n'a pas de site web.
+Il ne sait pas coder.
+Il vit à Cotonou.
+
+Il a juste utilisé FunnelAfrica pour vendre sa formation en ligne.
+
+🔥 Voici comment il a fait :
+1. Créé sa page de vente en 20 min
+2. Activé le paiement Wave + MTN MoMo
+3. Partagé son lien sur WhatsApp et Facebook
+4. Reçu ses premiers paiements le même jour
+
+👉 Essaie maintenant (c'est gratuit) :</div>
+          <button class="copy-ad-btn" onclick="copyText(this.previousElementSibling.textContent)">📋 Copier</button>
+        </div>
+
+        <div class="ad-copy-box">
+          <div class="ad-copy-label">Accroche Facebook · Version C — Curiosité</div>
+          <div class="ad-copy-text">🤔 Pourquoi des entrepreneurs africains abandonnent Systeme.io ?
+
+La réponse va vous surprendre...
+
+Ce n'est pas le prix.
+Ce n'est pas la complexité.
+
+C'est simple : Systeme.io ne parle pas Mobile Money.
+
+Ni Wave. Ni Orange Money. Ni MTN MoMo.
+
+FunnelAfrica, oui.
+
+👉 Essaie la différence :</div>
+          <button class="copy-ad-btn" onclick="copyText(this.previousElementSibling.textContent)">📋 Copier</button>
+        </div>
+
+        <div style="font-size:.78rem;color:var(--muted);margin:16px 0 10px;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Posts WhatsApp Status</div>
+        <div class="ad-copy-box">
+          <div class="ad-copy-label">WhatsApp Status</div>
+          <div class="ad-copy-text">🚀 FunnelAfrica — Vends en ligne depuis ton téléphone
+
+✅ Page de vente en 15 min
+✅ Paiement Wave & Orange Money
+✅ Commence gratuitement
+
+👉 funnelafrica.vercel.app</div>
+          <button class="copy-ad-btn" onclick="copyText(this.previousElementSibling.textContent)">📋 Copier</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB : CIBLAGE -->
+  <div id="tab-ciblage" style="display:none;">
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">👥 Configuration du ciblage</span></div>
+      <div class="card-body">
+
+        <div class="targeting-grid">
+          <div class="targeting-box">
+            <div class="targeting-label">🌍 Pays cibles</div>
+            <div class="targeting-items">
+              <span class="targeting-tag highlight">🇧🇯 Bénin</span>
+              <span class="targeting-tag highlight">🇨🇮 Côte d'Ivoire</span>
+              <span class="targeting-tag highlight">🇸🇳 Sénégal</span>
+              <span class="targeting-tag highlight">🇲🇱 Mali</span>
+              <span class="targeting-tag">🇧🇫 Burkina Faso</span>
+              <span class="targeting-tag">🇹🇬 Togo</span>
+              <span class="targeting-tag">🇨🇲 Cameroun</span>
+              <span class="targeting-tag">🇬🇳 Guinée</span>
+              <span class="targeting-tag">🇳🇪 Niger</span>
+            </div>
+          </div>
+          <div class="targeting-box">
+            <div class="targeting-label">👤 Démographie</div>
+            <div class="targeting-items">
+              <span class="targeting-tag highlight">Âge : 22-42 ans</span>
+              <span class="targeting-tag highlight">Android</span>
+              <span class="targeting-tag">Hommes + Femmes</span>
+              <span class="targeting-tag">Urbain</span>
+              <span class="targeting-tag">Revenus moyens+</span>
+            </div>
+          </div>
+          <div class="targeting-box">
+            <div class="targeting-label">🎯 Intérêts</div>
+            <div class="targeting-items">
+              <span class="targeting-tag highlight">Entrepreneuriat</span>
+              <span class="targeting-tag highlight">Business en ligne</span>
+              <span class="targeting-tag highlight">Formation en ligne</span>
+              <span class="targeting-tag">E-commerce</span>
+              <span class="targeting-tag">Marketing digital</span>
+              <span class="targeting-tag">Revenu passif</span>
+              <span class="targeting-tag">Petites entreprises</span>
+            </div>
+          </div>
+          <div class="targeting-box">
+            <div class="targeting-label">🚫 Exclusions</div>
+            <div class="targeting-items">
+              <span class="targeting-tag">Déjà inscrits (pixel)</span>
+              <span class="targeting-tag">Employés Systeme.io</span>
+              <span class="targeting-tag">Moins de 18 ans</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:8px;">💡 Stratégie lookalike</div>
+          <div style="font-size:.8rem;color:var(--muted);line-height:1.7;">
+            Une fois vos 50 premières inscriptions, créez une audience <strong style="color:var(--text);">Lookalike 1%</strong> basée sur les inscrits via le Pixel.<br>
+            Facebook trouvera des personnes similaires à vos meilleurs clients dans chaque pays.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB : BUDGET & ROI -->
+  <div id="tab-budget" style="display:none;">
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">💰 Calculateur de ROI</span></div>
+      <div class="card-body">
+
+        <div class="calc-input-row" style="margin-bottom:20px;">
+          <div class="calc-input-box">
+            <label>Budget/jour (FCFA)</label>
+            <input class="calc-input" type="number" id="calcBudget" value="5000" oninput="calcROI()">
+          </div>
+          <div class="calc-input-box">
+            <label>Coût par inscription (FCFA)</label>
+            <input class="calc-input" type="number" id="calcCPA" value="2000" oninput="calcROI()">
+          </div>
+          <div class="calc-input-box">
+            <label>Plan moyen (FCFA/mois)</label>
+            <input class="calc-input" type="number" id="calcPlan" value="6000" oninput="calcROI()">
+          </div>
+        </div>
+
+        <div class="calc-grid">
+          <div class="calc-box">
+            <div class="calc-val" id="calcSignups">—</div>
+            <div class="calc-label">Inscriptions/jour</div>
+          </div>
+          <div class="calc-box">
+            <div class="calc-val" id="calcPayingPct" style="color:var(--gold);">—</div>
+            <div class="calc-label">Payants estimés (20%)</div>
+          </div>
+          <div class="calc-box">
+            <div class="calc-val" id="calcMonthlyRev">—</div>
+            <div class="calc-label">Revenus/mois (FCFA)</div>
+          </div>
+          <div class="calc-box">
+            <div class="calc-val" id="calcROIVal">—</div>
+            <div class="calc-label">ROI (mois 1)</div>
+          </div>
+          <div class="calc-box">
+            <div class="calc-val" id="calcBreakeven" style="color:var(--gold);">—</div>
+            <div class="calc-label">Break-even (jours)</div>
+          </div>
+          <div class="calc-box">
+            <div class="calc-val" id="calcMRR" style="color:var(--green);">—</div>
+            <div class="calc-label">MRR potentiel mois 3</div>
+          </div>
+        </div>
+
+        <div style="background:#00c89610;border:1px solid #00c89630;border-radius:10px;padding:14px;font-size:.8rem;color:#8fa5bc;line-height:1.7;margin-top:4px;">
+          💡 <strong style="color:var(--text);">Hypothèses :</strong> Taux conversion visiteur→inscription = 5%, taux inscription→payant = 20%, abonnement moyen = Plan Starter 3 000 FCFA + upgrades.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB : PLANNING -->
+  <div id="tab-planning" style="display:none;">
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">📅 Planning de lancement 4 semaines</span></div>
+      <div class="card-body">
+
+        <div class="planning-row header">
+          <div>Semaine</div>
+          <div>Actions</div>
+          <div>Budget</div>
+          <div class="cell-last">Objectif</div>
+        </div>
+
+        <div class="planning-row">
+          <div><div class="week-badge active">S1</div></div>
+          <div style="font-size:.82rem;line-height:1.6;color:#a0b4c8;">
+            Créer page Facebook Business<br>
+            Installer pixel sur le site<br>
+            Lancer campagne Notoriété (vidéo 45s)<br>
+            Publier 3 posts organiques/jour
+          </div>
+          <div style="font-size:.85rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);">3 000<br><span style="font-size:.7rem;color:var(--muted);">FCFA/jour</span></div>
+          <div class="cell-last" style="font-size:.82rem;color:var(--green);">1 000+ vues<br>50+ interactions</div>
+        </div>
+
+        <div class="planning-row">
+          <div><div class="week-badge">S2</div></div>
+          <div style="font-size:.82rem;line-height:1.6;color:#a0b4c8;">
+            Lancer campagne Acquisition (3 visuels A/B)<br>
+            Tester les 3 copies publicitaires<br>
+            Garder la campagne notoriété<br>
+            Collecter les premières inscriptions
+          </div>
+          <div style="font-size:.85rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);">8 000<br><span style="font-size:.7rem;color:var(--muted);">FCFA/jour</span></div>
+          <div class="cell-last" style="font-size:.82rem;color:var(--green);">20-50 inscrits<br>5-10 payants</div>
+        </div>
+
+        <div class="planning-row">
+          <div><div class="week-badge">S3</div></div>
+          <div style="font-size:.82rem;line-height:1.6;color:#a0b4c8;">
+            Lancer campagne Retargeting<br>
+            Couper les visuels qui ne performent pas<br>
+            Doubler le budget sur le meilleur visuel<br>
+            Créer audience Lookalike 1%
+          </div>
+          <div style="font-size:.85rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);">12 000<br><span style="font-size:.7rem;color:var(--muted);">FCFA/jour</span></div>
+          <div class="cell-last" style="font-size:.82rem;color:var(--green);">50-100 inscrits<br>15-25 payants</div>
+        </div>
+
+        <div class="planning-row">
+          <div><div class="week-badge">S4</div></div>
+          <div style="font-size:.82rem;line-height:1.6;color:#a0b4c8;">
+            Scale la campagne gagnante<br>
+            Lancer sur les pays les plus rentables<br>
+            Ajouter témoignages clients<br>
+            Préparer mois 2 avec nouveaux créatifs
+          </div>
+          <div style="font-size:.85rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);">20 000<br><span style="font-size:.7rem;color:var(--muted);">FCFA/jour</span></div>
+          <div class="cell-last" style="font-size:.82rem;color:var(--green);">100-200 inscrits<br>30-50 payants</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">📋 Checklist avant lancement</span></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;" id="checklist">
+          <!-- Généré dynamiquement -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var CHECKLIST_ITEMS = [
+    { done:false, text:'Page Facebook Business créée' },
+    { done:false, text:'Pixel Facebook installé sur le site' },
+    { done:false, text:'Compte Facebook Ads Business configuré' },
+    { done:false, text:'Méthode de paiement Ads ajoutée (carte ou Mobile Money)' },
+    { done:false, text:'Vidéo de 45 secondes enregistrée (toi en train de créer un tunnel)' },
+    { done:false, text:'3 visuels créés pour le test A/B/C' },
+    { done:false, text:'FedaPay fonctionnel (test de paiement réussi)' },
+    { done:false, text:'Email de bienvenue Brevo configuré' },
+    { done:false, text:'WhatsApp automation activé' },
+    { done:false, text:'Page d\'inscription testée sur Android' }
+  ];
+
+  var checkedItems = JSON.parse(localStorage.getItem('fa_ads_checklist') || '[]');
+
+  function renderChecklist() {
+    var el = document.getElementById('checklist');
+    if (!el) return;
+    el.innerHTML = CHECKLIST_ITEMS.map(function(item, i) {
+      var done = checkedItems.includes(i);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface2);border-radius:8px;cursor:pointer;transition:background .2s;" onclick="toggleCheck('+i+')">' +
+        '<div style="width:20px;height:20px;border-radius:5px;border:2px solid '+(done?'var(--green)':'var(--border)')+';background:'+(done?'var(--green)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;">' +
+          (done ? '<span style="color:#0a0f14;font-size:.7rem;font-weight:800;">✓</span>' : '') +
+        '</div>' +
+        '<div style="font-size:.83rem;color:'+(done?'var(--muted)':'var(--text)')+';'+(done?'text-decoration:line-through;':'')+'">' + item.text + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleCheck(i) {
+    var idx = checkedItems.indexOf(i);
+    if (idx > -1) checkedItems.splice(idx, 1);
+    else checkedItems.push(i);
+    localStorage.setItem('fa_ads_checklist', JSON.stringify(checkedItems));
+    renderChecklist();
+  }
+
+  renderChecklist();
+  calcROI();
+
+  // ── TABS ──
+  function showTab(tab, el) {
+    document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.style.display = 'none'; });
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  // ── PIXEL ──
+  function validatePixel() {
+    var id  = document.getElementById('pixelId').value.trim();
+    var dot = document.getElementById('pixelDot');
+    var txt = document.getElementById('pixelStatusText');
+    if (id.length >= 15 && /^\d+$/.test(id)) {
+      dot.classList.add('active');
+      txt.textContent = 'Pixel ID valide';
+      txt.style.color = 'var(--green)';
+    } else {
+      dot.classList.remove('active');
+      txt.textContent = 'Non configuré';
+      txt.style.color = '';
+    }
+  }
+
+  function savePixel() {
+    var id = document.getElementById('pixelId').value.trim();
+    if (!id || id.length < 10) { showToast('Entrez un Pixel ID valide (15 chiffres)', 'error'); return; }
+    localStorage.setItem('fa_pixel_id', id);
+    showToast('✓ Pixel ID sauvegardé ! Uploadez les fichiers HTML mis à jour.', 'success');
+  }
+
+  // Charger pixel sauvegardé
+  var savedPixel = localStorage.getItem('fa_pixel_id');
+  if (savedPixel) {
+    document.getElementById('pixelId').value = savedPixel;
+    validatePixel();
+  }
+
+  // ── ROI CALCULATOR ──
+  function calcROI() {
+    var budget  = parseInt(document.getElementById('calcBudget').value) || 5000;
+    var cpa     = parseInt(document.getElementById('calcCPA').value)    || 2000;
+    var plan    = parseInt(document.getElementById('calcPlan').value)   || 6000;
+
+    var signupsPerDay  = Math.floor(budget / cpa);
+    var payingPerDay   = Math.round(signupsPerDay * 0.20);
+    var signupsMonth   = signupsPerDay * 30;
+    var payingMonth    = Math.round(signupsMonth * 0.20);
+    var revenue        = payingMonth * plan;
+    var adSpendMonth   = budget * 30;
+    var roi            = adSpendMonth > 0 ? Math.round(((revenue - adSpendMonth) / adSpendMonth) * 100) : 0;
+    var breakeven      = revenue > 0 ? Math.ceil(adSpendMonth / (revenue / 30)) : '∞';
+    var mrr3           = Math.round(payingMonth * 3 * plan * 0.7); // 30% churn
+
+    document.getElementById('calcSignups').textContent    = signupsPerDay;
+    document.getElementById('calcPayingPct').textContent  = payingPerDay;
+    document.getElementById('calcMonthlyRev').textContent = revenue > 999 ? (revenue/1000).toFixed(0)+'K' : revenue;
+    document.getElementById('calcROIVal').textContent     = (roi > 0 ? '+' : '') + roi + '%';
+    document.getElementById('calcROIVal').style.color     = roi > 0 ? 'var(--green)' : 'var(--danger)';
+    document.getElementById('calcBreakeven').textContent  = breakeven + (breakeven !== '∞' ? 'j' : '');
+    document.getElementById('calcMRR').textContent        = mrr3 > 999 ? (mrr3/1000).toFixed(0)+'K' : mrr3;
+  }
+
+  // ── COPIER TEXTE ──
+  function copyText(text) {
+    navigator.clipboard.writeText(text.trim()).then(function() {
+      showToast('✓ Copy publicitaire copié !', 'success');
+    });
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type) {
+    var c = type === 'error'
+      ? {bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}
+      : {bg:'#00c89618',border:'#00c89640',color:'#00c896'};
+    var t = document.getElementById('__toast');
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(10px);';
+    t.textContent = msg;
+    setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(10px)';},3500);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!--
+  ══════════════════════════════════════════════════════
+  PIXEL FACEBOOK — FunnelAfrica
+  
+  INSTRUCTIONS :
+  1. Remplace VOTRE_PIXEL_ID par ton vrai ID (15 chiffres)
+  2. Colle ce bloc juste avant </head> dans ces fichiers :
+     - funnelafrica-auth.html
+     - funnelafrica-dashboard.html
+     - funnelafrica-checkout.html
+     - funnelafrica-tunnel-public.html
+     - merci.html
+     - abonnement.html
+  ══════════════════════════════════════════════════════
+-->
+
+<!-- PIXEL FACEBOOK - COLLER AVANT </head> -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', 'VOTRE_PIXEL_ID');
+fbq('track', 'PageView');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=VOTRE_PIXEL_ID&ev=PageView&noscript=1"/>
+</noscript>
+<!-- FIN PIXEL FACEBOOK -->
+
+
+<!--
+  ══════════════════════════════════════════════════════
+  ÉVÉNEMENTS SPÉCIFIQUES PAR PAGE
+  Ajoute ces snippets après le pixel de base
+  ══════════════════════════════════════════════════════
+
+  === funnelafrica-auth.html (après inscription réussie) ===
+  fbq('track', 'CompleteRegistration', {
+    value: 0,
+    currency: 'XOF',
+    content_name: 'Inscription FunnelAfrica'
+  });
+
+  === funnelafrica-tunnel-public.html (à l'ouverture) ===
+  fbq('track', 'ViewContent', {
+    content_name: 'Page de vente tunnel',
+    content_type: 'product'
+  });
+
+  === funnelafrica-checkout.html (à l'ouverture) ===
+  fbq('track', 'InitiateCheckout', {
+    value: PRIX_DU_PRODUIT,
+    currency: 'XOF',
+    content_name: NOM_DU_PRODUIT
+  });
+
+  === merci.html (après paiement confirmé) ===
+  fbq('track', 'Purchase', {
+    value: MONTANT_PAYE,
+    currency: 'XOF',
+    content_name: NOM_DU_PRODUIT
+  });
+
+  === abonnement.html (après choix de plan) ===
+  fbq('track', 'Subscribe', {
+    value: PRIX_DU_PLAN,
+    currency: 'XOF',
+    predicted_ltv: PRIX_DU_PLAN * 6
+  });
+  ══════════════════════════════════════════════════════
+-->
