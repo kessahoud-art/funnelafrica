@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Membre — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* TOPBAR */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-dot{width:28px;height:28px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#0a0f14;font-weight:800;}
+  .topbar-right{display:flex;align-items:center;gap:12px;}
+  .user-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:.78rem;}
+  .user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#0a0f14;}
+  .btn-logout{color:var(--muted);font-size:.78rem;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;transition:all .2s;}
+  .btn-logout:hover{background:var(--surface2);color:var(--text);}
+
+  /* HERO */
+  .hero{padding:40px 24px 32px;max-width:1100px;margin:0 auto;}
+  .hero-greeting{font-size:.85rem;color:var(--muted);margin-bottom:6px;}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2rem);margin-bottom:8px;}
+  .hero-sub{color:var(--muted);font-size:.88rem;}
+
+  /* STATS MEMBER */
+  .member-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1100px;margin:0 auto;padding:0 24px 28px;}
+  .mstat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;animation:fadeUp .4s ease both;}
+  .mstat:nth-child(1){animation-delay:.05s;}.mstat:nth-child(2){animation-delay:.10s;}.mstat:nth-child(3){animation-delay:.15s;}.mstat:nth-child(4){animation-delay:.20s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .mstat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--green);margin-bottom:4px;}
+  .mstat-label{font-size:.72rem;color:var(--muted);}
+
+  /* MAIN LAYOUT */
+  .main-layout{display:grid;grid-template-columns:280px 1fr;gap:24px;max-width:1100px;margin:0 auto;padding:0 24px 60px;}
+
+  /* SIDEBAR COURS */
+  .courses-sidebar{position:sticky;top:80px;height:fit-content;}
+  .sidebar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .module-list{display:flex;flex-direction:column;gap:6px;}
+  .module-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;}
+  .module-item:hover{border-color:#00c89640;background:var(--surface2);}
+  .module-item.active{border-color:var(--green);background:#00c89610;}
+  .module-item.locked{opacity:.5;cursor:not-allowed;}
+  .module-header{display:flex;align-items:center;gap:10px;}
+  .module-num{width:26px;height:26px;border-radius:6px;background:var(--green-dim,#00c89615);border:1px solid #00c89630;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;color:var(--green);flex-shrink:0;}
+  .module-item.active .module-num{background:var(--green);color:#0a0f14;}
+  .module-item.locked .module-num{background:var(--surface2);border-color:var(--border);color:var(--muted);}
+  .module-info{flex:1;min-width:0;}
+  .module-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+  .module-lessons{font-size:.68rem;color:var(--muted);}
+  .module-progress{height:3px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;}
+  .module-progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .5s ease;}
+
+  /* CONTENT AREA */
+  .content-area{}
+
+  /* VIDEO PLAYER */
+  .video-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;animation:fadeUp .4s ease .1s both;}
+  .video-wrap{position:relative;aspect-ratio:16/9;background:#080d12;}
+  .video-wrap iframe{width:100%;height:100%;border:none;}
+  .video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;}
+  .play-btn{width:64px;height:64px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px #00c89650;transition:all .3s;}
+  .play-btn:hover{transform:scale(1.1);box-shadow:0 0 50px #00c89680;}
+  .video-label{color:var(--muted);font-size:.82rem;}
+  .video-info{padding:18px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .video-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:4px;}
+  .video-meta{font-size:.75rem;color:var(--muted);display:flex;gap:12px;}
+  .btn-complete{background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:9px 16px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+  .btn-complete:hover{background:#00dea8;}
+  .btn-complete.done{background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:default;}
+
+  /* LESSONS LIST */
+  .lessons-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;animation:fadeUp .4s ease .2s both;}
+  .lessons-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .lessons-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;}
+  .lesson-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;}
+  .lesson-item:last-child{border-bottom:none;}
+  .lesson-item:hover{background:var(--surface2);}
+  .lesson-item.active{background:#00c89610;}
+  .lesson-item.locked{opacity:.5;cursor:not-allowed;}
+  .lesson-num{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+  .lesson-item.done .lesson-num{background:var(--green);color:#0a0f14;border-color:var(--green);}
+  .lesson-item.active .lesson-num{background:var(--green);color:#0a0f14;border-color:var(--green);}
+  .lesson-item.locked .lesson-num{background:var(--surface2);}
+  .lesson-info{flex:1;min-width:0;}
+  .lesson-name{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+  .lesson-duration{font-size:.7rem;color:var(--muted);}
+  .lesson-badge{font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700;}
+  .lesson-badge.done{background:#00c89620;color:var(--green);}
+  .lesson-badge.current{background:#4da6ff20;color:#4da6ff;}
+  .lesson-badge.locked{background:var(--surface2);color:var(--muted);}
+
+  /* CERTIFICATE */
+  .cert-card{background:linear-gradient(135deg,#0d2a1a,#0a1f2e);border:1px solid #00c89640;border-radius:16px;padding:24px;display:flex;align-items:center;gap:20px;animation:fadeUp .4s ease .3s both;}
+  .cert-icon{font-size:2.5rem;flex-shrink:0;}
+  .cert-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:4px;}
+  .cert-sub{font-size:.78rem;color:#8fa5bc;margin-bottom:12px;line-height:1.5;}
+  .btn-cert{background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:9px 18px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+  .btn-cert:hover{background:#00dea8;}
+  .btn-cert:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* LOCKED OVERLAY */
+  .locked-overlay{text-align:center;padding:60px 24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;}
+  .locked-icon{font-size:2.5rem;margin-bottom:12px;}
+  .locked-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:8px;}
+  .locked-sub{color:var(--muted);font-size:.85rem;margin-bottom:20px;line-height:1.6;}
+  .btn-unlock{background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:13px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;}
+  .btn-unlock:hover{background:#00dea8;transform:translateY(-2px);}
+
+  /* PROGRESS GLOBAL */
+  .global-progress{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .gp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .gp-label{font-size:.78rem;color:var(--muted);}
+  .gp-pct{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--green);}
+  .gp-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .gp-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:3px;transition:width .8s ease;}
+
+  /* RESPONSIVE */
+  @media(max-width:900px){.main-layout{grid-template-columns:1fr;}.courses-sidebar{position:static;}.member-stats{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.member-stats{grid-template-columns:repeat(2,1fr);}.hero{padding:24px 16px 20px;}.main-layout{padding:0 16px 40px;}.member-stats{padding:0 16px 20px;}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot">FA</div>FunnelAfrica</div>
+  <div class="topbar-right">
+    <div class="user-pill">
+      <div class="user-avatar" id="topAvatar">?</div>
+      <span id="topName">Chargement...</span>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-greeting" id="heroGreeting">Bonjour 👋</div>
+  <h1 class="hero-title" id="heroTitle">Mon Espace Membre</h1>
+  <p class="hero-sub" id="heroSub">Continuez votre apprentissage là où vous vous êtes arrêté.</p>
+</div>
+
+<!-- STATS -->
+<div class="member-stats">
+  <div class="mstat">
+    <div class="mstat-val" id="statCompleted">0</div>
+    <div class="mstat-label">Leçons complétées</div>
+  </div>
+  <div class="mstat">
+    <div class="mstat-val" id="statTotal">0</div>
+    <div class="mstat-label">Leçons totales</div>
+  </div>
+  <div class="mstat">
+    <div class="mstat-val" id="statProgress">0%</div>
+    <div class="mstat-label">Progression</div>
+  </div>
+  <div class="mstat">
+    <div class="mstat-val" id="statModules">0</div>
+    <div class="mstat-label">Modules</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- SIDEBAR MODULES -->
+  <div class="courses-sidebar">
+
+    <!-- PROGRESSION GLOBALE -->
+    <div class="global-progress">
+      <div class="gp-header">
+        <span class="gp-label">Progression globale</span>
+        <span class="gp-pct" id="gpPct">0%</span>
+      </div>
+      <div class="gp-bar"><div class="gp-fill" id="gpFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="sidebar-title">Modules du cours</div>
+    <div class="module-list" id="moduleList">
+      <!-- Chargé dynamiquement -->
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:.82rem;">Chargement...</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area" id="contentArea">
+    <!-- Chargé dynamiquement -->
+    <div style="text-align:center;padding:60px 20px;color:var(--muted);">
+      <div style="font-size:2rem;margin-bottom:10px;">📚</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Chargement du cours...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var currentUser    = null;
+  var currentModule  = 0;
+  var currentLesson  = 0;
+  var completedLessons = [];
+  var courseData     = null;
+  var tunnelSlug     = new URLSearchParams(window.location.search).get('tunnel') || '';
+
+  // ── DONNÉES DU COURS (chargées depuis Supabase ou config tunnel) ──
+  // Structure par défaut — le vendeur configure ça dans l'éditeur
+  var DEFAULT_COURSE = {
+    title: 'Formation complète',
+    modules: [
+      {
+        id: 1,
+        name: 'Introduction & fondations',
+        lessons: [
+          { id:1, name:'Bienvenue dans la formation', duration:'5 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:2, name:'Comment tirer le maximum de ce cours', duration:'8 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:3, name:'Les outils nécessaires', duration:'12 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Les bases essentielles',
+        lessons: [
+          { id:4, name:'Comprendre les fondamentaux', duration:'15 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:5, name:'Mise en pratique #1', duration:'20 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:6, name:'Exercice et correction', duration:'18 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' }
+        ]
+      },
+      {
+        id: 3,
+        name: 'Techniques avancées',
+        lessons: [
+          { id:7, name:'Méthode professionnelle', duration:'22 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:8, name:'Cas pratiques africains', duration:'25 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:9, name:'Optimisation & productivité', duration:'19 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' }
+        ]
+      },
+      {
+        id: 4,
+        name: 'Projet final',
+        lessons: [
+          { id:10, name:'Instructions du projet final', duration:'10 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:11, name:'Correction & feedback', duration:'15 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+          { id:12, name:'Certification & suite', duration:'8 min', video:'https://www.youtube.com/embed/dQw4w9WgXcQ' }
+        ]
+      }
+    ]
+  };
+
+  // ── INIT ──
+  sb.auth.getUser().then(function(r) {
+    var user = r.data.user;
+    if (!user) { window.location.href = '/funnelafrica-auth.html'; return; }
+    currentUser = user;
+
+    // Charger le profil
+    sb.from('profiles').select('full_name,plan').eq('id', user.id).single().then(function(pr) {
+      var name = (pr.data && pr.data.full_name) || user.email.split('@')[0] || 'Membre';
+      var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+      document.getElementById('topName').textContent    = name;
+      document.getElementById('topAvatar').textContent  = initials;
+      document.getElementById('heroGreeting').textContent = 'Bonjour ' + name.split(' ')[0] + ' 👋';
+    });
+
+    // Vérifier l'accès au tunnel (a-t-il acheté ?)
+    checkAccess(user.id);
+  });
+
+  // ── VÉRIFIER L'ACCÈS ──
+  function checkAccess(userId) {
+    if (!tunnelSlug) {
+      // Pas de tunnel spécifié → afficher directement
+      loadCourse();
+      return;
+    }
+
+    // Vérifier si l'utilisateur a une commande payée pour ce tunnel
+    sb.from('orders')
+      .select('id, tunnels!inner(slug, page_config, name)')
+      .eq('buyer_email', currentUser.email)
+      .eq('payment_status', 'paid')
+      .eq('tunnels.slug', tunnelSlug)
+      .limit(1)
+      .then(function(r) {
+        if (r.data && r.data.length > 0) {
+          var order = r.data[0];
+          // Charger la config du cours depuis le tunnel
+          if (order.tunnels && order.tunnels.page_config && order.tunnels.page_config.course) {
+            courseData = order.tunnels.page_config.course;
+          }
+          document.getElementById('heroTitle').textContent = (order.tunnels && order.tunnels.name) || 'Mon cours';
+          loadCourse();
+        } else {
+          // Pas d'accès → afficher le mur de paiement
+          showLockedOverlay();
+        }
+      });
+  }
+
+  // ── CHARGER LE COURS ──
+  function loadCourse() {
+    var course = courseData || DEFAULT_COURSE;
+
+    // Charger la progression sauvegardée
+    var saved = localStorage.getItem('fa_progress_' + (tunnelSlug || 'default'));
+    completedLessons = saved ? JSON.parse(saved) : [];
+
+    var totalLessons    = course.modules.reduce(function(s,m){return s+m.lessons.length;},0);
+    var completedCount  = completedLessons.length;
+    var progressPct     = totalLessons > 0 ? Math.round((completedCount/totalLessons)*100) : 0;
+
+    // Stats
+    document.getElementById('statCompleted').textContent = completedCount;
+    document.getElementById('statTotal').textContent     = totalLessons;
+    document.getElementById('statProgress').textContent  = progressPct + '%';
+    document.getElementById('statModules').textContent   = course.modules.length;
+    document.getElementById('gpPct').textContent         = progressPct + '%';
+    document.getElementById('gpFill').style.width        = progressPct + '%';
+
+    // Sidebar modules
+    var moduleList = document.getElementById('moduleList');
+    moduleList.innerHTML = course.modules.map(function(mod, mIdx) {
+      var modCompleted = mod.lessons.filter(function(l){return completedLessons.includes(l.id);}).length;
+      var modPct       = Math.round((modCompleted / mod.lessons.length) * 100);
+      var isActive     = mIdx === currentModule;
+
+      return '<div class="module-item' + (isActive?' active':'') + '" onclick="selectModule('+mIdx+')">' +
+        '<div class="module-header">' +
+          '<div class="module-num">' + (mIdx+1) + '</div>' +
+          '<div class="module-info">' +
+            '<div class="module-name">' + mod.name + '</div>' +
+            '<div class="module-lessons">' + mod.lessons.length + ' leçons · ' + modCompleted + ' complétées</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="module-progress"><div class="module-progress-fill" style="width:'+modPct+'%"></div></div>' +
+      '</div>';
+    }).join('');
+
+    // Afficher le contenu du module actuel
+    renderModule(course.modules[currentModule]);
+  }
+
+  // ── SÉLECTIONNER UN MODULE ──
+  function selectModule(idx) {
+    currentModule = idx;
+    currentLesson = 0;
+    var course = courseData || DEFAULT_COURSE;
+
+    // Mettre à jour la sidebar
+    document.querySelectorAll('.module-item').forEach(function(el, i) {
+      el.classList.toggle('active', i === idx);
+    });
+
+    renderModule(course.modules[idx]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── AFFICHER UN MODULE ──
+  function renderModule(mod) {
+    var currentLessonData = mod.lessons[currentLesson];
+    var isCompleted       = completedLessons.includes(currentLessonData.id);
+    var totalLessons      = (courseData || DEFAULT_COURSE).modules.reduce(function(s,m){return s+m.lessons.length;},0);
+    var completedCount    = completedLessons.length;
+    var allDone           = completedCount >= totalLessons;
+
+    var html = '';
+
+    // VIDEO CARD
+    html += '<div class="video-card">' +
+      '<div class="video-wrap">' +
+        '<iframe src="' + currentLessonData.video + '?rel=0&modestbranding=1" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>' +
+      '</div>' +
+      '<div class="video-info">' +
+        '<div>' +
+          '<div class="video-title">' + currentLessonData.name + '</div>' +
+          '<div class="video-meta">' +
+            '<span>⏱ ' + currentLessonData.duration + '</span>' +
+            '<span>📚 Module ' + (currentModule+1) + '</span>' +
+            '<span>📖 Leçon ' + (currentLesson+1) + '/' + mod.lessons.length + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<button class="btn-complete' + (isCompleted?' done':'') + '" onclick="markComplete(' + currentLessonData.id + ')">' +
+          (isCompleted ? '✓ Complétée' : '✅ Marquer complété') +
+        '</button>' +
+      '</div>' +
+    '</div>';
+
+    // LEÇONS DU MODULE
+    html += '<div class="lessons-card">' +
+      '<div class="lessons-header">' +
+        '<span class="lessons-title">Leçons — ' + mod.name + '</span>' +
+        '<span style="font-size:.75rem;color:var(--muted);">' + mod.lessons.filter(function(l){return completedLessons.includes(l.id);}).length + '/' + mod.lessons.length + ' complétées</span>' +
+      '</div>';
+
+    mod.lessons.forEach(function(lesson, lIdx) {
+      var isDone    = completedLessons.includes(lesson.id);
+      var isCurrent = lIdx === currentLesson;
+      var cls       = isDone ? 'done' : (isCurrent ? 'active' : '');
+      var badge     = isDone ? '<span class="lesson-badge done">✓ Fait</span>' : (isCurrent ? '<span class="lesson-badge current">En cours</span>' : '');
+
+      html += '<div class="lesson-item ' + cls + '" onclick="selectLesson(' + lIdx + ')">' +
+        '<div class="lesson-num">' + (isDone ? '✓' : (lIdx+1)) + '</div>' +
+        '<div class="lesson-info">' +
+          '<div class="lesson-name">' + lesson.name + '</div>' +
+          '<div class="lesson-duration">⏱ ' + lesson.duration + '</div>' +
+        '</div>' +
+        badge +
+      '</div>';
+    });
+
+    html += '</div>';
+
+    // CERTIFICAT (si tout complété)
+    if (allDone) {
+      html += '<div class="cert-card">' +
+        '<div class="cert-icon">🏆</div>' +
+        '<div>' +
+          '<div class="cert-title">Formation terminée !</div>' +
+          '<div class="cert-sub">Félicitations ! Vous avez complété toutes les leçons.<br>Téléchargez votre certificat de réussite.</div>' +
+          '<button class="btn-cert" onclick="downloadCertificate()">🎓 Télécharger mon certificat</button>' +
+        '</div>' +
+      '</div>';
+    } else {
+      html += '<div class="cert-card">' +
+        '<div class="cert-icon">🎓</div>' +
+        '<div>' +
+          '<div class="cert-title">Certificat de réussite</div>' +
+          '<div class="cert-sub">Complétez toutes les leçons pour obtenir votre certificat. (' + completedCount + '/' + totalLessons + ' complétées)</div>' +
+          '<button class="btn-cert" disabled>🎓 ' + Math.round((completedCount/totalLessons)*100) + '% complété</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById('contentArea').innerHTML = html;
+  }
+
+  // ── SÉLECTIONNER UNE LEÇON ──
+  function selectLesson(idx) {
+    currentLesson = idx;
+    var course = courseData || DEFAULT_COURSE;
+    renderModule(course.modules[currentModule]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── MARQUER COMME COMPLÉTÉE ──
+  function markComplete(lessonId) {
+    if (completedLessons.includes(lessonId)) return;
+    completedLessons.push(lessonId);
+
+    // Sauvegarder localement
+    localStorage.setItem('fa_progress_' + (tunnelSlug || 'default'), JSON.stringify(completedLessons));
+
+    // Passer à la leçon suivante automatiquement
+    var course = courseData || DEFAULT_COURSE;
+    var mod    = course.modules[currentModule];
+
+    if (currentLesson < mod.lessons.length - 1) {
+      currentLesson++;
+    } else if (currentModule < course.modules.length - 1) {
+      currentModule++;
+      currentLesson = 0;
+    }
+
+    loadCourse();
+  }
+
+  // ── MURO DE PAIEMENT ──
+  function showLockedOverlay() {
+    document.getElementById('moduleList').innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:.82rem;">Achetez le cours pour accéder aux modules.</div>';
+    document.getElementById('contentArea').innerHTML = '<div class="locked-overlay">' +
+      '<div class="locked-icon">🔒</div>' +
+      '<div class="locked-title">Contenu verrouillé</div>' +
+      '<div class="locked-sub">Vous devez acheter ce cours pour accéder à l\'espace membre.<br>Cliquez ci-dessous pour découvrir l\'offre.</div>' +
+      '<button class="btn-unlock" onclick="window.location.href=\'/funnelafrica-tunnel-public.html?t=\'+\''+tunnelSlug+'\'">🛒 Voir l\'offre →</button>' +
+    '</div>';
+  }
+
+  // ── CERTIFICAT PDF (simple) ──
+  function downloadCertificate() {
+    var name    = document.getElementById('topName').textContent;
+    var date    = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+    var course  = (courseData && courseData.title) || DEFAULT_COURSE.title;
+
+    var cert = '═══════════════════════════════════════\n' +
+      '         CERTIFICAT DE RÉUSSITE\n' +
+      '         FunnelAfrica Academy\n' +
+      '═══════════════════════════════════════\n\n' +
+      'Ce certificat est décerné à :\n\n' +
+      '    ' + name.toUpperCase() + '\n\n' +
+      'Pour avoir complété avec succès :\n\n' +
+      '    ' + course + '\n\n' +
+      'Date de complétion : ' + date + '\n\n' +
+      '═══════════════════════════════════════\n' +
+      '   funnelafrica.vercel.app\n' +
+      '═══════════════════════════════════════';
+
+    var blob = new Blob([cert], {type:'text/plain'});
+    var a    = document.createElement('a');
+    a.href   = URL.createObjectURL(blob);
+    a.download = 'certificat-' + name.toLowerCase().replace(/\s+/g,'-') + '.txt';
+    a.click();
+  }
+
+  // ── LOGOUT ──
+  function logout() {
+    sb.auth.signOut().then(function() {
+      window.location.href = '/funnelafrica-auth.html';
+    });
+  }
+</script>
+</body>
+</html>

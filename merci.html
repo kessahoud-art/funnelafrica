@@ -5,319 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paiement confirmé — FunnelAfrica</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-  :root {
-    --bg: #0a0f14;
-    --surface: #111820;
-    --surface2: #182030;
-    --border: #1e2a38;
-    --green: #00c896;
-    --green2: #00a87a;
-    --gold: #f5a623;
-    --text: #e8f0f8;
-    --muted: #6b7e93;
-  }
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,#00c89612 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,#f5a62310 0%,transparent 50%);pointer-events:none;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* PARTICLES */
+  .particle{position:fixed;border-radius:2px;opacity:0;animation:fall linear infinite;pointer-events:none;}
+  @keyframes fall{0%{opacity:1;transform:translateY(-20px) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
-  }
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;overflow:hidden;position:relative;z-index:1;animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
 
-  /* ── CONFETTI BG ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 20%, #00c89612 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, #f5a62310 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, #00c89608 0%, transparent 70%);
-    pointer-events: none;
-  }
+  /* HEADER */
+  .card-header{background:linear-gradient(135deg,#0d2a1a,#0a1f2e);padding:36px 32px 28px;text-align:center;border-bottom:1px solid var(--border);}
+  .success-ring{width:90px;height:90px;border-radius:50%;background:#00c89615;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2.2rem;animation:ringPop .6s cubic-bezier(.34,1.56,.64,1) .2s both;box-shadow:0 0 40px #00c89640;}
+  @keyframes ringPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--green);margin-bottom:6px;animation:fadeUp .4s ease .3s both;}
+  .success-sub{font-size:.88rem;color:#8fa5bc;animation:fadeUp .4s ease .4s both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-  /* ── PARTICLES ── */
-  .particle {
-    position: fixed;
-    width: 8px; height: 8px;
-    border-radius: 2px;
-    opacity: 0;
-    animation: fall linear infinite;
-    pointer-events: none;
-  }
+  /* BODY */
+  .card-body{padding:24px 28px;}
+  .order-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;animation:fadeUp .4s ease .45s both;}
+  .order-box-title{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+  .order-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+  .order-row:last-child{border-bottom:none;}
+  .order-row .label{color:var(--muted);}
+  .order-row .value{font-weight:600;}
+  .order-row .value.green{color:var(--green);}
+  .order-row .value.gold{color:var(--gold);}
 
-  @keyframes fall {
-    0%   { opacity: 1; transform: translateY(-20px) rotate(0deg); }
-    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
-  }
+  /* NEXT STEPS */
+  .next-steps{margin-bottom:20px;animation:fadeUp .4s ease .5s both;}
+  .next-steps-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .step-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:border-color .2s;}
+  .step-item:hover{border-color:#00c89640;}
+  .step-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-text{font-size:.82rem;line-height:1.5;}
+  .step-text strong{color:var(--text);display:block;margin-bottom:2px;}
+  .step-text span{color:var(--muted);}
 
-  /* ── MAIN CARD ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 520px;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-    animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
-  }
+  /* BUTTONS */
+  .btn-stack{display:flex;flex-direction:column;gap:10px;animation:fadeUp .4s ease .55s both;}
+  .btn{width:100%;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;text-decoration:none;}
+  .btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#0a0f14;box-shadow:0 6px 20px #00c89635;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px #00c89650;}
+  .btn-whatsapp{background:#25d36618;border:1px solid #25d36640;color:#25d366;}
+  .btn-whatsapp:hover{background:#25d36628;}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text);}
 
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(.85) translateY(20px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
+  /* FOOTER */
+  .card-footer{padding:16px 28px;border-top:1px solid var(--border);text-align:center;font-size:.75rem;color:var(--muted);background:#0d1520;animation:fadeUp .4s ease .6s both;}
 
-  /* ── HEADER ── */
-  .card-header {
-    background: linear-gradient(135deg, #0d2a1a, #0a1f2e);
-    padding: 36px 32px 28px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
+  /* LOADING */
+  .loading-state{text-align:center;padding:60px 32px;}
+  .loader{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loader-text{color:var(--muted);font-size:.85rem;}
 
-  .success-ring {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    background: #00c89615;
-    border: 3px solid var(--green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 18px;
-    font-size: 2.2rem;
-    animation: ringPop .6s cubic-bezier(.34,1.56,.64,1) .2s both;
-    box-shadow: 0 0 40px #00c89640;
-  }
-
-  @keyframes ringPop {
-    from { transform: scale(0); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
-  }
-
-  .success-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.6rem;
-    color: var(--green);
-    margin-bottom: 6px;
-    animation: fadeUp .4s ease .3s both;
-  }
-
-  .success-sub {
-    font-size: .88rem;
-    color: #8fa5bc;
-    animation: fadeUp .4s ease .4s both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── BODY ── */
-  .card-body { padding: 24px 28px; }
-
-  /* ── ORDER DETAILS ── */
-  .order-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 20px;
-    animation: fadeUp .4s ease .45s both;
-  }
-
-  .order-box-title {
-    font-family: 'Syne', sans-serif;
-    font-size: .7rem;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    margin-bottom: 12px;
-  }
-
-  .order-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: .83rem;
-  }
-
-  .order-row:last-child { border-bottom: none; }
-  .order-row .label { color: var(--muted); }
-  .order-row .value { font-weight: 600; }
-  .order-row .value.green { color: var(--green); }
-  .order-row .value.gold  { color: var(--gold); }
-
-  /* ── NEXT STEPS ── */
-  .next-steps {
-    margin-bottom: 20px;
-    animation: fadeUp .4s ease .5s both;
-  }
-
-  .next-steps-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: .82rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-bottom: 12px;
-  }
-
-  .step-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    transition: border-color .2s;
-  }
-
-  .step-item:hover { border-color: #00c89640; }
-
-  .step-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--green);
-    color: #0a0f14;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: .78rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .step-text { font-size: .82rem; line-height: 1.5; }
-  .step-text strong { color: var(--text); display: block; margin-bottom: 2px; }
-  .step-text span { color: var(--muted); }
-
-  /* ── BUTTONS ── */
-  .btn-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: fadeUp .4s ease .55s both;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: .9rem;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all .2s;
-    text-decoration: none;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--green), var(--green2));
-    color: #0a0f14;
-    box-shadow: 0 6px 20px #00c89635;
-  }
-
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px #00c89650; }
-
-  .btn-whatsapp {
-    background: #25d36618;
-    border: 1px solid #25d36640;
-    color: #25d366;
-  }
-
-  .btn-whatsapp:hover { background: #25d36628; }
-
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-
-  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-
-  /* ── FOOTER ── */
-  .card-footer {
-    padding: 16px 28px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    font-size: .75rem;
-    color: var(--muted);
-    background: #0d1520;
-    animation: fadeUp .4s ease .6s both;
-  }
-
-  /* ── LOADING STATE ── */
-  .loading-state {
-    text-align: center;
-    padding: 60px 32px;
-  }
-
-  .loader {
-    width: 44px; height: 44px;
-    border: 3px solid var(--border);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-    margin: 0 auto 16px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loader-text { color: var(--muted); font-size: .85rem; }
-
-  /* ── ERROR STATE ── */
-  .error-state {
-    display: none;
-    text-align: center;
-    padding: 40px 32px;
-  }
-
-  .error-icon { font-size: 2.5rem; margin-bottom: 12px; }
-
-  .error-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: #ff4d6d;
-    margin-bottom: 8px;
-  }
-
-  .error-sub { font-size: .83rem; color: var(--muted); margin-bottom: 20px; }
+  /* ERROR */
+  .error-state{display:none;text-align:center;padding:40px 32px;}
+  .error-icon{font-size:2.5rem;margin-bottom:12px;}
+  .error-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#ff4d6d;margin-bottom:8px;}
+  .error-sub{font-size:.83rem;color:var(--muted);margin-bottom:20px;}
 </style>
 </head>
 <body>
 
-<!-- PARTICULES CONFETTI -->
 <div id="particles"></div>
 
-<!-- CARD PRINCIPALE -->
 <div class="card" id="mainCard">
 
   <!-- LOADING -->
@@ -326,9 +87,8 @@
     <div class="loader-text">Vérification du paiement...</div>
   </div>
 
-  <!-- SUCCÈS (caché par défaut, affiché après vérif) -->
+  <!-- SUCCÈS -->
   <div id="successState" style="display:none;">
-
     <div class="card-header">
       <div class="success-ring">✅</div>
       <div class="success-title">Paiement confirmé !</div>
@@ -336,64 +96,42 @@
     </div>
 
     <div class="card-body">
-
-      <!-- Détails commande -->
       <div class="order-box">
         <div class="order-box-title">Récapitulatif</div>
-        <div class="order-row">
-          <span class="label">Produit</span>
-          <span class="value" id="productName">—</span>
-        </div>
-        <div class="order-row">
-          <span class="label">Montant payé</span>
-          <span class="value green" id="orderAmount">—</span>
-        </div>
-        <div class="order-row">
-          <span class="label">Méthode</span>
-          <span class="value" id="paymentMethod">—</span>
-        </div>
-        <div class="order-row">
-          <span class="label">Référence</span>
-          <span class="value" style="font-size:.75rem;font-family:monospace;" id="orderRef">—</span>
-        </div>
-        <div class="order-row">
-          <span class="label">Email envoyé à</span>
-          <span class="value gold" id="buyerEmail">—</span>
-        </div>
+        <div class="order-row"><span class="label">Produit</span><span class="value" id="productName">—</span></div>
+        <div class="order-row"><span class="label">Montant payé</span><span class="value green" id="orderAmount">—</span></div>
+        <div class="order-row"><span class="label">Méthode</span><span class="value" id="paymentMethod">—</span></div>
+        <div class="order-row"><span class="label">Référence</span><span class="value" style="font-size:.75rem;font-family:monospace;" id="orderRef">—</span></div>
+        <div class="order-row"><span class="label">Email envoyé à</span><span class="value gold" id="buyerEmail">—</span></div>
       </div>
 
-      <!-- Étapes suivantes -->
       <div class="next-steps">
         <div class="next-steps-title">Prochaines étapes</div>
-
         <div class="step-item">
           <div class="step-num">1</div>
           <div class="step-text">
-            <strong>Vérifiez votre email</strong>
-            <span>Un email avec vos identifiants de connexion vient d'être envoyé</span>
+            <strong>Accédez à votre contenu</strong>
+            <span>Cliquez sur le bouton ci-dessous pour accéder immédiatement</span>
           </div>
         </div>
-
         <div class="step-item">
           <div class="step-num">2</div>
           <div class="step-text">
-            <strong>Connectez-vous à votre espace</strong>
-            <span>Cliquez sur le lien dans l'email pour accéder à votre formation</span>
+            <strong>Vérifiez votre email</strong>
+            <span>Un email de confirmation a été envoyé avec vos accès</span>
           </div>
         </div>
-
         <div class="step-item">
           <div class="step-num">3</div>
           <div class="step-text">
             <strong>Rejoignez le groupe WhatsApp</strong>
-            <span>Communauté d'entraide exclusive pour les apprenants</span>
+            <span>Communauté d'entraide exclusive</span>
           </div>
         </div>
       </div>
 
-      <!-- Boutons d'action -->
       <div class="btn-stack">
-        <button class="btn btn-primary" onclick="goToAccess()">
+        <button class="btn btn-primary" id="accessBtn" onclick="goToAccess()">
           🚀 Accéder à ma formation maintenant
         </button>
         <button class="btn btn-whatsapp" onclick="joinWhatsApp()">
@@ -403,13 +141,11 @@
           🧾 Télécharger mon reçu
         </button>
       </div>
-
     </div>
 
     <div class="card-footer">
       Besoin d'aide ? Contactez-nous sur WhatsApp · <strong style="color:var(--green)">FunnelAfrica</strong>
     </div>
-
   </div>
 
   <!-- ERREUR -->
@@ -424,82 +160,90 @@
 
 </div>
 
-<script type="module">
-  // ── CONFIG ──
-  // Remplace par tes vraies clés Supabase
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
 
-  const SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
-  const supabase          = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const WHATSAPP_GROUP_LINK = 'https://chat.whatsapp.com/VOTRE_LIEN_GROUPE';
-  const MEMBER_AREA_URL     = '/espace-membre.html';
+  var WHATSAPP_GROUP = 'https://chat.whatsapp.com/VOTRE_LIEN_GROUPE';
+  var WHATSAPP_SUPPORT = 'https://wa.me/VOTRE_NUMERO';
+
+  // Récupérer les paramètres URL
+  var params      = new URLSearchParams(window.location.search);
+  var orderId     = params.get('order') || '';
+  var tunnelSlug  = params.get('tunnel') || '';
+
+  // URL d'accès dynamique selon le tunnel
+  var MEMBER_AREA_URL = tunnelSlug
+    ? '/espace-membre.html?tunnel=' + tunnelSlug
+    : '/espace-membre.html';
+
+  var METHODS = {
+    wave:'🌊 Wave', orange:'🟠 Orange Money',
+    mtn:'💛 MTN MoMo', cinetpay:'💚 CinetPay',
+    card:'💳 Carte', fedapay:'📱 FedaPay'
+  };
 
   // ── INIT ──
-  document.addEventListener('DOMContentLoaded', async () => {
-    const params  = new URLSearchParams(window.location.search);
-    const orderId = params.get('order');
-
-    if (!orderId) {
-      showError();
-      return;
-    }
-
-    try {
-      // Vérifier la commande dans Supabase
-      const { data: order, error } = await supabase
-        .from('orders')
-        .select('*, tunnels(name)')
-        .eq('payment_ref', orderId)
-        .single();
-
-      if (error || !order || order.payment_status !== 'paid') {
-        // Attendre 3 secondes (webhook peut être légèrement en retard)
-        await new Promise(r => setTimeout(r, 3000));
-
-        const { data: retry } = await supabase
-          .from('orders')
-          .select('*, tunnels(name)')
-          .eq('payment_ref', orderId)
-          .single();
-
-        if (!retry || retry.payment_status !== 'paid') {
-          showError();
-          return;
-        }
-        showSuccess(retry);
-      } else {
-        showSuccess(order);
-      }
-    } catch (err) {
-      console.error(err);
-      showError();
-    }
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!orderId) { showError(); return; }
+    verifyPayment(orderId);
   });
+
+  // ── VÉRIFIER LE PAIEMENT ──
+  function verifyPayment(ref) {
+    sb.from('orders')
+      .select('*, tunnels(name,slug)')
+      .eq('payment_ref', ref)
+      .single()
+      .then(function(r) {
+        var order = r.data;
+
+        if (!order || order.payment_status !== 'paid') {
+          // Réessayer après 3 secondes (webhook peut être en retard)
+          setTimeout(function() {
+            sb.from('orders')
+              .select('*, tunnels(name,slug)')
+              .eq('payment_ref', ref)
+              .single()
+              .then(function(r2) {
+                if (!r2.data || r2.data.payment_status !== 'paid') {
+                  showError();
+                } else {
+                  showSuccess(r2.data);
+                }
+              });
+          }, 3000);
+        } else {
+          showSuccess(order);
+        }
+      });
+  }
 
   // ── AFFICHER SUCCÈS ──
   function showSuccess(order) {
-    document.getElementById('loadingState').style.display   = 'none';
+    document.getElementById('loadingState').style.display  = 'none';
     document.getElementById('successState').style.display  = 'block';
     document.getElementById('errorState').style.display    = 'none';
 
-    const methods = {
-      wave: '🌊 Wave',
-      orange: '🟠 Orange Money',
-      mtn: '💛 MTN MoMo',
-      cinetpay: '💚 CinetPay',
-      card: '💳 Carte bancaire'
-    };
+    // Si le tunnel a un slug, utiliser celui de la commande
+    if (order.tunnels && order.tunnels.slug && !tunnelSlug) {
+      tunnelSlug = order.tunnels.slug;
+      MEMBER_AREA_URL = '/espace-membre.html?tunnel=' + tunnelSlug;
+    }
 
     document.getElementById('buyerName').textContent    = order.buyer_name || 'Client';
     document.getElementById('buyerEmail').textContent   = order.buyer_email || '—';
-    document.getElementById('productName').textContent  = order.tunnels?.name || 'Produit';
+    document.getElementById('productName').textContent  = (order.tunnels && order.tunnels.name) || 'Votre achat';
     document.getElementById('orderAmount').textContent  = (order.amount || 0).toLocaleString('fr') + ' ' + (order.currency || 'FCFA');
-    document.getElementById('paymentMethod').textContent = methods[order.payment_method] || order.payment_method || '—';
+    document.getElementById('paymentMethod').textContent = METHODS[order.payment_method] || order.payment_method || '—';
     document.getElementById('orderRef').textContent     = order.payment_ref || '—';
 
-    // Lancer les confettis
     launchConfetti();
   }
 
@@ -511,53 +255,61 @@
   }
 
   // ── ACTIONS ──
-  window.goToAccess     = () => window.location.href = MEMBER_AREA_URL;
-  window.joinWhatsApp   = () => window.open(WHATSAPP_GROUP_LINK, '_blank');
-  window.contactSupport = () => window.open('https://wa.me/VOTRE_NUMERO', '_blank');
+  function goToAccess() {
+    window.location.href = MEMBER_AREA_URL;
+  }
 
-  window.downloadReceipt = () => {
-    const ref    = document.getElementById('orderRef').textContent;
-    const amount = document.getElementById('orderAmount').textContent;
-    const name   = document.getElementById('buyerName').textContent;
-    const product = document.getElementById('productName').textContent;
-    const date   = new Date().toLocaleDateString('fr-FR');
+  function joinWhatsApp() {
+    window.open(WHATSAPP_GROUP, '_blank');
+  }
 
-    const receipt = `
-REÇU DE PAIEMENT — FunnelAfrica
-================================
-Date     : ${date}
-Client   : ${name}
-Produit  : ${product}
-Montant  : ${amount}
-Référence: ${ref}
-================================
-FunnelAfrica · funnelafrica.vercel.app
-    `.trim();
+  function contactSupport() {
+    window.open(WHATSAPP_SUPPORT, '_blank');
+  }
 
-    const blob = new Blob([receipt], { type: 'text/plain' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = `recu-${ref}.txt`;
+  function downloadReceipt() {
+    var ref     = document.getElementById('orderRef').textContent;
+    var amount  = document.getElementById('orderAmount').textContent;
+    var name    = document.getElementById('buyerName').textContent;
+    var product = document.getElementById('productName').textContent;
+    var date    = new Date().toLocaleDateString('fr-FR');
+
+    var receipt =
+      'REÇU DE PAIEMENT — FunnelAfrica\n' +
+      '================================\n' +
+      'Date     : ' + date + '\n' +
+      'Client   : ' + name + '\n' +
+      'Produit  : ' + product + '\n' +
+      'Montant  : ' + amount + '\n' +
+      'Référence: ' + ref + '\n' +
+      '================================\n' +
+      'FunnelAfrica · funnelafrica.vercel.app';
+
+    var blob = new Blob([receipt], {type:'text/plain'});
+    var a    = document.createElement('a');
+    a.href   = URL.createObjectURL(blob);
+    a.download = 'recu-' + ref + '.txt';
     a.click();
-  };
+  }
 
   // ── CONFETTI ──
   function launchConfetti() {
-    const colors = ['#00c896', '#f5a623', '#4da6ff', '#ff6b9d', '#a78bfa'];
-    const container = document.getElementById('particles');
-
-    for (let i = 0; i < 60; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left            = Math.random() * 100 + 'vw';
-      p.style.background      = colors[Math.floor(Math.random() * colors.length)];
-      p.style.width           = (Math.random() * 8 + 4) + 'px';
-      p.style.height          = (Math.random() * 8 + 4) + 'px';
-      p.style.animationDelay  = Math.random() * 3 + 's';
-      p.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      p.style.borderRadius    = Math.random() > 0.5 ? '50%' : '2px';
-      container.appendChild(p);
-      setTimeout(() => p.remove(), 6000);
+    var colors  = ['#00c896','#f5a623','#4da6ff','#ff6b9d','#a78bfa'];
+    var container = document.getElementById('particles');
+    for (var i = 0; i < 60; i++) {
+      (function() {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left              = Math.random() * 100 + 'vw';
+        p.style.background        = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width             = (Math.random() * 8 + 4) + 'px';
+        p.style.height            = (Math.random() * 8 + 4) + 'px';
+        p.style.animationDelay    = Math.random() * 3 + 's';
+        p.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        p.style.borderRadius      = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(p);
+        setTimeout(function() { p.remove(); }, 6000);
+      })();
     }
   }
 </script>
