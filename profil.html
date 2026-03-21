@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Profil — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+  .logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-mark span{width:30px;height:30px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#0a0f14;font-weight:800;flex-shrink:0;}
+  .plan-badge{margin-top:8px;font-size:.68rem;color:var(--gold);background:#f5a62318;border:1px solid #f5a62340;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Syne',sans-serif;font-weight:600;}
+  .nav{padding:12px 10px;flex:1;}
+  .nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 5px;font-family:'Syne',sans-serif;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:#00c89615;color:var(--green);}
+  .nav-icon{font-size:.85rem;flex-shrink:0;}
+  .sidebar-footer{padding:14px 12px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:9px;padding:9px;border-radius:9px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:#0a0f14;flex-shrink:0;}
+  .user-name{font-size:.8rem;font-weight:500;}
+  .user-plan{font-size:.68rem;color:var(--muted);}
+  .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn-primary{background:var(--green);color:#0a0f14;box-shadow:0 4px 14px #00c89630;}
+  .btn-primary:hover{background:#00dea8;transform:translateY(-1px);}
+  .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .btn-ghost:hover{color:var(--text);}
+  .btn-danger{background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);}
+  .btn-danger:hover{background:var(--danger);color:white;border-color:var(--danger);}
+  .content{padding:24px;max-width:800px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+  /* PROFILE HERO */
+  .profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:24px;animation:fadeUp .4s ease both;position:relative;overflow:hidden;}
+  .profile-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,#00c89615 0%,transparent 70%);pointer-events:none;}
+  .profile-avatar-wrap{position:relative;flex-shrink:0;}
+  .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:#0a0f14;cursor:pointer;transition:all .2s;border:3px solid var(--green);}
+  .profile-avatar:hover{transform:scale(1.05);}
+  .profile-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+  .profile-info{flex:1;}
+  .profile-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:4px;}
+  .profile-email{font-size:.82rem;color:var(--muted);margin-bottom:8px;}
+  .profile-badges{display:flex;gap:8px;flex-wrap:wrap;}
+  .profile-badge{font-size:.7rem;font-family:'Syne',sans-serif;font-weight:700;padding:4px 12px;border-radius:20px;}
+  .badge-plan{background:var(--gold);color:#0a0f14;}
+  .badge-member{background:#00c89618;border:1px solid #00c89640;color:var(--green);}
+  .badge-verified{background:#4da6ff18;border:1px solid #4da6ff40;color:#4da6ff;}
+
+  /* SECTIONS */
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;animation:fadeUp .5s ease both;}
+  .section:nth-child(2){animation-delay:.05s;}.section:nth-child(3){animation-delay:.10s;}.section:nth-child(4){animation-delay:.15s;}.section:nth-child(5){animation-delay:.20s;}.section:nth-child(6){animation-delay:.25s;}
+  .section-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;display:flex;align-items:center;gap:8px;}
+  .section-body{padding:20px;}
+  .form-group{margin-bottom:16px;}
+  .form-group:last-child{margin-bottom:0;}
+  .form-label{font-size:.72rem;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+  .form-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--green);}
+  .form-input::placeholder{color:#3a4f65;}
+  .form-input:disabled{opacity:.5;cursor:not-allowed;}
+  .form-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-size:.88rem;outline:none;cursor:pointer;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .input-with-copy{display:flex;gap:8px;}
+  .copy-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.75rem;padding:0 12px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;}
+  .copy-btn:hover{background:var(--green);color:#0a0f14;border-color:var(--green);}
+
+  /* TOGGLE */
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-info{flex:1;}
+  .toggle-label{font-size:.88rem;font-weight:500;margin-bottom:2px;}
+  .toggle-sub{font-size:.72rem;color:var(--muted);}
+  .toggle-sw{width:40px;height:22px;border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+  .toggle-sw.on{background:var(--green);}
+  .toggle-sw.off{background:var(--surface2);border:1px solid var(--border);}
+  .toggle-sw::after{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;transition:left .2s;}
+  .toggle-sw.on::after{left:21px;}
+  .toggle-sw.off::after{left:3px;}
+
+  /* PLAN CARD */
+  .plan-current{background:linear-gradient(135deg,#0d2a1a,#0a1f2e);border:1.5px solid var(--green);border-radius:12px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .plan-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);margin-bottom:4px;}
+  .plan-price{font-size:.82rem;color:var(--muted);}
+  .plan-features{font-size:.78rem;color:#8fa5bc;margin-top:8px;line-height:1.6;}
+
+  /* DANGER ZONE */
+  .danger-zone{background:#ff4d6d08;border:1px solid #ff4d6d30;border-radius:12px;padding:18px;}
+  .danger-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--danger);margin-bottom:6px;}
+  .danger-sub{font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(8px);display:none;}
+  .save-bar{position:fixed;bottom:0;left:220px;right:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 24px;display:none;align-items:center;justify-content:space-between;z-index:60;}
+  .save-bar.show{display:flex;}
+  .hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.3rem;}
+  .overlay-sb{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+  @media(max-width:760px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.overlay-sb.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}.content{padding:16px;}.topbar{padding:12px 16px;}.form-row{grid-template-columns:1fr;}.save-bar{left:0;}.profile-hero{flex-direction:column;text-align:center;}.profile-badges{justify-content:center;}}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<div class="overlay-sb" id="overlaySb" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark"><span>FA</span>FunnelAfrica</div>
+    <div class="plan-badge" id="planBadge">⚡ Plan Starter</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-templates.html?new=1'"><span class="nav-icon">🚀</span>Mes Tunnels</div>
+    <div class="nav-item" onclick="window.location.href='/produits.html'"><span class="nav-icon">📦</span>Produits</div>
+    <div class="nav-item" onclick="window.location.href='/commandes.html'"><span class="nav-icon">📋</span>Commandes</div>
+    <div class="nav-section">Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/statistiques.html'"><span class="nav-icon">📈</span>Statistiques</div>
+    <div class="nav-item" onclick="window.location.href='/email-marketing.html'"><span class="nav-icon">📧</span>Email Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/contacts.html'"><span class="nav-icon">👥</span>Contacts</div>
+    <div class="nav-item" onclick="window.location.href='/whatsapp.html'"><span class="nav-icon">📱</span>WhatsApp</div>
+    <div class="nav-item" onclick="window.location.href='/affiliation.html'"><span class="nav-icon">🤝</span>Affiliation</div>
+    <div class="nav-item" onclick="window.location.href='/facebook-ads.html'"><span class="nav-icon">📢</span>Facebook Ads</div>
+    <div class="nav-section">Paramètres</div>
+    <div class="nav-item active"><span class="nav-icon">👤</span>Mon profil</div>
+    <div class="nav-item" onclick="window.location.href='/abonnement.html'"><span class="nav-icon">💳</span>Plans & Paiements</div>
+    <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span>Déconnexion</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sideAvatar">?</div>
+      <div><div class="user-name" id="sideUserName">—</div><div class="user-plan" id="sideUserPlan">—</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">👤 Mon Profil</span>
+    </div>
+    <button class="btn btn-primary" onclick="saveAll()">💾 Sauvegarder</button>
+  </div>
+
+  <div class="content">
+
+    <!-- HERO PROFIL -->
+    <div class="profile-hero">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar" onclick="changePhoto()" title="Changer la photo">
+          <span id="profileInitials">?</span>
+        </div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">—</div>
+        <div class="profile-email" id="profileEmail">—</div>
+        <div class="profile-badges">
+          <span class="profile-badge badge-plan" id="badgePlan">Starter</span>
+          <span class="profile-badge badge-member" id="badgeMember">Membre depuis —</span>
+          <span class="profile-badge badge-verified">✓ Vérifié</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFOS PERSONNELLES -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">👤 Informations personnelles</span>
+      </div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prénom</label>
+            <input class="form-input" type="text" id="firstName" placeholder="Moussa" oninput="onFormChange()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <input class="form-input" type="text" id="lastName" placeholder="Koné" oninput="onFormChange()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span style="color:var(--muted);font-size:.65rem;text-transform:none;letter-spacing:0;font-weight:400;">(non modifiable)</span></label>
+          <input class="form-input" type="email" id="userEmail" disabled>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Téléphone WhatsApp</label>
+            <input class="form-input" type="tel" id="phone" placeholder="+229 97 00 00 00" oninput="onFormChange()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pays</label>
+            <select class="form-select" id="country" onchange="onFormChange()">
+              <option value="BJ">🇧🇯 Bénin</option>
+              <option value="CI">🇨🇮 Côte d'Ivoire</option>
+              <option value="SN">🇸🇳 Sénégal</option>
+              <option value="ML">🇲🇱 Mali</option>
+              <option value="BF">🇧🇫 Burkina Faso</option>
+              <option value="TG">🇹🇬 Togo</option>
+              <option value="CM">🇨🇲 Cameroun</option>
+              <option value="GN">🇬🇳 Guinée</option>
+              <option value="NE">🇳🇪 Niger</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bio courte</label>
+          <input class="form-input" type="text" id="bio" placeholder="Ex: Formateur Excel · Cotonou" oninput="onFormChange()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Site web / Lien WhatsApp</label>
+          <input class="form-input" type="text" id="website" placeholder="https://wa.me/22997000000" oninput="onFormChange()">
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFIL PUBLIC -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🌐 Profil public vendeur</span>
+        <span style="font-size:.72rem;color:var(--muted);">Affiché sur vos pages de vente</span>
+      </div>
+      <div class="section-body">
+        <div class="form-group">
+          <label class="form-label">Nom affiché sur vos tunnels</label>
+          <input class="form-input" type="text" id="displayName" placeholder="Kessahou Delphin" oninput="onFormChange()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Photo de profil (URL)</label>
+          <input class="form-input" type="text" id="photoUrl" placeholder="https://..." oninput="onFormChange();updatePhotoPreview()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lien d'affiliation</label>
+          <div class="input-with-copy">
+            <input class="form-input" type="text" id="affLink" readonly style="font-family:monospace;font-size:.78rem;">
+            <button class="copy-btn" onclick="copyAffLink()">📋 Copier</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lien de parrainage</label>
+          <div class="input-with-copy">
+            <input class="form-input" type="text" id="refLink" readonly style="font-family:monospace;font-size:.78rem;">
+            <button class="copy-btn" onclick="copyRefLink()">📋 Copier</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MON PLAN -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">⚡ Mon abonnement</span>
+        <button class="btn btn-ghost" style="padding:6px 12px;font-size:.75rem;" onclick="window.location.href='/abonnement.html'">Changer de plan →</button>
+      </div>
+      <div class="section-body">
+        <div class="plan-current">
+          <div>
+            <div class="plan-name" id="planName">Plan Starter</div>
+            <div class="plan-price" id="planPrice">3 000 FCFA / mois</div>
+            <div class="plan-features" id="planFeatures">1 tunnel · 500 contacts</div>
+          </div>
+          <button class="btn btn-primary" onclick="window.location.href='/abonnement.html'">⚡ Upgrader →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🔔 Notifications</span>
+      </div>
+      <div class="section-body">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Nouvelle vente</div>
+            <div class="toggle-sub">Recevoir un email à chaque vente réalisée</div>
+          </div>
+          <div class="toggle-sw on" id="notif-sale" onclick="toggleNotif('sale',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Nouveau contact</div>
+            <div class="toggle-sub">Recevoir un email à chaque opt-in</div>
+          </div>
+          <div class="toggle-sw on" id="notif-contact" onclick="toggleNotif('contact',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Résumé hebdomadaire</div>
+            <div class="toggle-sub">Recevoir un rapport chaque lundi</div>
+          </div>
+          <div class="toggle-sw off" id="notif-weekly" onclick="toggleNotif('weekly',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Conseils & nouveautés</div>
+            <div class="toggle-sub">Recevoir des tips pour vendre plus</div>
+          </div>
+          <div class="toggle-sw on" id="notif-tips" onclick="toggleNotif('tips',this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SÉCURITÉ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🔒 Sécurité</span>
+      </div>
+      <div class="section-body">
+        <div class="form-group">
+          <label class="form-label">Nouveau mot de passe</label>
+          <input class="form-input" type="password" id="newPassword" placeholder="Minimum 8 caractères">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmer le mot de passe</label>
+          <input class="form-input" type="password" id="confirmPassword" placeholder="Répétez le mot de passe">
+        </div>
+        <button class="btn btn-ghost" onclick="changePassword()">🔒 Changer le mot de passe</button>
+      </div>
+    </div>
+
+    <!-- ZONE DANGER -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title" style="color:var(--danger);">⚠️ Zone de danger</span>
+      </div>
+      <div class="section-body">
+        <div class="danger-zone">
+          <div class="danger-title">Supprimer mon compte</div>
+          <div class="danger-sub">Cette action est irréversible. Tous vos tunnels, contacts et données seront définitivement supprimés.</div>
+          <button class="btn btn-danger" onclick="deleteAccount()">🗑 Supprimer mon compte</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- SAVE BAR -->
+<div class="save-bar" id="saveBar">
+  <span style="font-size:.82rem;color:var(--muted);">⚠️ Modifications non sauvegardées</span>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-ghost" onclick="cancelChanges()">Annuler</button>
+    <button class="btn btn-primary" onclick="saveAll()">💾 Sauvegarder</button>
+  </div>
+</div>
+
+<script>
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+  var originalData = {};
+  var hasChanges   = false;
+  var notifs       = { sale:true, contact:true, weekly:false, tips:true };
+
+  var PLAN_INFO = {
+    starter: { name:'Plan Starter', price:'3 000 FCFA / mois', features:'1 tunnel · 500 contacts · Paiement Mobile Money' },
+    pro:     { name:'Plan Pro',     price:'9 900 FCFA / mois', features:'Tunnels illimités · Email marketing · 5 000 contacts' },
+    scale:   { name:'Plan Scale',   price:'24 900 FCFA / mois',features:'Tout illimité · Espace membre · Affiliation · WhatsApp' }
+  };
+
+  sb.auth.getUser().then(function(r) {
+    if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
+    currentUser = r.data.user;
+    document.getElementById('userEmail').value = r.data.user.email;
+    document.getElementById('profileEmail').textContent = r.data.user.email;
+    loadProfile();
+  });
+
+  function loadProfile() {
+    sb.from('profiles').select('*').eq('id', currentUser.id).single().then(function(r) {
+      var p = r.data || {};
+      var fullName = p.full_name || '';
+      var parts    = fullName.split(' ');
+      var first    = parts[0] || '';
+      var last     = parts.slice(1).join(' ') || '';
+      var initials = fullName.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2) || '?';
+      var plan     = p.plan || 'starter';
+      var planInfo = PLAN_INFO[plan] || PLAN_INFO.starter;
+
+      // Hero
+      document.getElementById('profileInitials').textContent = initials;
+      document.getElementById('profileName').textContent     = fullName || 'Votre nom';
+      document.getElementById('sideAvatar').textContent      = initials;
+      document.getElementById('sideUserName').textContent    = fullName || '—';
+      document.getElementById('sideUserPlan').textContent    = 'Plan '+plan;
+      document.getElementById('planBadge').textContent       = '⚡ Plan '+plan.charAt(0).toUpperCase()+plan.slice(1);
+      document.getElementById('badgePlan').textContent       = plan.charAt(0).toUpperCase()+plan.slice(1);
+
+      var created = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}) : '—';
+      document.getElementById('badgeMember').textContent = 'Membre depuis '+created;
+
+      // Formulaire
+      document.getElementById('firstName').value   = first;
+      document.getElementById('lastName').value    = last;
+      document.getElementById('phone').value       = p.phone || '';
+      document.getElementById('bio').value         = p.bio   || '';
+      document.getElementById('website').value     = p.website || '';
+      document.getElementById('displayName').value = p.display_name || fullName;
+      document.getElementById('photoUrl').value    = p.photo_url || '';
+      if (p.country) document.getElementById('country').value = p.country;
+
+      // Plan
+      document.getElementById('planName').textContent     = planInfo.name;
+      document.getElementById('planPrice').textContent    = planInfo.price;
+      document.getElementById('planFeatures').textContent = planInfo.features;
+      document.getElementById('sideUserPlan').textContent = planInfo.name+' · Actif';
+
+      // Liens
+      var affCode = p.affiliate_code || currentUser.id.substring(0,8);
+      document.getElementById('affLink').value = 'https://funnelafrica.vercel.app/?ref='+affCode;
+      document.getElementById('refLink').value = 'https://funnelafrica.vercel.app/?invite='+affCode;
+
+      // Photo
+      if (p.photo_url) updatePhotoPreview();
+
+      // Notifs
+      if (p.notifications) {
+        notifs = Object.assign(notifs, p.notifications);
+        Object.keys(notifs).forEach(function(k) {
+          var el = document.getElementById('notif-'+k);
+          if (el) el.className = 'toggle-sw '+(notifs[k]?'on':'off');
+        });
+      }
+
+      originalData = {
+        first:first, last:last, phone:p.phone||'', bio:p.bio||'',
+        website:p.website||'', displayName:p.display_name||fullName,
+        photoUrl:p.photo_url||''
+      };
+    });
+  }
+
+  function onFormChange() {
+    hasChanges = true;
+    document.getElementById('saveBar').classList.add('show');
+    // Mettre à jour le héro en temps réel
+    var first = document.getElementById('firstName').value.trim();
+    var last  = document.getElementById('lastName').value.trim();
+    var full  = first+(last?' '+last:'');
+    var ini   = full.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2)||'?';
+    document.getElementById('profileName').textContent     = full || 'Votre nom';
+    document.getElementById('profileInitials').textContent = ini;
+    document.getElementById('sideAvatar').textContent      = ini;
+    document.getElementById('sideUserName').textContent    = full || '—';
+  }
+
+  function updatePhotoPreview() {
+    var url = document.getElementById('photoUrl').value.trim();
+    var av  = document.getElementById('profileAvatar');
+    if (url) {
+      av.innerHTML = '<img src="'+url+'" onerror="this.style.display=\'none\'">';
+    } else {
+      av.innerHTML = '<span id="profileInitials">'+document.getElementById('profileInitials').textContent+'</span>';
+    }
+  }
+
+  function saveAll() {
+    var first   = document.getElementById('firstName').value.trim();
+    var last    = document.getElementById('lastName').value.trim();
+    var phone   = document.getElementById('phone').value.trim();
+    var bio     = document.getElementById('bio').value.trim();
+    var website = document.getElementById('website').value.trim();
+    var display = document.getElementById('displayName').value.trim();
+    var photo   = document.getElementById('photoUrl').value.trim();
+    var country = document.getElementById('country').value;
+    if (!first) { showToast('Le prénom est requis','error'); return; }
+    var full = first+(last?' '+last:'');
+    sb.from('profiles').update({
+      full_name:    full,
+      phone:        phone,
+      bio:          bio,
+      website:      website,
+      display_name: display||full,
+      photo_url:    photo,
+      country:      country,
+      notifications: notifs,
+      updated_at:   new Date().toISOString()
+    }).eq('id', currentUser.id).then(function(r) {
+      if (r.error) { showToast('Erreur : '+r.error.message,'error'); return; }
+      hasChanges = false;
+      document.getElementById('saveBar').classList.remove('show');
+      showToast('✓ Profil sauvegardé !','success');
+    });
+  }
+
+  function cancelChanges() {
+    document.getElementById('firstName').value   = originalData.first;
+    document.getElementById('lastName').value    = originalData.last;
+    document.getElementById('phone').value       = originalData.phone;
+    document.getElementById('bio').value         = originalData.bio;
+    document.getElementById('website').value     = originalData.website;
+    document.getElementById('displayName').value = originalData.displayName;
+    document.getElementById('photoUrl').value    = originalData.photoUrl;
+    hasChanges = false;
+    document.getElementById('saveBar').classList.remove('show');
+  }
+
+  function toggleNotif(key, toggle) {
+    notifs[key] = !notifs[key];
+    toggle.className = 'toggle-sw '+(notifs[key]?'on':'off');
+    onFormChange();
+  }
+
+  function changePassword() {
+    var pwd  = document.getElementById('newPassword').value;
+    var conf = document.getElementById('confirmPassword').value;
+    if (!pwd||pwd.length<8) { showToast('Mot de passe minimum 8 caractères','error'); return; }
+    if (pwd!==conf) { showToast('Les mots de passe ne correspondent pas','error'); return; }
+    sb.auth.updateUser({ password: pwd }).then(function(r) {
+      if (r.error) { showToast('Erreur : '+r.error.message,'error'); return; }
+      showToast('✓ Mot de passe mis à jour !','success');
+      document.getElementById('newPassword').value     = '';
+      document.getElementById('confirmPassword').value = '';
+    });
+  }
+
+  function changePhoto() {
+    var url = prompt('URL de votre photo de profil :');
+    if (url) {
+      document.getElementById('photoUrl').value = url;
+      updatePhotoPreview();
+      onFormChange();
+    }
+  }
+
+  function copyAffLink() {
+    var link = document.getElementById('affLink').value;
+    navigator.clipboard.writeText(link).then(function(){showToast('✓ Lien affilié copié !','success');});
+  }
+
+  function copyRefLink() {
+    var link = document.getElementById('refLink').value;
+    navigator.clipboard.writeText(link).then(function(){showToast('✓ Lien de parrainage copié !','success');});
+  }
+
+  function deleteAccount() {
+    if (!confirm('⚠️ Êtes-vous sûr ? Cette action supprime définitivement votre compte et toutes vos données.')) return;
+    if (!confirm('Dernière confirmation : supprimer votre compte FunnelAfrica ?')) return;
+    showToast('Pour supprimer votre compte, contactez support@funnelafrica.com','success');
+  }
+
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}
+  function logout(){sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';});}
+
+  function showToast(msg,type){
+    var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00c89618',border:'#00c89640',color:'#00c896'};
+    var t=document.getElementById('__toast');
+    t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(8px);';
+    t.textContent=msg;
+    setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)';},3500);
+  }
+</script>
+</body>
+</html>
