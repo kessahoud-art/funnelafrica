@@ -143,11 +143,14 @@
   /* HAMBURGER */
   .hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.3rem;}
   .overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+  .tfilter-btn{padding:6px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;}
+  .tfilter-btn.tfilter-active{background:var(--surface);color:var(--text);}
+  .tfilter-btn:hover{color:var(--text);}
 
   /* RESPONSIVE */
   @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.chart-row{grid-template-columns:1fr;}}
   @media(max-width:760px){
-    .sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}
+    .sidebar{transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}
     .overlay.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}
     .vendor-row{grid-template-columns:1fr 1fr;}.vendor-row .cell:nth-child(n+4),.vendor-row .action-btns{display:none;}
     .content{padding:16px;}.kpi-grid{grid-template-columns:repeat(2,1fr);}
@@ -385,9 +388,9 @@
           <span class="table-title">🚀 Tous les tunnels de la plateforme</span>
           <div style="display:flex;gap:8px;align-items:center;">
             <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px;">
-              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:var(--surface);color:var(--text);" id="tfilter-all" onclick="filterAdminTunnels('all',this)">Tous</button>
-              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);" id="tfilter-live" onclick="filterAdminTunnels('live',this)">🟢 Actifs</button>
-              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);" id="tfilter-draft" onclick="filterAdminTunnels('draft',this)">⚫ Brouillons</button>
+              <button class="tfilter-btn tfilter-active" id="tfilter-all" onclick="filterAdminTunnels('all',this)">Tous</button>
+              <button class="tfilter-btn" id="tfilter-live" onclick="filterAdminTunnels('live',this)">🟢 Actifs</button>
+              <button class="tfilter-btn" id="tfilter-draft" onclick="filterAdminTunnels('draft',this)">⚫ Brouillons</button>
             </div>
             <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="allTunnelCount">—</span>
           </div>
@@ -554,7 +557,7 @@
   //  SEUL ENDROIT À MODIFIER — ta clé anon
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   // ══════════════════════════════════════════
 
   // ⚠️ IMPORTANT — ton email CEO (toi seulement)
@@ -600,10 +603,10 @@
   }
 
   function filterAdminTunnels(status, btn) {
-    document.querySelectorAll('[id^="tfilter-"]').forEach(function(b) {
-      b.style.background = 'transparent'; b.style.color = 'var(--muted)';
+    document.querySelectorAll('.tfilter-btn').forEach(function(b) {
+      b.classList.remove('tfilter-active');
     });
-    btn.style.background = 'var(--surface)'; btn.style.color = 'var(--text)';
+    btn.classList.add('tfilter-active');
     var filtered = status === 'all' ? allAdminTunnels : allAdminTunnels.filter(function(t){return t.status===status;});
     renderAdminTunnels(filtered);
   }
