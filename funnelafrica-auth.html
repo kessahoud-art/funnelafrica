@@ -394,7 +394,9 @@
       setLoading('loginBtn','loginSpinner','loginBtnText', false, 'Se connecter');
     } else {
       showAlert('success', '✓ Connexion réussie ! Redirection...');
-      setTimeout(() => window.location.href = '/funnelafrica-dashboard.html', 1200);
+const params = new URLSearchParams(window.location.search);
+const redirect = params.get('redirect') || '/funnelafrica-dashboard.html';
+setTimeout(() => window.location.href = redirect, 1200);
     }
   }
 
