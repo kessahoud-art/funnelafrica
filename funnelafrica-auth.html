@@ -992,6 +992,16 @@
       else if (currentTab === 'register') handleRegister();
     }
   });
+  // ── EXPOSER AU HTML ──
+  window.handleLogin    = handleLogin;
+  window.handleRegister = handleRegister;
+  window.handleForgot   = handleForgot;
+  window.handleGoogle   = handleGoogle;
+  window.switchTab      = switchTab;
+  window.switchToForgot = switchToForgot;
+  window.selectPlan     = selectPlan;
+  window.togglePass     = togglePass;
+</script>
 </script>
 </body>
 </html>
