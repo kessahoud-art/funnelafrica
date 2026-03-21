@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2a3342;
+    --green:#00c896;--green-dim:#00c89620;--gold:#f5a623;--gold-dim:#f5a62320;
+    --text:#e6edf3;--muted:#7d8fa3;--danger:#ff4d6d;--radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;}
+
+  /* SIDEBAR */
+  .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s ease;}
+  .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--green);display:flex;align-items:center;gap:10px;}
+  .logo-mark span{width:32px;height:32px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#0d1117;font-weight:800;}
+  .plan-badge{margin-top:10px;font-size:.72rem;color:var(--gold);background:var(--gold-dim);border:1px solid #f5a62340;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Syne',sans-serif;font-weight:600;}
+  .nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;}
+  .nav-section-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:12px 8px 6px;font-family:'Syne',sans-serif;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--muted);font-size:.88rem;font-weight:400;transition:all .2s;position:relative;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:var(--green-dim);color:var(--green);font-weight:500;}
+  .nav-item.active::before{content:'';position:absolute;left:-12px;width:3px;height:60%;background:var(--green);border-radius:0 3px 3px 0;}
+  .nav-icon{width:18px;height:18px;opacity:.8;flex-shrink:0;}
+  .nav-badge{margin-left:auto;background:var(--green);color:#0d1117;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
+  .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:background .2s;}
+  .user-card:hover{background:var(--surface2);}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#0d1117;flex-shrink:0;}
+  .user-info{flex:1;min-width:0;}
+  .user-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-plan{font-size:.7rem;color:var(--muted);}
+
+  /* MAIN */
+  .main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;}
+  .topbar-actions{display:flex;align-items:center;gap:12px;}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;border:none;transition:all .2s;}
+  .btn-primary{background:var(--green);color:#0d1117;font-family:'Syne',sans-serif;font-weight:700;}
+  .btn-primary:hover{background:#00dea8;transform:translateY(-1px);box-shadow:0 6px 20px #00c89640;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+  .content{padding:28px;flex:1;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;animation:fadeUp .5s ease both;}
+  .stat-card:nth-child(1){animation-delay:.05s;}.stat-card:nth-child(2){animation-delay:.10s;}.stat-card:nth-child(3){animation-delay:.15s;}.stat-card:nth-child(4){animation-delay:.20s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.06;transform:translate(20px,-20px);}
+  .stat-card.green::after{background:var(--green);}.stat-card.gold::after{background:var(--gold);}.stat-card.blue::after{background:#4da6ff;}.stat-card.pink::after{background:#ff6b9d;}
+  .stat-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-family:'Syne',sans-serif;}
+  .stat-value{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;line-height:1;margin-bottom:8px;}
+  .stat-card.green .stat-value{color:var(--green);}.stat-card.gold .stat-value{color:var(--gold);}.stat-card.blue .stat-value{color:#4da6ff;}.stat-card.pink .stat-value{color:#ff6b9d;}
+  .stat-trend{font-size:.75rem;color:var(--green);}
+  .stat-trend.down{color:var(--danger);}
+
+  /* MAIN GRID */
+  .main-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp .5s ease .25s both;}
+  .card-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .card-body{padding:20px;}
+
+  /* TUNNELS */
+  .tunnel-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;}
+  .tunnel-item:last-child{border-bottom:none;}
+  .tunnel-item:hover{background:var(--surface2);}
+  .tunnel-icon{width:40px;height:40px;border-radius:10px;background:var(--green-dim);border:1px solid #00c89630;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+  .tunnel-info{flex:1;min-width:0;}
+  .tunnel-name{font-weight:500;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+  .tunnel-meta{font-size:.75rem;color:var(--muted);display:flex;gap:12px;}
+  .tunnel-stats{text-align:right;flex-shrink:0;}
+  .tunnel-revenue{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--green);}
+  .tunnel-conv{font-size:.72rem;color:var(--muted);}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+  .status-dot.off{background:var(--muted);box-shadow:none;animation:none;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  /* ORDERS */
+  .order-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .order-item:last-child{border-bottom:none;}
+  .order-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2a3342,#3a4557);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;}
+  .order-info{flex:1;min-width:0;}
+  .order-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .order-product{font-size:.72rem;color:var(--muted);}
+  .order-amount{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--gold);text-align:right;flex-shrink:0;}
+  .order-method{font-size:.65rem;color:var(--muted);text-align:right;}
+
+  /* QUICK ACTIONS */
+  .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;text-align:center;transition:all .2s;}
+  .quick-btn:hover{border-color:var(--green);background:var(--green-dim);}
+  .quick-btn-icon{font-size:1.3rem;margin-bottom:6px;}
+  .quick-btn-label{font-size:.75rem;color:var(--muted);font-weight:500;}
+
+  /* CHART */
+  .mini-chart{height:60px;display:flex;align-items:flex-end;gap:4px;padding-top:8px;}
+  .bar{flex:1;border-radius:4px 4px 0 0;background:var(--green-dim);border-top:2px solid var(--green);min-height:4px;}
+  .bar.highlight{background:var(--green);opacity:.8;}
+
+  /* SKELETON */
+  .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
+  @keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
+
+  /* NOTIF */
+  .notif-btn{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--muted);}
+  .notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--green);border-radius:50%;border:2px solid var(--surface);}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:#00000090;z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;padding:28px;animation:fadeUp .3s ease;}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px;}
+  .modal-sub{color:var(--muted);font-size:.85rem;margin-bottom:24px;line-height:1.7;}
+  .modal-feature{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;font-size:.83rem;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;padding:4px;background:var(--surface2);border-radius:10px;width:fit-content;}
+  .tab{padding:6px 14px;border-radius:7px;font-size:.78rem;font-weight:500;cursor:pointer;color:var(--muted);transition:all .2s;}
+  .tab.active{background:var(--surface);color:var(--text);}
+
+  /* HAMBURGER */
+  .hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.3rem;padding:4px;}
+  .overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+
+  /* RESPONSIVE */
+  @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:800px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .overlay.open{display:block;}
+    .main{margin-left:0;}
+    .hamburger{display:flex;}
+    .main-grid{grid-template-columns:1fr;}
+    .content{padding:16px;}
+    .topbar{padding:14px 16px;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+    .stat-value{font-size:1.4rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark"><span>FA</span>FunnelAfrica</div>
+    <div class="plan-badge" id="planBadge">⚡ Plan Starter</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section-label">Principal</div>
+    <div class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="goToTemplates()">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 0M3 8l14 0M3 13l10 0M3 18l6 0"/></svg>
+      Mes Tunnels
+      <span class="nav-badge" id="tunnelCount">0</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Produits
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Commandes
+    </div>
+    <div class="nav-section-label">Marketing</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Email Marketing
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Contacts
+    </div>
+    <div class="nav-section-label">Paramètres</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Paiements
+    </div>
+    <div class="nav-item" onclick="logout()">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="userAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Chargement...</div>
+        <div class="user-plan" id="userPlan">—</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+      <button class="btn btn-primary" onclick="openNewTunnelModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau Tunnel
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-label">Revenus ce mois</div>
+        <div class="stat-value" id="statRevenue">—</div>
+        <div class="stat-trend" id="statRevenueSub">FCFA</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-label">Commandes</div>
+        <div class="stat-value" id="statOrders">—</div>
+        <div class="stat-trend" style="color:var(--gold);">ce mois</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Visites tunnels</div>
+        <div class="stat-value" id="statViews">—</div>
+        <div class="stat-trend" style="color:#4da6ff;">vues totales</div>
+      </div>
+      <div class="stat-card pink">
+        <div class="stat-label">Taux conversion</div>
+        <div class="stat-value" id="statConv">—</div>
+        <div class="stat-trend" style="color:#ff6b9d;">moyenne tunnels</div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+      <div>
+        <!-- TUNNELS -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <span class="card-title">Mes Tunnels de Vente</span>
+            <div class="tabs">
+              <div class="tab active">Tous</div>
+              <div class="tab">Actifs</div>
+              <div class="tab">Brouillons</div>
+            </div>
+          </div>
+          <div id="tunnelsList">
+            <div style="padding:20px;">
+              <div class="skeleton" style="height:56px;margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:56px;margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:56px;"></div>
+            </div>
+          </div>
+          <div style="padding:16px 20px;">
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="openNewTunnelModal()">
+              + Créer un nouveau tunnel
+            </button>
+          </div>
+        </div>
+
+        <!-- CHART -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Revenus 7 derniers jours</span>
+            <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="chartBadge">—</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+              <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--green);" id="chartTotal">—</span>
+              <span style="font-size:.75rem;color:var(--muted);">7 derniers jours</span>
+            </div>
+            <div class="mini-chart">
+              <div class="bar" style="height:30%"></div>
+              <div class="bar" style="height:45%"></div>
+              <div class="bar" style="height:35%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:50%"></div>
+              <div class="bar" style="height:75%"></div>
+              <div class="bar highlight" style="height:100%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px;">
+              <span style="font-size:.65rem;color:var(--muted)">Lun</span>
+              <span style="font-size:.65rem;color:var(--muted)">Mar</span>
+              <span style="font-size:.65rem;color:var(--muted)">Mer</span>
+              <span style="font-size:.65rem;color:var(--muted)">Jeu</span>
+              <span style="font-size:.65rem;color:var(--muted)">Ven</span>
+              <span style="font-size:.65rem;color:var(--muted)">Sam</span>
+              <span style="font-size:.65rem;color:var(--green);font-weight:700">Auj</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Actions rapides</span></div>
+          <div class="card-body">
+            <div class="quick-actions">
+              <div class="quick-btn" onclick="openNewTunnelModal()">
+                <div class="quick-btn-icon">🚀</div>
+                <div class="quick-btn-label">Nouveau tunnel</div>
+              </div>
+              <div class="quick-btn">
+                <div class="quick-btn-icon">📦</div>
+                <div class="quick-btn-label">Ajouter produit</div>
+              </div>
+              <div class="quick-btn">
+                <div class="quick-btn-icon">📧</div>
+                <div class="quick-btn-label">Envoyer email</div>
+              </div>
+              <div class="quick-btn">
+                <div class="quick-btn-icon">💳</div>
+                <div class="quick-btn-label">Paiements</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="flex:1;">
+          <div class="card-header">
+            <span class="card-title">Dernières commandes</span>
+            <span style="font-size:.75rem;color:var(--green);cursor:pointer;">Tout voir</span>
+          </div>
+          <div class="card-body" style="padding-top:8px;" id="ordersFeed">
+            <div class="skeleton" style="height:48px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:48px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:48px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL NOUVEAU TUNNEL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">🚀 Créer un nouveau tunnel</div>
+    <div class="modal-sub">Choisissez parmi nos 6 templates optimisés pour le marché africain. Personnalisez en quelques clics, publiez en 1 minute.</div>
+    <div class="modal-feature">🎨 <span>6 templates prêts : Formation, Coaching, Produit, Ebook, Service, Lead magnet</span></div>
+    <div class="modal-feature">💳 <span>Wave, Orange Money, MTN MoMo intégrés</span></div>
+    <div class="modal-feature">⚡ <span>De la création au premier paiement en 15 min</span></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="goToTemplates()">
+        🎨 Choisir un template →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ══════════════════════════════
+  //  CONFIG — remplace tes clés
+  // ══════════════════════════════
+  const SUPABASE_URL      = 'https://VOTRE_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  const supabase          = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const METHODS = { wave:'📱 Wave', orange:'📱 Orange Money', mtn:'📱 MTN MoMo', cinetpay:'💳 CinetPay', card:'💳 Carte' };
+  const ICONS   = { formation:'📘', coaching:'🎯', physique:'📦', ebook:'📄', service:'🛠', leadmagnet:'🎁' };
+
+  // ══════════════════════════════
+  //  INIT — vérif auth + chargement
+  // ══════════════════════════════
+  document.addEventListener('DOMContentLoaded', async () => {
+    const { data:{ user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = '/funnelafrica-auth.html'; return; }
+
+    await Promise.all([
+      loadProfile(user),
+      loadStats(user.id),
+      loadTunnels(user.id),
+      loadOrders(user.id)
+    ]);
+  });
+
+  // ══════════════════════════════
+  //  PROFIL
+  // ══════════════════════════════
+  async function loadProfile(user) {
+    const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    if (!p) return;
+    const name     = p.full_name || user.email?.split('@')[0] || 'Vendeur';
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userName').textContent   = name;
+    document.getElementById('userPlan').textContent   = `Plan ${p.plan || 'starter'} · Actif`;
+    document.getElementById('planBadge').textContent  = `⚡ Plan ${(p.plan||'starter').charAt(0).toUpperCase()+(p.plan||'starter').slice(1)}`;
+  }
+
+  // ══════════════════════════════
+  //  STATS
+  // ══════════════════════════════
+  async function loadStats(userId) {
+    const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
+
+    const [{ data: orders }, { data: tunnels }] = await Promise.all([
+      supabase.from('orders').select('amount').eq('user_id', userId).eq('payment_status', 'paid').gte('created_at', start.toISOString()),
+      supabase.from('tunnels').select('views,orders').eq('user_id', userId)
+    ]);
+
+    const revenue     = (orders||[]).reduce((s,o) => s+(o.amount||0), 0);
+    const orderCount  = (orders||[]).length;
+    const totalViews  = (tunnels||[]).reduce((s,t) => s+(t.views||0), 0);
+    const totalOrders = (tunnels||[]).reduce((s,t) => s+(t.orders||0), 0);
+    const conv        = totalViews > 0 ? ((totalOrders/totalViews)*100).toFixed(1) : '0';
+
+    document.getElementById('statRevenue').textContent    = revenue > 999 ? (revenue/1000).toFixed(0)+'K' : revenue.toLocaleString('fr');
+    document.getElementById('statOrders').textContent     = orderCount;
+    document.getElementById('statViews').textContent      = totalViews > 999 ? (totalViews/1000).toFixed(1)+'K' : totalViews;
+    document.getElementById('statConv').textContent       = conv+'%';
+    document.getElementById('chartTotal').textContent     = revenue.toLocaleString('fr')+' FCFA';
+    document.getElementById('chartBadge').textContent     = orderCount > 0 ? `+${orderCount} ventes` : 'Aucune vente';
+    document.getElementById('tunnelCount').textContent    = (tunnels||[]).length;
+  }
+
+  // ══════════════════════════════
+  //  TUNNELS
+  // ══════════════════════════════
+  async function loadTunnels(userId) {
+    const { data: tunnels } = await supabase.from('tunnels').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(5);
+    const el = document.getElementById('tunnelsList');
+
+    if (!tunnels?.length) {
+      el.innerHTML = `
+        <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+          <div style="font-size:2rem;margin-bottom:10px;">🚀</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucun tunnel encore</div>
+          <div style="font-size:.82rem;">Cliquez "Créer un nouveau tunnel" pour démarrer</div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = tunnels.map(t => {
+      const conv   = t.views > 0 ? ((t.orders/t.views)*100).toFixed(1) : '0';
+      const icon   = ICONS[t.template] || '📘';
+      const isLive = t.status === 'live';
+      return `
+        <div class="tunnel-item" onclick="window.location.href='/funnelafrica-editor.html?tunnel=${t.id}'">
+          <div class="tunnel-icon">${icon}</div>
+          <div class="tunnel-info">
+            <div class="tunnel-name">${t.name}</div>
+            <div class="tunnel-meta">
+              <span><span class="status-dot ${isLive?'':'off'}"></span>${isLive?'Actif':'Brouillon'}</span>
+              <span>${(t.views||0).toLocaleString('fr')} vues</span>
+            </div>
+          </div>
+          <div class="tunnel-stats">
+            <div class="tunnel-revenue">${(t.revenue||0).toLocaleString('fr')} F</div>
+            <div class="tunnel-conv">Conv. ${conv}%</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ══════════════════════════════
+  //  COMMANDES
+  // ══════════════════════════════
+  async function loadOrders(userId) {
+    const { data: orders } = await supabase.from('orders').select('*,tunnels(name)').eq('user_id', userId).eq('payment_status','paid').order('created_at',{ascending:false}).limit(5);
+    const el = document.getElementById('ordersFeed');
+
+    if (!orders?.length) {
+      el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.82rem;">Aucune commande pour le moment</div>`;
+      return;
+    }
+
+    el.innerHTML = orders.map(o => {
+      const initials = (o.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+      const date     = new Date(o.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      return `
+        <div class="order-item">
+          <div class="order-avatar">${initials}</div>
+          <div class="order-info">
+            <div class="order-name">${o.buyer_name}</div>
+            <div class="order-product">${o.tunnels?.name||'—'} · ${date}</div>
+          </div>
+          <div>
+            <div class="order-amount">${(o.amount||0).toLocaleString('fr')} F</div>
+            <div class="order-method">${METHODS[o.payment_method]||o.payment_method||'—'}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ══════════════════════════════
+  //  ACTIONS GLOBALES
+  // ══════════════════════════════
+  window.toggleSidebar = () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  };
+
+  window.openNewTunnelModal = () => document.getElementById('modalOverlay').classList.add('open');
+  window.closeModal         = () => document.getElementById('modalOverlay').classList.remove('open');
+  window.goToTemplates      = () => window.location.href = '/funnelafrica-templates.html?new=1';
+
+  window.logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/funnelafrica-auth.html';
+  };
+
+  document.getElementById('modalOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalOverlay')) window.closeModal();
+  });
+</script>
+</body>
+</html>

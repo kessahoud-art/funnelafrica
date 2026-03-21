@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paiement sécurisé — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f14;
+    --surface: #111820;
+    --surface2: #182030;
+    --border: #1e2a38;
+    --green: #00c896;
+    --green2: #00a87a;
+    --gold: #f5a623;
+    --text: #e8f0f8;
+    --muted: #6b7e93;
+    --danger: #ff4d6d;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--green), var(--green2));
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    color: #0a0f14;
+    font-weight: 800;
+  }
+
+  .secure-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .75rem;
+    color: var(--green);
+    background: #00c89615;
+    border: 1px solid #00c89630;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── STEPS ── */
+  .steps-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+
+  .step.active { color: var(--text); }
+  .step.done { color: var(--green); }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    font-weight: 800;
+  }
+
+  .step.active .step-num {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0a0f14;
+  }
+
+  .step.done .step-num {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0a0f14;
+  }
+
+  .step-line {
+    width: 40px; height: 1px;
+    background: var(--border);
+    margin: 0 6px;
+  }
+
+  .step-line.done { background: var(--green); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #00c89618;
+    border: 1px solid #00c89630;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+  }
+
+  .card-body { padding: 22px; }
+
+  /* ── FORM ── */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group:last-child { margin-bottom: 0; }
+
+  .form-label {
+    display: block;
+    font-size: .75rem;
+    color: var(--muted);
+    margin-bottom: 7px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .form-input::placeholder { color: #3a4f65; }
+
+  .form-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px #00c89615;
+  }
+
+  .form-input.error { border-color: var(--danger); }
+
+  .input-flag {
+    position: relative;
+  }
+
+  .input-flag .flag {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+
+  .input-flag .form-input { padding-left: 38px; }
+
+  /* ── PAYMENT METHODS ── */
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .method-option {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+
+  .method-option:hover { border-color: #00c89640; background: #00c89608; }
+  .method-option.selected { border-color: var(--green); background: #00c89610; }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .method-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s;
+  }
+
+  .method-option.selected .method-radio {
+    border-color: var(--green);
+  }
+
+  .method-radio-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    display: none;
+  }
+
+  .method-option.selected .method-radio-dot { display: block; }
+
+  .method-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .method-icon.wave { background: #fff3; }
+  .method-icon.orange { background: #ff800020; }
+  .method-icon.mtn { background: #ffd00020; }
+  .method-icon.cinetpay { background: #00c89615; }
+  .method-icon.card { background: #4da6ff15; }
+
+  .method-info { flex: 1; }
+  .method-name { font-weight: 600; font-size: .9rem; }
+  .method-desc { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+
+  .method-tag {
+    font-size: .65rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .method-tag.popular {
+    background: #00c89620;
+    color: var(--green);
+    border: 1px solid #00c89640;
+  }
+
+  .method-tag.fast {
+    background: #f5a62320;
+    color: var(--gold);
+    border: 1px solid #f5a62340;
+  }
+
+  /* ── METHOD DETAIL ── */
+  .method-detail {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp .2s ease;
+  }
+
+  .method-option.selected .method-detail { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .phone-input-wrap {
+    display: flex;
+    gap: 10px;
+  }
+
+  .country-select {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    color: var(--text);
+    font-size: .88rem;
+    outline: none;
+    cursor: pointer;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  /* ── SUBMIT BTN ── */
+  .submit-btn {
+    width: 100%;
+    padding: 17px;
+    background: linear-gradient(135deg, var(--green), var(--green2));
+    color: #0a0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 30px #00c89635;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, #ffffff20 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform .5s;
+  }
+
+  .submit-btn:hover::after { transform: translateX(100%); }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px #00c89650;
+  }
+
+  .submit-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid #0a0f1460;
+    border-top-color: #0a0f14;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .trust-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+
+  /* ── ORDER SUMMARY ── */
+  .order-summary { position: sticky; top: 20px; }
+
+  .product-preview {
+    display: flex;
+    gap: 14px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+
+  .product-thumb {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0d3a2a, #1a5a40);
+    border: 1px solid #00c89630;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .product-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .product-meta { font-size: .72rem; color: var(--muted); }
+
+  .price-breakdown {
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .85rem;
+    padding: 7px 0;
+  }
+
+  .price-line .label { color: var(--muted); }
+
+  .price-line.striked .value {
+    text-decoration: line-through;
+    color: var(--muted);
+    font-size: .78rem;
+  }
+
+  .price-line.discount .value { color: var(--green); font-weight: 600; }
+
+  .price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-total .label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+  }
+
+  .price-total .value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--green);
+  }
+
+  .includes-list {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .includes-title {
+    font-size: .72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+
+  .include-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: .8rem;
+    color: #a0b4c8;
+    padding: 4px 0;
+  }
+
+  .include-item::before { content: '✓'; color: var(--green); font-weight: 800; flex-shrink: 0; }
+
+  .guarantee-box {
+    padding: 16px 22px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #00c89608;
+  }
+
+  .guarantee-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .guarantee-text { font-size: .78rem; color: #8fa5bc; line-height: 1.5; }
+  .guarantee-text strong { color: var(--text); }
+
+  /* ── SUCCESS MODAL ── */
+  .success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000000c0;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .success-overlay.open { display: flex; }
+
+  .success-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    animation: fadeUp .4s ease;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: #00c89620;
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 20px;
+    animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: var(--green);
+  }
+
+  .success-sub { font-size: .88rem; color: #8fa5bc; line-height: 1.6; margin-bottom: 24px; }
+
+  .success-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #0a0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .95rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: 12px;
+  }
+
+  .success-btn:hover { background: #00dea8; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .order-summary { position: static; }
+    .form-row { grid-template-columns: 1fr; }
+    .steps-bar { gap: 0; }
+    .step span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-dot">FA</div>
+    FunnelAfrica
+  </div>
+  <div class="secure-badge">🔒 Paiement 100% sécurisé</div>
+</div>
+
+<!-- STEPS -->
+<div class="steps-bar">
+  <div class="step done">
+    <div class="step-num">✓</div>
+    <span>Offre</span>
+  </div>
+  <div class="step-line done"></div>
+  <div class="step active">
+    <div class="step-num">2</div>
+    <span>Paiement</span>
+  </div>
+  <div class="step-line"></div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <span>Accès</span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- LEFT: FORM -->
+  <div>
+
+    <!-- INFOS CLIENT -->
+    <div class="card" style="margin-bottom:20px;animation:fadeUp .4s ease both;">
+      <div class="card-header">
+        <div class="card-header-icon">👤</div>
+        <div class="card-title">Vos informations</div>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prénom</label>
+            <input class="form-input" type="text" placeholder="Moussa" id="firstName">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <input class="form-input" type="text" placeholder="Koné" id="lastName">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="moussa@gmail.com" id="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone WhatsApp</label>
+          <div class="phone-input-wrap">
+            <select class="country-select" id="countryCode">
+              <option value="+225">🇨🇮 +225</option>
+              <option value="+221">🇸🇳 +221</option>
+              <option value="+223">🇲🇱 +223</option>
+              <option value="+226">🇧🇫 +226</option>
+              <option value="+228">🇹🇬 +228</option>
+              <option value="+229">🇧🇯 +229</option>
+              <option value="+224">🇬🇳 +224</option>
+              <option value="+227">🇳🇪 +227</option>
+              <option value="+237">🇨🇲 +237</option>
+              <option value="+243">🇨🇩 +243</option>
+              <option value="+233">🇬🇭 +233</option>
+              <option value="+234">🇳🇬 +234</option>
+            </select>
+            <input class="form-input" type="tel" placeholder="07 00 00 00 00" id="phone" style="flex:1;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÉTHODE DE PAIEMENT -->
+    <div class="card" style="animation:fadeUp .4s ease .1s both;">
+      <div class="card-header">
+        <div class="card-header-icon">💳</div>
+        <div class="card-title">Méthode de paiement</div>
+      </div>
+      <div class="card-body">
+        <div class="payment-methods">
+
+          <!-- WAVE -->
+          <div class="method-option selected" onclick="selectMethod(this, 'wave')">
+            <div class="method-header">
+              <div class="method-radio"><div class="method-radio-dot"></div></div>
+              <div class="method-icon wave">🌊</div>
+              <div class="method-info">
+                <div class="method-name">Wave</div>
+                <div class="method-desc">Paiement instantané · Côte d'Ivoire, Sénégal, Mali</div>
+              </div>
+              <div class="method-tag popular">Populaire</div>
+            </div>
+            <div class="method-detail">
+              <label class="form-label">Numéro Wave</label>
+              <div class="phone-input-wrap">
+                <select class="country-select">
+                  <option>🇨🇮 +225</option>
+                  <option>🇸🇳 +221</option>
+                  <option>🇲🇱 +223</option>
+                </select>
+                <input class="form-input" type="tel" placeholder="07 00 00 00 00" style="flex:1;">
+              </div>
+            </div>
+          </div>
+
+          <!-- ORANGE MONEY -->
+          <div class="method-option" onclick="selectMethod(this, 'orange')">
+            <div class="method-header">
+              <div class="method-radio"><div class="method-radio-dot"></div></div>
+              <div class="method-icon orange">🟠</div>
+              <div class="method-info">
+                <div class="method-name">Orange Money</div>
+                <div class="method-desc">Disponible dans 17 pays africains</div>
+              </div>
+              <div class="method-tag fast">Rapide</div>
+            </div>
+            <div class="method-detail">
+              <label class="form-label">Numéro Orange Money</label>
+              <div class="phone-input-wrap">
+                <select class="country-select">
+                  <option>🇨🇮 +225</option>
+                  <option>🇸🇳 +221</option>
+                  <option>🇲🇱 +223</option>
+                  <option>🇧🇫 +226</option>
+                  <option>🇬🇳 +224</option>
+                </select>
+                <input class="form-input" type="tel" placeholder="07 00 00 00 00" style="flex:1;">
+              </div>
+            </div>
+          </div>
+
+          <!-- MTN MOMO -->
+          <div class="method-option" onclick="selectMethod(this, 'mtn')">
+            <div class="method-header">
+              <div class="method-radio"><div class="method-radio-dot"></div></div>
+              <div class="method-icon mtn">💛</div>
+              <div class="method-info">
+                <div class="method-name">MTN Mobile Money</div>
+                <div class="method-desc">Ghana, Côte d'Ivoire, Cameroun, Bénin…</div>
+              </div>
+            </div>
+            <div class="method-detail">
+              <label class="form-label">Numéro MTN MoMo</label>
+              <div class="phone-input-wrap">
+                <select class="country-select">
+                  <option>🇨🇮 +225</option>
+                  <option>🇨🇲 +237</option>
+                  <option>🇬🇭 +233</option>
+                  <option>🇧🇯 +229</option>
+                </select>
+                <input class="form-input" type="tel" placeholder="05 00 00 00 00" style="flex:1;">
+              </div>
+            </div>
+          </div>
+
+          <!-- CINETPAY -->
+          <div class="method-option" onclick="selectMethod(this, 'cinetpay')">
+            <div class="method-header">
+              <div class="method-radio"><div class="method-radio-dot"></div></div>
+              <div class="method-icon cinetpay">💚</div>
+              <div class="method-info">
+                <div class="method-name">CinetPay</div>
+                <div class="method-desc">Carte bancaire + tous Mobile Money</div>
+              </div>
+            </div>
+            <div class="method-detail">
+              <p style="font-size:.82rem;color:var(--muted);">
+                Vous serez redirigé vers la plateforme CinetPay pour finaliser le paiement de manière sécurisée.
+              </p>
+            </div>
+          </div>
+
+          <!-- CARTE -->
+          <div class="method-option" onclick="selectMethod(this, 'card')">
+            <div class="method-header">
+              <div class="method-radio"><div class="method-radio-dot"></div></div>
+              <div class="method-icon card">💳</div>
+              <div class="method-info">
+                <div class="method-name">Carte bancaire</div>
+                <div class="method-desc">Visa · Mastercard · Carte locale</div>
+              </div>
+            </div>
+            <div class="method-detail">
+              <div class="form-group">
+                <label class="form-label">Numéro de carte</label>
+                <input class="form-input" type="text" placeholder="0000 0000 0000 0000" maxlength="19" id="cardNum" oninput="formatCard(this)">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Expiration</label>
+                  <input class="form-input" type="text" placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CVV</label>
+                  <input class="form-input" type="text" placeholder="123" maxlength="3">
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SUBMIT -->
+        <button class="submit-btn" id="submitBtn" onclick="processPayment()">
+          <span id="btnText">🔒 Payer 9 900 FCFA maintenant</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+
+        <div class="trust-row">
+          <div class="trust-item">🔒 SSL sécurisé</div>
+          <div class="trust-item">🛡️ Remboursé sous 7 jours</div>
+          <div class="trust-item">⚡ Accès immédiat</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: ORDER SUMMARY -->
+  <div class="order-summary">
+    <div class="card" style="animation:fadeUp .4s ease .15s both;">
+
+      <div class="product-preview">
+        <div class="product-thumb">📘</div>
+        <div>
+          <div class="product-name">Formation Excel Avancé</div>
+          <div class="product-meta">53 leçons · Accès à vie · Certificat inclus</div>
+        </div>
+      </div>
+
+      <div class="price-breakdown">
+        <div class="price-line striked">
+          <span class="label">Prix normal</span>
+          <span class="value">19 900 FCFA</span>
+        </div>
+        <div class="price-line discount">
+          <span class="label">Réduction lancement (−50%)</span>
+          <span class="value">−10 000 FCFA</span>
+        </div>
+      </div>
+
+      <div class="price-total">
+        <span class="label">Total à payer</span>
+        <div>
+          <div class="value">9 900 FCFA</div>
+          <div style="font-size:.68rem;color:var(--muted);text-align:right;">Paiement unique</div>
+        </div>
+      </div>
+
+      <div class="includes-list">
+        <div class="includes-title">Ce que vous obtenez</div>
+        <div class="include-item">53 leçons vidéo HD</div>
+        <div class="include-item">Fichiers Excel téléchargeables</div>
+        <div class="include-item">Groupe WhatsApp entraide</div>
+        <div class="include-item">Certificat de réussite PDF</div>
+        <div class="include-item">Mises à jour gratuites à vie</div>
+        <div class="include-item">Support WhatsApp 24h</div>
+      </div>
+
+      <div class="guarantee-box">
+        <div class="guarantee-icon">🛡️</div>
+        <div class="guarantee-text">
+          <strong>Garantie satisfait ou remboursé 7 jours.</strong><br>
+          Si vous n'êtes pas satisfait, envoyez un message WhatsApp et nous vous remboursons intégralement. Sans question.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TIMER -->
+    <div style="background:#130d10;border:1px solid #3a1a25;border-radius:12px;padding:14px 18px;margin-top:14px;text-align:center;animation:fadeUp .4s ease .2s both;">
+      <div style="font-size:.72rem;color:#ff7090;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">⏰ Prix réduit expire dans</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--gold);" id="checkoutTimer">02:47:33</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Paiement confirmé !</div>
+    <div class="success-sub">
+      Félicitations ! Votre accès à la <strong>Formation Excel Avancé</strong> est activé.<br><br>
+      Vérifiez votre email et SMS pour vos identifiants de connexion.
+    </div>
+    <button class="success-btn" onclick="goToAccess()">
+      🚀 Accéder à ma formation maintenant
+    </button>
+    <div style="font-size:.75rem;color:var(--muted);">
+      Un email de confirmation a été envoyé à <span id="confirmEmail" style="color:var(--text);">votre adresse</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── METHOD SELECTION ──
+  function selectMethod(el, method) {
+    document.querySelectorAll('.method-option').forEach(m => m.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── CARD FORMAT ──
+  function formatCard(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 16);
+    el.value = v.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  function formatExpiry(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
+    el.value = v;
+  }
+
+  // ── VALIDATION ──
+  function validateForm() {
+    let ok = true;
+    const fields = ['firstName', 'lastName', 'email', 'phone'];
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        ok = false;
+      } else {
+        el.classList.remove('error');
+      }
+    });
+    return ok;
+  }
+
+  // ── PROCESS PAYMENT ──
+  function processPayment() {
+    if (!validateForm()) {
+      document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    const text = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled = true;
+    text.textContent = 'Traitement en cours...';
+    spinner.style.display = 'block';
+
+    // Simulation paiement
+    setTimeout(() => {
+      btn.disabled = false;
+      text.textContent = '🔒 Payer 9 900 FCFA maintenant';
+      spinner.style.display = 'none';
+
+      const email = document.getElementById('email').value || 'votre adresse email';
+      document.getElementById('confirmEmail').textContent = email;
+      document.getElementById('successOverlay').classList.add('open');
+    }, 2800);
+  }
+
+  function goToAccess() {
+    document.getElementById('successOverlay').classList.remove('open');
+    alert('→ Redirection vers l\'espace membre...\n\nPage auth = prochaine étape !');
+  }
+
+  // ── TIMER ──
+  let t = 2 * 3600 + 47 * 60 + 33;
+  setInterval(() => {
+    if (t <= 0) return;
+    t--;
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = t % 60;
+    const f = n => String(n).padStart(2, '0');
+    document.getElementById('checkoutTimer').textContent = `${f(h)}:${f(m)}:${f(s)}`;
+  }, 1000);
+</script>
+</body>
+</html>

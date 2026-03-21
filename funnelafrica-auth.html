@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #0a0f14;
+    --surface: #111820;
+    --surface2: #182030;
+    --border: #1e2a38;
+    --green: #00c896;
+    --green2: #00a87a;
+    --gold: #f5a623;
+    --text: #e8f0f8;
+    --muted: #6b7e93;
+    --danger: #ff4d6d;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    width: 45%;
+    background: linear-gradient(160deg, #0d1f18 0%, #0a1520 50%, #0f1a0f 100%);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: -120px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #00c89618 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, #f5a62312 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .panel-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel-logo-dot {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--green), var(--green2));
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    color: #0a0f14;
+    font-weight: 800;
+  }
+
+  .panel-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel-tagline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .panel-tagline .accent { color: var(--green); }
+
+  .panel-desc {
+    font-size: .88rem;
+    color: #7a9ab5;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 340px;
+  }
+
+  .panel-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .panel-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff08;
+    border: 1px solid #ffffff10;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .panel-stat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .panel-stat-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .panel-stat-label { font-size: .75rem; color: var(--muted); }
+
+  .panel-footer {
+    position: relative;
+    z-index: 1;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* ── TABS ── */
+  .auth-tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 9px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .2s;
+  }
+
+  .auth-tab.active {
+    background: var(--surface2);
+    color: var(--text);
+    box-shadow: 0 2px 8px #00000030;
+  }
+
+  /* ── FORM ── */
+  .auth-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    animation: fadeUp .4s ease both;
+  }
+
+  .auth-subtitle {
+    font-size: .85rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+    animation: fadeUp .4s ease .05s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+    animation: fadeUp .4s ease both;
+  }
+
+  .form-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .75rem;
+    color: var(--muted);
+    margin-bottom: 7px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .form-label a {
+    color: var(--green);
+    text-decoration: none;
+    font-size: .72rem;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    padding-right: 44px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .form-input::placeholder { color: #2e3f52; }
+
+  .form-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px #00c89615;
+  }
+
+  .form-input.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px #ff4d6d18;
+  }
+
+  .input-icon {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: .9rem;
+    cursor: pointer;
+    user-select: none;
+    transition: color .2s;
+  }
+
+  .input-icon:hover { color: var(--text); }
+
+  .error-msg {
+    font-size: .72rem;
+    color: var(--danger);
+    margin-top: 5px;
+    display: none;
+  }
+
+  .error-msg.show { display: block; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: .75rem;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── SOCIAL LOGIN ── */
+  .social-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: .88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: 10px;
+  }
+
+  .social-btn:hover {
+    background: var(--surface2);
+    border-color: #3a5a80;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--green), var(--green2));
+    color: #0a0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .95rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 24px #00c89630;
+    margin-top: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, #ffffff25, transparent);
+    transform: translateX(-100%);
+    transition: transform .5s;
+  }
+
+  .submit-btn:hover::after { transform: translateX(100%); }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px #00c89650; }
+  .submit-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    display: none;
+    width: 17px; height: 17px;
+    border: 2px solid #0a0f1450;
+    border-top-color: #0a0f14;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── PLAN SELECTOR (register only) ── */
+  .plan-selector {
+    display: none;
+    margin-bottom: 16px;
+  }
+
+  .plan-selector.show { display: block; }
+
+  .plan-label {
+    font-size: .75rem;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 8px;
+  }
+
+  .plan-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .plan-option {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .plan-option:hover { border-color: #00c89640; }
+  .plan-option.selected { border-color: var(--green); background: #00c89610; }
+
+  .plan-option-icon { font-size: 1rem; margin-bottom: 4px; }
+
+  .plan-option-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    color: var(--text);
+  }
+
+  .plan-option-price { font-size: .65rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── ALERT ── */
+  .alert {
+    display: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: .82rem;
+    margin-bottom: 16px;
+    animation: fadeUp .3s ease;
+  }
+
+  .alert.success {
+    background: #00c89615;
+    border: 1px solid #00c89640;
+    color: var(--green);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .alert.error {
+    background: #ff4d6d15;
+    border: 1px solid #ff4d6d40;
+    color: var(--danger);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* ── FORGOT PASSWORD VIEW ── */
+  .forgot-view {
+    display: none;
+  }
+
+  /* ── TERMS ── */
+  .terms-text {
+    font-size: .72rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .terms-text a { color: var(--green); text-decoration: none; }
+
+  /* ── STRENGTH BAR ── */
+  .strength-wrap {
+    margin-top: 6px;
+    display: none;
+  }
+
+  .strength-wrap.show { display: block; }
+
+  .strength-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .strength-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .3s, background .3s;
+    width: 0%;
+  }
+
+  .strength-text { font-size: .68rem; color: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 760px) {
+    .left-panel { display: none; }
+    body { align-items: flex-start; }
+    .right-panel { padding: 24px 16px; align-items: flex-start; padding-top: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="panel-logo">
+    <div class="panel-logo-dot">FA</div>
+    FunnelAfrica
+  </div>
+
+  <div class="panel-content">
+    <h2 class="panel-tagline">
+      Vendez en ligne.<br>
+      Encaissez en <span class="accent">Mobile Money.</span><br>
+      Grandissez en Afrique.
+    </h2>
+    <p class="panel-desc">
+      La plateforme tout-en-un pour les entrepreneurs africains — tunnels de vente, cours en ligne, email marketing et paiements mobiles natifs.
+    </p>
+
+    <div class="panel-stats">
+      <div class="panel-stat">
+        <div class="panel-stat-icon">🚀</div>
+        <div>
+          <div class="panel-stat-val">2 400+ vendeurs</div>
+          <div class="panel-stat-label">nous font déjà confiance dans 14 pays</div>
+        </div>
+      </div>
+      <div class="panel-stat">
+        <div class="panel-stat-icon">💰</div>
+        <div>
+          <div class="panel-stat-val">480M FCFA traités</div>
+          <div class="panel-stat-label">via Wave, Orange Money, MTN MoMo</div>
+        </div>
+      </div>
+      <div class="panel-stat">
+        <div class="panel-stat-icon">⚡</div>
+        <div>
+          <div class="panel-stat-val">Tunnel en 15 min</div>
+          <div class="panel-stat-label">de la création au premier paiement reçu</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-footer">
+    © 2026 FunnelAfrica · Tous droits réservés
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <!-- ALERT -->
+    <div class="alert" id="alertBox">
+      <span id="alertIcon">✓</span>
+      <span id="alertMsg"></span>
+    </div>
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</div>
+    </div>
+
+    <!-- ═══ LOGIN FORM ═══ -->
+    <div id="loginForm">
+      <h1 class="auth-title">Bon retour 👋</h1>
+      <p class="auth-subtitle">Connectez-vous à votre espace vendeur</p>
+
+      <div class="form-group" style="animation-delay:.05s">
+        <label class="form-label">Email</label>
+        <div class="input-wrap">
+          <input class="form-input" type="email" placeholder="vous@exemple.com" id="loginEmail">
+          <span class="input-icon">✉️</span>
+        </div>
+        <div class="error-msg" id="loginEmailErr">Email invalide</div>
+      </div>
+
+      <div class="form-group" style="animation-delay:.1s">
+        <label class="form-label">
+          Mot de passe
+          <a href="#" onclick="switchToForgot(); return false;">Mot de passe oublié ?</a>
+        </label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" placeholder="••••••••" id="loginPassword">
+          <span class="input-icon" onclick="togglePass('loginPassword', this)">👁</span>
+        </div>
+        <div class="error-msg" id="loginPassErr">Mot de passe requis</div>
+      </div>
+
+      <button class="submit-btn" onclick="handleLogin()" id="loginBtn">
+        <span id="loginBtnText">Se connecter</span>
+        <div class="spinner" id="loginSpinner"></div>
+      </button>
+
+      <div class="divider">ou continuer avec</div>
+
+      <button class="social-btn" onclick="handleGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z"/></svg>
+        Continuer avec Google
+      </button>
+
+      <p class="terms-text">
+        Pas encore de compte ?
+        <a href="#" onclick="switchTab('register'); return false;">Créer un compte gratuit →</a>
+      </p>
+    </div>
+
+    <!-- ═══ REGISTER FORM ═══ -->
+    <div id="registerForm" style="display:none;">
+      <h1 class="auth-title">Créez votre compte 🚀</h1>
+      <p class="auth-subtitle">Commencez à vendre en ligne dès aujourd'hui</p>
+
+      <div class="form-group" style="animation-delay:.05s">
+        <label class="form-label">Nom complet</label>
+        <div class="input-wrap">
+          <input class="form-input" type="text" placeholder="Moussa Koné" id="regName">
+          <span class="input-icon">👤</span>
+        </div>
+        <div class="error-msg" id="regNameErr">Nom requis</div>
+      </div>
+
+      <div class="form-group" style="animation-delay:.08s">
+        <label class="form-label">Email</label>
+        <div class="input-wrap">
+          <input class="form-input" type="email" placeholder="vous@exemple.com" id="regEmail">
+          <span class="input-icon">✉️</span>
+        </div>
+        <div class="error-msg" id="regEmailErr">Email invalide</div>
+      </div>
+
+      <div class="form-group" style="animation-delay:.11s">
+        <label class="form-label">Mot de passe</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" placeholder="Minimum 8 caractères" id="regPassword" oninput="checkStrength(this.value)">
+          <span class="input-icon" onclick="togglePass('regPassword', this)">👁</span>
+        </div>
+        <div class="strength-wrap" id="strengthWrap">
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+        <div class="error-msg" id="regPassErr">Minimum 8 caractères</div>
+      </div>
+
+      <!-- PLAN SELECTOR -->
+      <div class="plan-selector show" style="animation-delay:.14s">
+        <div class="plan-label">Choisissez votre plan</div>
+        <div class="plan-options">
+          <div class="plan-option selected" onclick="selectPlan(this, 'starter')">
+            <div class="plan-option-icon">🌱</div>
+            <div class="plan-option-name">Starter</div>
+            <div class="plan-option-price">3 000 F/mois</div>
+          </div>
+          <div class="plan-option" onclick="selectPlan(this, 'pro')">
+            <div class="plan-option-icon">⚡</div>
+            <div class="plan-option-name">Pro</div>
+            <div class="plan-option-price">9 900 F/mois</div>
+          </div>
+          <div class="plan-option" onclick="selectPlan(this, 'scale')">
+            <div class="plan-option-icon">🏆</div>
+            <div class="plan-option-name">Scale</div>
+            <div class="plan-option-price">24 900 F/mois</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="handleRegister()" id="regBtn">
+        <span id="regBtnText">Créer mon compte gratuitement</span>
+        <div class="spinner" id="regSpinner"></div>
+      </button>
+
+      <div class="divider">ou</div>
+
+      <button class="social-btn" onclick="handleGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z"/></svg>
+        Continuer avec Google
+      </button>
+
+      <p class="terms-text">
+        En créant un compte, vous acceptez nos
+        <a href="#">Conditions d'utilisation</a> et notre
+        <a href="#">Politique de confidentialité</a>.
+      </p>
+    </div>
+
+    <!-- ═══ FORGOT PASSWORD ═══ -->
+    <div id="forgotForm" style="display:none;">
+      <h1 class="auth-title">Mot de passe oublié 🔑</h1>
+      <p class="auth-subtitle">Entrez votre email pour recevoir un lien de réinitialisation</p>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <div class="input-wrap">
+          <input class="form-input" type="email" placeholder="vous@exemple.com" id="forgotEmail">
+          <span class="input-icon">✉️</span>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="handleForgot()" id="forgotBtn">
+        <span id="forgotBtnText">Envoyer le lien de réinitialisation</span>
+        <div class="spinner" id="forgotSpinner"></div>
+      </button>
+
+      <p class="terms-text" style="margin-top:20px;">
+        <a href="#" onclick="switchTab('login'); return false;">← Retour à la connexion</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── CONFIG SUPABASE ──
+  // Remplacez par vos vraies clés depuis supabase.com/dashboard
+  const SUPABASE_URL = 'https://VOTRE_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+
+  let supabase;
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch(e) {
+    console.log('Supabase non configuré — mode démo');
+  }
+
+  let selectedPlan = 'starter';
+  let currentTab = 'login';
+
+  // ── TAB SWITCH ──
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    hideAlert();
+  }
+
+  function switchToForgot() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('forgotForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    hideAlert();
+  }
+
+  // ── PLAN SELECT ──
+  function selectPlan(el, plan) {
+    selectedPlan = plan;
+    document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── PASSWORD TOGGLE ──
+  function togglePass(id, icon) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+    icon.textContent = el.type === 'password' ? '👁' : '🙈';
+  }
+
+  // ── PASSWORD STRENGTH ──
+  function checkStrength(pwd) {
+    const wrap = document.getElementById('strengthWrap');
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+
+    if (!pwd) { wrap.classList.remove('show'); return; }
+    wrap.classList.add('show');
+
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    const levels = [
+      { pct: '25%', color: '#ff4d6d', label: 'Très faible' },
+      { pct: '50%', color: '#f5a623', label: 'Faible' },
+      { pct: '75%', color: '#4da6ff', label: 'Moyen' },
+      { pct: '100%', color: '#00c896', label: 'Fort 💪' },
+    ];
+
+    const l = levels[score - 1] || levels[0];
+    fill.style.width = l.pct;
+    fill.style.background = l.color;
+    text.textContent = l.label;
+    text.style.color = l.color;
+  }
+
+  // ── ALERT ──
+  function showAlert(type, msg) {
+    const box = document.getElementById('alertBox');
+    box.className = `alert ${type}`;
+    document.getElementById('alertIcon').textContent = type === 'success' ? '✓' : '✕';
+    document.getElementById('alertMsg').textContent = msg;
+    box.style.display = 'flex';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBox').style.display = 'none';
+  }
+
+  // ── LOADING STATE ──
+  function setLoading(btnId, spinnerId, textId, loading, label) {
+    const btn = document.getElementById(btnId);
+    const spinner = document.getElementById(spinnerId);
+    const text = document.getElementById(textId);
+    btn.disabled = loading;
+    spinner.style.display = loading ? 'block' : 'none';
+    if (!loading && label) text.textContent = label;
+  }
+
+  // ── VALIDATE EMAIL ──
+  function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  // ── LOGIN ──
+  async function handleLogin() {
+    hideAlert();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+    let ok = true;
+
+    if (!isEmail(email)) {
+      document.getElementById('loginEmailErr').classList.add('show');
+      document.getElementById('loginEmail').classList.add('error');
+      ok = false;
+    } else {
+      document.getElementById('loginEmailErr').classList.remove('show');
+      document.getElementById('loginEmail').classList.remove('error');
+    }
+
+    if (!pass) {
+      document.getElementById('loginPassErr').classList.add('show');
+      document.getElementById('loginPassword').classList.add('error');
+      ok = false;
+    } else {
+      document.getElementById('loginPassErr').classList.remove('show');
+      document.getElementById('loginPassword').classList.remove('error');
+    }
+
+    if (!ok) return;
+
+    setLoading('loginBtn', 'loginSpinner', 'loginBtnText', true);
+
+    try {
+      if (supabase) {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
+        showAlert('success', 'Connexion réussie ! Redirection vers votre dashboard...');
+        setTimeout(() => { window.location.href = 'funnelafrica-dashboard.html'; }, 1500);
+      } else {
+        // Mode démo
+        await new Promise(r => setTimeout(r, 1800));
+        showAlert('success', '✓ Connexion réussie ! Redirection vers votre dashboard...');
+        setTimeout(() => { alert('→ Redirection dashboard\n(Configurez Supabase pour activer l\'auth réelle)'); }, 1500);
+      }
+    } catch(err) {
+      showAlert('error', err.message === 'Invalid login credentials'
+        ? 'Email ou mot de passe incorrect.'
+        : (err.message || 'Erreur de connexion. Réessayez.'));
+    } finally {
+      setLoading('loginBtn', 'loginSpinner', 'loginBtnText', false, 'Se connecter');
+    }
+  }
+
+  // ── REGISTER ──
+  async function handleRegister() {
+    hideAlert();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPassword').value;
+    let ok = true;
+
+    if (!name) {
+      document.getElementById('regNameErr').classList.add('show');
+      document.getElementById('regName').classList.add('error');
+      ok = false;
+    } else {
+      document.getElementById('regNameErr').classList.remove('show');
+      document.getElementById('regName').classList.remove('error');
+    }
+
+    if (!isEmail(email)) {
+      document.getElementById('regEmailErr').classList.add('show');
+      document.getElementById('regEmail').classList.add('error');
+      ok = false;
+    } else {
+      document.getElementById('regEmailErr').classList.remove('show');
+      document.getElementById('regEmail').classList.remove('error');
+    }
+
+    if (pass.length < 8) {
+      document.getElementById('regPassErr').classList.add('show');
+      document.getElementById('regPassword').classList.add('error');
+      ok = false;
+    } else {
+      document.getElementById('regPassErr').classList.remove('show');
+      document.getElementById('regPassword').classList.remove('error');
+    }
+
+    if (!ok) return;
+
+    setLoading('regBtn', 'regSpinner', 'regBtnText', true);
+
+    try {
+      if (supabase) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password: pass,
+          options: {
+            data: { full_name: name, plan: selectedPlan }
+          }
+        });
+        if (error) throw error;
+        showAlert('success', 'Compte créé ! Vérifiez votre email pour confirmer votre inscription.');
+      } else {
+        await new Promise(r => setTimeout(r, 2000));
+        showAlert('success', `✓ Compte créé (plan ${selectedPlan}) ! Email de confirmation envoyé à ${email}`);
+      }
+    } catch(err) {
+      showAlert('error', err.message === 'User already registered'
+        ? 'Un compte existe déjà avec cet email.'
+        : (err.message || 'Erreur lors de la création. Réessayez.'));
+    } finally {
+      setLoading('regBtn', 'regSpinner', 'regBtnText', false, 'Créer mon compte gratuitement');
+    }
+  }
+
+  // ── FORGOT PASSWORD ──
+  async function handleForgot() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!isEmail(email)) {
+      document.getElementById('forgotEmail').classList.add('error');
+      return;
+    }
+
+    setLoading('forgotBtn', 'forgotSpinner', 'forgotBtnText', true);
+
+    try {
+      if (supabase) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/reset-password'
+        });
+        if (error) throw error;
+      } else {
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      showAlert('success', `Lien envoyé à ${email}. Vérifiez vos spams si vous ne le voyez pas.`);
+      document.getElementById('forgotEmail').value = '';
+    } catch(err) {
+      showAlert('error', err.message || 'Erreur. Vérifiez votre email et réessayez.');
+    } finally {
+      setLoading('forgotBtn', 'forgotSpinner', 'forgotBtnText', false, 'Envoyer le lien de réinitialisation');
+    }
+  }
+
+  // ── GOOGLE AUTH ──
+  async function handleGoogle() {
+    try {
+      if (supabase) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + '/dashboard' }
+        });
+        if (error) throw error;
+      } else {
+        showAlert('success', 'Connexion Google → configurez Supabase OAuth pour activer.');
+      }
+    } catch(err) {
+      showAlert('error', err.message || 'Erreur Google Auth');
+    }
+  }
+
+  // ── ENTER KEY ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (currentTab === 'login') handleLogin();
+      else if (currentTab === 'register') handleRegister();
+    }
+  });
+</script>
+</body>
+</html>
