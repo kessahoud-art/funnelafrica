@@ -3,1030 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formation Excel Avancé — Maîtrisez Excel en 30 Jours</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<title>FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-  :root {
-    --green: #00c896;
-    --green2: #00a87a;
-    --gold: #f5a623;
-    --dark: #0a0f14;
-    --surface: #111820;
-    --border: #1e2a38;
-    --text: #e8f0f8;
-    --muted: #6b7e93;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    line-height: 1.6;
-  }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    background: #0d1520;
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
-    text-align: center;
-    font-size: .82rem;
-    color: var(--gold);
-    font-weight: 500;
-    animation: pulse-bar 3s infinite;
-  }
-
-  @keyframes pulse-bar {
-    0%,100% { background: #0d1520; }
-    50% { background: #1a2030; }
-  }
-
-  /* ── HERO ── */
-  .hero {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 60px 20px 40px;
-    text-align: center;
-    position: relative;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 600px; height: 400px;
-    background: radial-gradient(ellipse, #00c89615 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #00c89618;
-    border: 1px solid #00c89635;
-    color: var(--green);
-    padding: 6px 16px;
-    border-radius: 30px;
-    font-size: .78rem;
-    font-weight: 600;
-    font-family: 'Syne', sans-serif;
-    margin-bottom: 24px;
-    animation: fadeDown .6s ease both;
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(1.9rem, 5vw, 3rem);
-    line-height: 1.15;
-    margin-bottom: 20px;
-    animation: fadeUp .6s ease .1s both;
-  }
-
-  .hero-title .accent { color: var(--green); }
-  .hero-title .gold { color: var(--gold); }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero-sub {
-    font-size: 1rem;
-    color: #a0b4c8;
-    max-width: 560px;
-    margin: 0 auto 32px;
-    animation: fadeUp .6s ease .2s both;
-  }
-
-  /* ── VIDEO PLACEHOLDER ── */
-  .video-wrap {
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    margin: 0 auto 40px;
-    max-width: 700px;
-    aspect-ratio: 16/9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    animation: fadeUp .6s ease .3s both;
-    transition: transform .3s, box-shadow .3s;
-  }
-
-  .video-wrap:hover {
-    transform: scale(1.01);
-    box-shadow: 0 20px 60px #00c89625;
-  }
-
-  .video-bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #0d1a2a, #0a1520);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .play-btn {
-    width: 72px; height: 72px;
-    background: var(--green);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 40px #00c89650;
-    animation: glow 2s infinite;
-  }
-
-  @keyframes glow {
-    0%,100% { box-shadow: 0 0 30px #00c89640; }
-    50% { box-shadow: 0 0 60px #00c89680; }
-  }
-
-  .play-btn svg { margin-left: 5px; }
-
-  .video-label {
-    color: var(--muted);
-    font-size: .82rem;
-  }
-
-  /* ── SOCIAL PROOF ── */
-  .social-strip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 48px;
-    animation: fadeUp .6s ease .35s both;
-  }
-
-  .social-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: .82rem;
-    color: var(--muted);
-  }
-
-  .social-item strong { color: var(--text); }
-
-  .stars { color: var(--gold); letter-spacing: 1px; font-size: .85rem; }
-
-  .divider-dot { color: var(--border); }
-
-  /* ── SECTION ── */
-  .section {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 0 20px 60px;
-  }
-
-  .section-label {
-    font-family: 'Syne', sans-serif;
-    font-size: .7rem;
-    text-transform: uppercase;
-    letter-spacing: .15em;
-    color: var(--green);
-    margin-bottom: 12px;
-    font-weight: 700;
-  }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    margin-bottom: 16px;
-    line-height: 1.25;
-  }
-
-  .section-desc {
-    color: #8fa5bc;
-    font-size: .92rem;
-    margin-bottom: 32px;
-    max-width: 600px;
-  }
-
-  /* ── PAIN POINTS ── */
-  .pain-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    margin-bottom: 32px;
-  }
-
-  .pain-item {
-    background: #130d10;
-    border: 1px solid #3a1520;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .pain-icon {
-    font-size: 1.1rem;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .pain-text { font-size: .85rem; color: #a08090; line-height: 1.4; }
-
-  /* ── BENEFITS ── */
-  .benefit-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .benefit-item {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    transition: border-color .2s;
-  }
-
-  .benefit-item:hover { border-color: #00c89640; }
-
-  .benefit-check {
-    width: 28px; height: 28px;
-    background: var(--green);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: .75rem;
-    color: #0a0f14;
-    font-weight: 800;
-    margin-top: 2px;
-  }
-
-  .benefit-content {}
-  .benefit-title { font-weight: 600; font-size: .9rem; margin-bottom: 3px; }
-  .benefit-desc { font-size: .8rem; color: var(--muted); }
-
-  /* ── CURRICULUM ── */
-  .module-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .module-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: border-color .2s;
-  }
-
-  .module-item:hover { border-color: #00c89640; }
-
-  .module-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-  }
-
-  .module-num {
-    width: 30px; height: 30px;
-    background: var(--green-dim, #00c89615);
-    border: 1px solid #00c89630;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: .8rem;
-    color: var(--green);
-    flex-shrink: 0;
-  }
-
-  .module-title { font-weight: 500; font-size: .88rem; flex: 1; }
-  .module-count { font-size: .72rem; color: var(--muted); }
-
-  /* ── INSTRUCTOR ── */
-  .instructor-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-  }
-
-  .instructor-avatar {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--green), var(--gold));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.6rem;
-    color: #0a0f14;
-    flex-shrink: 0;
-  }
-
-  .instructor-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    margin-bottom: 4px;
-  }
-
-  .instructor-title { font-size: .8rem; color: var(--green); margin-bottom: 12px; }
-  .instructor-bio { font-size: .85rem; color: #8fa5bc; line-height: 1.6; }
-
-  /* ── TESTIMONIALS ── */
-  .testimonial-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-  }
-
-  .testimonial-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-  }
-
-  .testi-stars { color: var(--gold); margin-bottom: 10px; font-size: .85rem; }
-  .testi-text { font-size: .83rem; color: #a0b4c8; line-height: 1.6; margin-bottom: 14px; font-style: italic; }
-
-  .testi-author {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .testi-av {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1e3a5f, #2a4a7f);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .72rem;
-    font-weight: 700;
-  }
-
-  .testi-name { font-size: .8rem; font-weight: 600; }
-  .testi-city { font-size: .7rem; color: var(--muted); }
-
-  /* ── PRICING ── */
-  .pricing-card {
-    background: var(--surface);
-    border: 2px solid var(--green);
-    border-radius: 20px;
-    padding: 36px;
-    max-width: 480px;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 0 60px #00c89620;
-  }
-
-  .pricing-badge {
-    position: absolute;
-    top: -14px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: #0a0f14;
-    font-size: .72rem;
-    font-weight: 800;
-    font-family: 'Syne', sans-serif;
-    padding: 5px 18px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
-
-  .pricing-label {
-    font-size: .78rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    margin-bottom: 12px;
-    font-family: 'Syne', sans-serif;
-  }
-
-  .price-old {
-    font-size: 1rem;
-    color: var(--muted);
-    text-decoration: line-through;
-    margin-bottom: 4px;
-  }
-
-  .price-main {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 3rem;
-    color: var(--green);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .price-currency {
-    font-size: 1rem;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-
-  .pricing-includes {
-    text-align: left;
-    margin-bottom: 28px;
-  }
-
-  .pricing-includes li {
-    list-style: none;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: .85rem;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .pricing-includes li:last-child { border-bottom: none; }
-  .pricing-includes li::before { content: '✓'; color: var(--green); font-weight: 800; }
-
-  .cta-btn {
-    display: block;
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, var(--green), var(--green2));
-    color: #0a0f14;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1rem;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all .3s;
-    text-align: center;
-    box-shadow: 0 8px 30px #00c89640;
-    animation: bounce-soft 2s infinite;
-  }
-
-  @keyframes bounce-soft {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-  }
-
-  .cta-btn:hover {
-    background: linear-gradient(135deg, #00dea8, #00c896);
-    box-shadow: 0 12px 40px #00c89660;
-    transform: translateY(-2px) !important;
-    animation: none;
-  }
-
-  .guarantee {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 16px;
-    font-size: .78rem;
-    color: var(--muted);
-  }
-
-  /* ── TIMER ── */
-  .timer-section {
-    background: linear-gradient(135deg, #130d10, #0d1520);
-    border: 1px solid #3a1a25;
-    border-radius: 16px;
-    padding: 24px;
-    text-align: center;
-    margin-bottom: 32px;
-  }
-
-  .timer-label {
-    font-size: .8rem;
-    color: #ff7090;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    margin-bottom: 12px;
-  }
-
-  .timer-display {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .timer-unit {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 16px;
-    min-width: 64px;
-  }
-
-  .timer-num {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.8rem;
-    color: var(--gold);
-    display: block;
-    line-height: 1;
-  }
-
-  .timer-sub { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-
-  /* ── FAQ ── */
-  .faq-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .faq-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .faq-q {
-    padding: 16px 20px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: .88rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    transition: background .2s;
-  }
-
-  .faq-q:hover { background: #1a2535; }
-
-  .faq-arrow { color: var(--green); font-size: .8rem; transition: transform .2s; flex-shrink: 0; }
-  .faq-item.open .faq-arrow { transform: rotate(180deg); }
-
-  .faq-a {
-    display: none;
-    padding: 0 20px 16px;
-    font-size: .83rem;
-    color: var(--muted);
-    line-height: 1.6;
-    border-top: 1px solid var(--border);
-    padding-top: 14px;
-  }
-
-  .faq-item.open .faq-a { display: block; }
-
-  /* ── FOOTER ── */
-  .footer {
-    border-top: 1px solid var(--border);
-    padding: 24px 20px;
-    text-align: center;
-    font-size: .75rem;
-    color: var(--muted);
-  }
-
-  /* ── STICKY CTA MOBILE ── */
-  .sticky-cta {
-    display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 14px 20px;
-    z-index: 100;
-    box-shadow: 0 -10px 30px #00000060;
-  }
-
-  @media (max-width: 640px) {
-    .sticky-cta { display: block; }
-    .instructor-card { flex-direction: column; }
-    body { padding-bottom: 80px; }
-  }
-
-  /* ── DIVIDER ── */
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0 20px 60px;
-    max-width: 820px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+  :root{--color:#00c896;--bg:#0a0f14;--surface:#111820;--border:#1e2a38;--text:#e8f0f8;--muted:#6b7e93;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 20px 60px;}
+  .badge-wrap{text-align:center;margin-bottom:16px;}
+  .badge{background:var(--surface);border:1px solid var(--color);color:var(--color);padding:6px 18px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;display:inline-block;}
+  .timer-box{background:#1a0800;border:1px solid #f5a62340;border-radius:10px;padding:10px;text-align:center;margin-bottom:16px;font-size:.82rem;color:#f5a623;display:none;}
+  .hero{text-align:center;margin-bottom:32px;}
+  .hero-emoji{font-size:3rem;margin-bottom:12px;}
+  .hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,5vw,2.2rem);line-height:1.15;margin-bottom:10px;}
+  .hero h2{font-size:1.05rem;font-weight:600;margin-bottom:14px;}
+  .hero p{color:var(--muted);font-size:.9rem;line-height:1.7;max-width:540px;margin:0 auto;}
+  .video-wrap{margin:24px 0;border-radius:12px;overflow:hidden;aspect-ratio:16/9;display:none;}
+  .video-wrap iframe{width:100%;height:100%;border:none;}
+  .benefits-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px;}
+  .benefits-box h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:14px;}
+  .benefit-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+  .benefit-item:last-child{border-bottom:none;}
+  .benefit-check{color:var(--color);font-weight:700;flex-shrink:0;}
+  .testis{margin-bottom:24px;}
+  .testis h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:12px;text-align:center;}
+  .testi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+  .testi-text{font-size:.85rem;color:#a0b4c8;font-style:italic;margin-bottom:10px;line-height:1.6;}
+  .testi-author{display:flex;align-items:center;gap:8px;}
+  .testi-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;flex-shrink:0;}
+  .testi-name{font-size:.8rem;font-weight:600;}
+  .testi-city{font-size:.7rem;color:var(--muted);}
+  .offer-box{background:var(--surface);border:2px solid var(--color);border-radius:16px;padding:24px;margin-bottom:24px;text-align:center;}
+  .price-old{font-size:.88rem;color:var(--muted);text-decoration:line-through;margin-bottom:4px;}
+  .price-main{font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;margin-bottom:6px;}
+  .price-sub{font-size:.75rem;color:var(--muted);margin-bottom:16px;}
+  .includes{text-align:left;margin-bottom:18px;}
+  .include-item{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:4px 0;}
+  .include-check{flex-shrink:0;}
+  .cta-btn{display:block;width:100%;padding:16px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:10px;}
+  .guarantee{font-size:.72rem;color:var(--muted);}
+  .faq-box{margin-bottom:24px;}
+  .faq-box h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:12px;}
+  .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;}
+  .faq-q{font-weight:600;font-size:.85rem;margin-bottom:6px;}
+  .faq-a{font-size:.8rem;color:var(--muted);line-height:1.6;}
+  .footer-vendor{text-align:center;padding:20px 0;border-top:1px solid var(--border);font-size:.75rem;color:var(--muted);}
+  .footer-vendor img{width:48px;height:48px;border-radius:50%;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;object-fit:cover;}
+  .loading{display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:16px;color:var(--muted);}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--color);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .error-box{text-align:center;padding:60px 20px;}
 </style>
 </head>
 <body>
 
-<!-- URGENCY BAR -->
-<div class="topbar">
-  🔥 Offre limitée — Prix réduit de 50% encore <strong id="topTimer">02:47:33</strong> · 23 places restantes
+<div id="loadingView" class="loading">
+  <div class="spinner"></div>
+  <div>Chargement...</div>
 </div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="badge">📘 Formation en ligne · Accès immédiat</div>
-
-  <h1 class="hero-title">
-    Maîtrisez <span class="accent">Excel</span> en<br>
-    <span class="gold">30 jours</span> — Même si vous débutez
-  </h1>
-
-  <p class="hero-sub">
-    La seule formation Excel conçue pour les professionnels africains.
-    Tableaux de bord, formules avancées, automatisation — du concret, pas de la théorie.
-  </p>
-
-  <!-- VIDEO -->
-  <div class="video-wrap">
-    <div class="video-bg">
-      <div class="play-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#0a0f14">
-          <polygon points="5,3 19,12 5,21"/>
-        </svg>
-      </div>
-      <div class="video-label">▶ Regarder la présentation (2 min)</div>
+<div id="mainView" style="display:none;">
+  <div class="wrap">
+    <div class="badge-wrap"><div class="badge" id="pubBadge">Formation en ligne · Accès immédiat</div></div>
+    <div class="timer-box" id="pubTimer">⏰ Offre limitée — expire dans <strong id="timerCount">23:59:59</strong></div>
+    <div class="hero">
+      <div class="hero-emoji" id="pubEmoji">📘</div>
+      <h1 id="pubTitle">Titre du produit</h1>
+      <h2 id="pubSubtitle" style="color:var(--color);">Sous-titre</h2>
+      <p id="pubDesc">Description...</p>
+    </div>
+    <div class="video-wrap" id="pubVideoWrap">
+      <iframe id="pubVideo" allowfullscreen></iframe>
+    </div>
+    <div class="benefits-box" id="pubBenefitsBox" style="display:none;">
+      <h3 id="pubBenefitsTitle" style="color:var(--color);">✅ Ce que vous allez apprendre</h3>
+      <div id="pubBenefitsList"></div>
+    </div>
+    <div class="testis" id="pubTestisBox" style="display:none;">
+      <h3>⭐ Ils ont déjà réussi</h3>
+      <div id="pubTestisList"></div>
+    </div>
+    <div class="offer-box">
+      <div class="price-old" id="pubOldPrice" style="display:none;"></div>
+      <div class="price-main" id="pubPrice" style="color:var(--color);">— FCFA</div>
+      <div class="price-sub">Paiement unique · Accès immédiat</div>
+      <div class="includes" id="pubIncludesList"></div>
+      <a class="cta-btn" id="pubCtaBtn" href="#">Accéder maintenant →</a>
+      <div class="guarantee" id="pubGuarantee"></div>
+    </div>
+    <div class="faq-box" id="pubFaqBox" style="display:none;">
+      <h3>❓ Questions fréquentes</h3>
+      <div id="pubFaqList"></div>
+    </div>
+    <div class="footer-vendor">
+      <img id="pubVendorPhoto" style="display:none;">
+      <strong id="pubVendorName" style="display:block;color:var(--text);margin-bottom:4px;"></strong>
+      Propulsé par <strong style="color:var(--color);">FunnelAfrica</strong>
     </div>
   </div>
-
-  <!-- SOCIAL PROOF -->
-  <div class="social-strip">
-    <div class="social-item">
-      <span class="stars">★★★★★</span>
-      <span><strong>4.9/5</strong> (127 avis)</span>
-    </div>
-    <span class="divider-dot">•</span>
-    <div class="social-item">👥 <strong>840+</strong> apprenants</div>
-    <span class="divider-dot">•</span>
-    <div class="social-item">🌍 <strong>12 pays</strong> africains</div>
-    <span class="divider-dot">•</span>
-    <div class="social-item">⚡ Accès <strong>immédiat</strong></div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- PAIN POINTS -->
-<section class="section">
-  <div class="section-label">Le problème</div>
-  <h2 class="section-title">Est-ce que vous vous reconnaissez ?</h2>
-
-  <div class="pain-grid">
-    <div class="pain-item">
-      <div class="pain-icon">😤</div>
-      <div class="pain-text">Vous perdez des heures sur des tableaux que Excel pourrait faire en secondes</div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">😰</div>
-      <div class="pain-text">Vos formules ne marchent jamais et vous ne savez pas pourquoi</div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">😓</div>
-      <div class="pain-text">Vous copiez-collez manuellement des données qui devraient s'automatiser</div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">😞</div>
-      <div class="pain-text">Vos collègues semblent à l'aise avec Excel et vous vous sentez bloqué</div>
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- BENEFITS -->
-<section class="section">
-  <div class="section-label">Ce que vous allez apprendre</div>
-  <h2 class="section-title">Après la formation, vous saurez :</h2>
-  <p class="section-desc">Des compétences directement applicables dans votre travail, dès le lendemain.</p>
-
-  <div class="benefit-list">
-    <div class="benefit-item">
-      <div class="benefit-check">✓</div>
-      <div class="benefit-content">
-        <div class="benefit-title">Créer des tableaux de bord professionnels</div>
-        <div class="benefit-desc">Graphiques dynamiques, indicateurs visuels, rapports automatisés que votre patron adorera</div>
-      </div>
-    </div>
-    <div class="benefit-item">
-      <div class="benefit-check">✓</div>
-      <div class="benefit-content">
-        <div class="benefit-title">Maîtriser les formules avancées</div>
-        <div class="benefit-desc">RECHERCHEV, INDEX/EQUIV, SOMME.SI, formules imbriquées — plus aucune formule ne vous résistera</div>
-      </div>
-    </div>
-    <div class="benefit-item">
-      <div class="benefit-check">✓</div>
-      <div class="benefit-content">
-        <div class="benefit-title">Automatiser vos tâches répétitives</div>
-        <div class="benefit-desc">Macros et VBA simplifiés — automatisez ce qui vous prend 2h en 5 minutes</div>
-      </div>
-    </div>
-    <div class="benefit-item">
-      <div class="benefit-check">✓</div>
-      <div class="benefit-content">
-        <div class="benefit-title">Analyser des données comme un expert</div>
-        <div class="benefit-desc">Tableaux croisés dynamiques, filtres avancés, visualisation de données pour prendre de meilleures décisions</div>
-      </div>
-    </div>
-    <div class="benefit-item">
-      <div class="benefit-check">✓</div>
-      <div class="benefit-content">
-        <div class="benefit-title">Gérer votre business avec Excel</div>
-        <div class="benefit-desc">Factures, suivi de stock, trésorerie, tableaux de suivi clients — tout ce dont un entrepreneur africain a besoin</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- CURRICULUM -->
-<section class="section">
-  <div class="section-label">Le programme</div>
-  <h2 class="section-title">30 jours, 6 modules</h2>
-  <p class="section-desc">Chaque module = des vidéos courtes + exercices pratiques + fichiers Excel téléchargeables</p>
-
-  <div class="module-list">
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">01</div>
-        <div class="module-title">Les fondations — Maîtriser l'interface et les bases</div>
-        <div class="module-count">8 leçons</div>
-      </div>
-    </div>
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">02</div>
-        <div class="module-title">Formules essentielles — Les 20 formules incontournables</div>
-        <div class="module-count">12 leçons</div>
-      </div>
-    </div>
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">03</div>
-        <div class="module-title">Tableaux et graphiques professionnels</div>
-        <div class="module-count">10 leçons</div>
-      </div>
-    </div>
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">04</div>
-        <div class="module-title">Tableaux croisés dynamiques — Analyse de données</div>
-        <div class="module-count">9 leçons</div>
-      </div>
-    </div>
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">05</div>
-        <div class="module-title">Automatisation et Macros — Travaillez moins, faites plus</div>
-        <div class="module-count">8 leçons</div>
-      </div>
-    </div>
-    <div class="module-item">
-      <div class="module-header">
-        <div class="module-num">06</div>
-        <div class="module-title">Projet final — Tableau de bord business complet</div>
-        <div class="module-count">6 leçons</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- INSTRUCTOR -->
-<section class="section">
-  <div class="section-label">Votre formateur</div>
-  <h2 class="section-title" style="margin-bottom:24px;">Qui vous enseigne</h2>
-
-  <div class="instructor-card">
-    <div class="instructor-avatar">MK</div>
-    <div>
-      <div class="instructor-name">Moussa Koné</div>
-      <div class="instructor-title">Expert Excel · 12 ans d'expérience · Abidjan, Côte d'Ivoire</div>
-      <div class="instructor-bio">
-        Ancien contrôleur de gestion dans 3 multinationales, j'ai formé plus de 2 000 professionnels africains à Excel depuis 2016. Ma pédagogie : du concret, des exercices tirés du vrai monde du travail africain, et du soutien jusqu'à ce que vous maîtrisez.
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- TESTIMONIALS -->
-<section class="section">
-  <div class="section-label">Témoignages</div>
-  <h2 class="section-title">Ce que disent nos apprenants</h2>
-  <p class="section-desc" style="margin-bottom:24px;">Résultats réels de professionnels comme vous.</p>
-
-  <div class="testimonial-grid">
-    <div class="testimonial-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"En 3 semaines j'ai créé le tableau de bord de mon service. Mon directeur était impressionné. Cette formation vaut 10x son prix."</div>
-      <div class="testi-author">
-        <div class="testi-av">AB</div>
-        <div>
-          <div class="testi-name">Awa Balde</div>
-          <div class="testi-city">Responsable RH · Dakar</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"J'avais peur parce que je suis nul en informatique. Maintenant je fais des macros ! Le formateur explique vraiment bien."</div>
-      <div class="testi-author">
-        <div class="testi-av">KD</div>
-        <div>
-          <div class="testi-name">Kofi Darkwa</div>
-          <div class="testi-city">Comptable · Accra</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"J'ai payé avec Wave, accès immédiat. Vraiment professionnel. Le contenu est excellent et pratique pour notre contexte africain."</div>
-      <div class="testi-author">
-        <div class="testi-av">FT</div>
-        <div>
-          <div class="testi-name">Fatoumata Traoré</div>
-          <div class="testi-city">Gérante PME · Bamako</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- PRICING -->
-<section class="section">
-  <div class="section-label">Tarif</div>
-  <h2 class="section-title" style="text-align:center;margin-bottom:8px;">Une seule fois. À vie.</h2>
-  <p style="text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:32px;">Pas d'abonnement. Payez une fois, accédez pour toujours.</p>
-
-  <!-- TIMER -->
-  <div class="timer-section">
-    <div class="timer-label">⏰ Prix réduit expire dans</div>
-    <div class="timer-display">
-      <div class="timer-unit">
-        <span class="timer-num" id="h">02</span>
-        <div class="timer-sub">Heures</div>
-      </div>
-      <div class="timer-unit">
-        <span class="timer-num" id="m">47</span>
-        <div class="timer-sub">Minutes</div>
-      </div>
-      <div class="timer-unit">
-        <span class="timer-num" id="s">33</span>
-        <div class="timer-sub">Secondes</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pricing-card">
-    <div class="pricing-badge">🔥 Offre de lancement — 50% de réduction</div>
-
-    <div class="pricing-label">Accès complet à vie</div>
-    <div class="price-old">19 900 FCFA</div>
-    <div class="price-main">9 900</div>
-    <div class="price-currency">FCFA · Paiement unique</div>
-
-    <ul class="pricing-includes">
-      <li>53 leçons vidéo HD accessibles à vie</li>
-      <li>Fichiers Excel téléchargeables (tous modules)</li>
-      <li>Accès au groupe WhatsApp d'entraide</li>
-      <li>Certificat de réussite PDF</li>
-      <li>Mises à jour gratuites à vie</li>
-      <li>Support par WhatsApp (réponse sous 24h)</li>
-    </ul>
-
-    <button class="cta-btn" onclick="goToCheckout()">
-      💳 Je veux accéder maintenant →
-    </button>
-
-    <div class="guarantee">
-      🛡️ Satisfait ou remboursé 7 jours · Aucun risque
-    </div>
-
-    <div style="margin-top:16px;font-size:.75rem;color:var(--muted);">
-      Paiement sécurisé via Wave · Orange Money · MTN MoMo · CinetPay
-    </div>
-
-    <div style="margin-top:12px;display:flex;justify-content:center;gap:12px;font-size:1.3rem;">
-      📱 💛 🟠 💚
-    </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- FAQ -->
-<section class="section">
-  <div class="section-label">Questions fréquentes</div>
-  <h2 class="section-title" style="margin-bottom:24px;">Vous avez des questions ?</h2>
-
-  <div class="faq-list">
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Comment accéder à la formation après paiement ?
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">Immédiatement après votre paiement, vous recevez un SMS et un email avec vos identifiants d'accès. Vous pouvez commencer à apprendre dans les 5 minutes.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Quelles méthodes de paiement acceptez-vous ?
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">Wave, Orange Money, MTN MoMo, CinetPay, et carte bancaire. Tous les paiements sont sécurisés.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Faut-il une version spéciale d'Excel ?
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">Non, la formation fonctionne avec Excel 2010 et toutes les versions supérieures, y compris la version gratuite en ligne (Office 365 web).</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Puis-je suivre la formation sur téléphone ?
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">Oui, la plateforme est 100% mobile. Regardez les vidéos et faites les exercices directement depuis votre smartphone Android ou iPhone.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Et si je ne suis pas satisfait ?
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">Vous avez 7 jours pour tester la formation. Si elle ne vous convient pas, envoyez un message WhatsApp et vous êtes remboursé intégralement. Sans question.</div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<div class="footer">
-  <p>© 2026 FunnelAfrica · Tous droits réservés</p>
-  <p style="margin-top:6px;">Propulsé par <strong style="color:var(--green)">FunnelAfrica</strong> · La plateforme des vendeurs africains</p>
 </div>
 
-<!-- STICKY CTA MOBILE -->
-<div class="sticky-cta">
-  <button class="cta-btn" onclick="goToCheckout()" style="animation:none;">
-    💳 Accéder pour 9 900 FCFA →
-  </button>
+<div id="errorView" class="error-box" style="display:none;">
+  <div style="font-size:3rem;margin-bottom:14px;">😕</div>
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px;">Page introuvable</div>
+  <div style="color:var(--muted);font-size:.88rem;">Ce tunnel n'existe pas ou n'est plus disponible.</div>
 </div>
 
 <script>
-  // ── COUNTDOWN TIMER ──
-  let total = 2 * 3600 + 47 * 60 + 33;
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function updateTimer() {
-    if (total <= 0) return;
-    total--;
-    const h = Math.floor(total / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
-    const fmt = n => String(n).padStart(2, '0');
-    document.getElementById('h').textContent = fmt(h);
-    document.getElementById('m').textContent = fmt(m);
-    document.getElementById('s').textContent = fmt(s);
-    document.getElementById('topTimer').textContent = `${fmt(h)}:${fmt(m)}:${fmt(s)}`;
+  var params = new URLSearchParams(window.location.search);
+  var slug   = params.get('t') || params.get('slug');
+  var ref    = params.get('ref'); // code affilié
+
+  if (!slug) { showError(); } else { loadTunnel(); }
+
+  function loadTunnel() {
+    sb.from('tunnels').select('*,profiles(full_name,photo_url,display_name)').eq('slug', slug).eq('status','live').single().then(function(r) {
+      if (r.error || !r.data) { showError(); return; }
+      var t = r.data;
+      var cfg = t.page_config || {};
+
+      // Injecter couleur principale
+      var color = cfg.primary_color || '#00c896';
+      document.documentElement.style.setProperty('--color', color);
+
+      // Badge et timer
+      document.getElementById('pubBadge').textContent = cfg.badge || 'Formation en ligne · Accès immédiat';
+      document.getElementById('pubBadge').style.borderColor = color;
+      document.getElementById('pubBadge').style.color = color;
+
+      // Timer d'urgence
+      if (cfg.timer_enabled) {
+        document.getElementById('pubTimer').style.display = 'block';
+        startTimer();
+      }
+
+      // Hero
+      document.getElementById('pubEmoji').textContent    = cfg.emoji || '📘';
+      document.getElementById('pubTitle').textContent    = cfg.title || t.name;
+      document.getElementById('pubSubtitle').textContent = cfg.subtitle || '';
+      document.getElementById('pubSubtitle').style.color = color;
+      document.getElementById('pubDesc').textContent     = cfg.desc || '';
+
+      // Meta title
+      document.title = (cfg.title || t.name) + ' — FunnelAfrica';
+
+      // Vidéo
+      if (cfg.video_enabled && cfg.video_url) {
+        var ytId = cfg.video_url.replace('https://www.youtube.com/watch?v=','').replace('https://youtu.be/','').split('&')[0];
+        document.getElementById('pubVideo').src = 'https://www.youtube.com/embed/'+ytId;
+        document.getElementById('pubVideoWrap').style.display = 'block';
+      }
+
+      // Bénéfices
+      var benefits = cfg.benefits || [];
+      if (benefits.length) {
+        document.getElementById('pubBenefitsBox').style.display = 'block';
+        document.getElementById('pubBenefitsTitle').style.color = color;
+        document.getElementById('pubBenefitsList').innerHTML = benefits.map(function(b) {
+          return '<div class="benefit-item"><span class="benefit-check" style="color:'+color+';">✓</span>'+b+'</div>';
+        }).join('');
+      }
+
+      // Témoignages
+      var testis = cfg.testimonials || [];
+      if (testis.length) {
+        document.getElementById('pubTestisBox').style.display = 'block';
+        var colors = ['#00c896','#4da6ff','#f5a623','#ff6b9d'];
+        document.getElementById('pubTestisList').innerHTML = testis.map(function(testi,i) {
+          var ini = (testi.name||'?').split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+          var c   = colors[i%colors.length];
+          return '<div class="testi-card">' +
+            '<div class="testi-text">"'+testi.text+'"</div>' +
+            '<div class="testi-author"><div class="testi-av" style="background:'+c+'25;color:'+c+';">'+ini+'</div><div><div class="testi-name">'+testi.name+'</div><div class="testi-city">'+testi.city+'</div></div></div>' +
+          '</div>';
+        }).join('');
+      }
+
+      // Offre
+      var price    = t.price || cfg.price || 0;
+      var oldPrice = t.old_price || cfg.old_price || 0;
+      document.getElementById('pubPrice').textContent = price.toLocaleString('fr') + ' FCFA';
+      document.getElementById('pubPrice').style.color = color;
+      if (oldPrice) {
+        document.getElementById('pubOldPrice').style.display = 'block';
+        document.getElementById('pubOldPrice').textContent = oldPrice.toLocaleString('fr') + ' FCFA';
+      }
+
+      // Inclus
+      var includes = cfg.includes || [];
+      if (includes.length) {
+        document.getElementById('pubIncludesList').innerHTML = includes.map(function(inc) {
+          return '<div class="include-item"><span class="include-check" style="color:'+color+';">✓</span>'+inc+'</div>';
+        }).join('');
+      }
+
+      // Bouton CTA
+      var btnText = cfg.btn_text || 'Accéder maintenant →';
+      var ctaBtn  = document.getElementById('pubCtaBtn');
+      ctaBtn.textContent = btnText;
+      ctaBtn.style.background = color;
+      ctaBtn.style.color = '#0a0f14';
+      var checkoutUrl = '/funnelafrica-checkout.html?tunnel='+slug+(ref?'&ref='+ref:'');
+      ctaBtn.href = checkoutUrl;
+
+      // Garantie
+      if (cfg.guarantee) {
+        document.getElementById('pubGuarantee').textContent = '🛡️ ' + cfg.guarantee;
+      }
+
+      // FAQ
+      var faq = cfg.faq || [];
+      if (faq.length) {
+        document.getElementById('pubFaqBox').style.display = 'block';
+        document.getElementById('pubFaqList').innerHTML = faq.map(function(f) {
+          return '<div class="faq-item"><div class="faq-q">'+f.q+'</div><div class="faq-a">'+f.a+'</div></div>';
+        }).join('');
+      }
+
+      // Vendeur
+      var vendorProfile = t.profiles || {};
+      var vendorName    = cfg.vendor_name || vendorProfile.display_name || vendorProfile.full_name || '';
+      var vendorPhoto   = cfg.vendor_photo || vendorProfile.photo_url || '';
+      if (vendorName) document.getElementById('pubVendorName').textContent = vendorName;
+      if (vendorPhoto) {
+        var img = document.getElementById('pubVendorPhoto');
+        img.src   = vendorPhoto;
+        img.style.display = 'block';
+      }
+
+      // Pixel Facebook vendeur
+      if (cfg.pixel_id) {
+        injectPixel(cfg.pixel_id);
+        setTimeout(function(){fbqTrack('ViewContent',{content_name:cfg.title||t.name,value:price,currency:'XOF'});},500);
+      }
+
+      // Tracker clic affilié
+      if (ref) trackAffClick(ref, t.id);
+
+      // Tracker vue tunnel
+      sb.from('tunnels').update({ views: (t.views||0)+1 }).eq('id', t.id);
+
+      document.getElementById('loadingView').style.display = 'none';
+      document.getElementById('mainView').style.display    = 'block';
+    });
   }
 
-  setInterval(updateTimer, 1000);
-
-  // ── FAQ ──
-  function toggleFaq(el) {
-    el.parentElement.classList.toggle('open');
+  // ── PIXEL ──
+  function injectPixel(pixelId) {
+    if (typeof fbq !== 'undefined') { fbq('init', pixelId); return; }
+    (function(f,b,e,v,n,t,s){
+      if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+      t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    })(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', pixelId);
+    fbq('track', 'PageView');
   }
 
-  // ── CTA ──
-  function goToCheckout() {
-    // Lien vers page checkout
-    alert('→ Redirection vers le checkout sécurisé...\n\nPage checkout = prochaine étape du build !');
+  function fbqTrack(event, params) {
+    if (typeof fbq !== 'undefined') fbq('track', event, params);
+  }
+
+  // ── AFFILIÉ ──
+  function trackAffClick(refCode, tunnelId) {
+    fetch('/api/affiliate/click', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ref_code:refCode, tunnel_id:tunnelId})
+    }).catch(function(){});
+    localStorage.setItem('fa_ref_'+tunnelId, refCode);
+  }
+
+  // ── TIMER ──
+  var timerSeconds = 23*3600+59*60+59;
+  function startTimer() {
+    var saved = localStorage.getItem('fa_timer_end');
+    if (!saved) {
+      var end = Date.now() + timerSeconds*1000;
+      localStorage.setItem('fa_timer_end', end);
+      saved = end;
+    }
+    function tick() {
+      var remaining = Math.max(0, Math.floor((saved - Date.now())/1000));
+      var h = Math.floor(remaining/3600);
+      var m = Math.floor((remaining%3600)/60);
+      var s = remaining%60;
+      document.getElementById('timerCount').textContent =
+        String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+      if (remaining > 0) setTimeout(tick, 1000);
+    }
+    tick();
+  }
+
+  function showError() {
+    document.getElementById('loadingView').style.display = 'none';
+    document.getElementById('errorView').style.display  = 'block';
   }
 </script>
 </body>

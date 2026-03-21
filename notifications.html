@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--blue:#4da6ff;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+  .logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-mark span{width:30px;height:30px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#0a0f14;font-weight:800;flex-shrink:0;}
+  .plan-badge{margin-top:8px;font-size:.68rem;color:var(--gold);background:#f5a62318;border:1px solid #f5a62340;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Syne',sans-serif;font-weight:600;}
+  .nav{padding:12px 10px;flex:1;}
+  .nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 5px;font-family:'Syne',sans-serif;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:#00c89615;color:var(--green);}
+  .nav-icon{font-size:.85rem;flex-shrink:0;}
+  .sidebar-footer{padding:14px 12px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:9px;padding:9px;border-radius:9px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:#0a0f14;flex-shrink:0;}
+  .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .btn-ghost:hover{color:var(--text);}
+  .content{padding:24px;max-width:680px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  .notif-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:all .2s;cursor:pointer;animation:fadeUp .4s ease both;}
+  .notif-item:hover{border-color:#00c89640;background:var(--surface2);}
+  .notif-item.unread{border-left:3px solid var(--green);}
+  .notif-item.unread.gold{border-left-color:var(--gold);}
+  .notif-item.unread.blue{border-left-color:var(--blue);}
+  .notif-item.unread.red{border-left-color:var(--danger);}
+  .notif-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .notif-icon.green{background:#00c89618;}
+  .notif-icon.gold{background:#f5a62318;}
+  .notif-icon.blue{background:#4da6ff18;}
+  .notif-icon.red{background:#ff4d6d18;}
+  .notif-title{font-weight:600;font-size:.88rem;margin-bottom:4px;}
+  .notif-desc{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+  .notif-time{font-size:.68rem;color:var(--muted);}
+  .notif-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:6px;}
+  .notif-dot.gold{background:var(--gold);}
+  .notif-dot.blue{background:var(--blue);}
+  .notif-dot.hidden{visibility:hidden;}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+  .filter-tabs{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:20px;width:fit-content;}
+  .filter-tab{padding:7px 14px;border-radius:8px;font-size:.78rem;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .2s;}
+  .filter-tab.active{background:var(--surface);color:var(--text);}
+  .unread-badge{background:var(--danger);color:white;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:6px;}
+  .hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.3rem;}
+  .overlay-sb{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+  @media(max-width:760px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.overlay-sb.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}.content{padding:16px;}.topbar{padding:12px 16px;}}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<div class="overlay-sb" id="overlaySb" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo"><div class="logo-mark"><span>FA</span>FunnelAfrica</div><div class="plan-badge" id="planBadge">⚡ Starter</div></div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-templates.html?new=1'"><span class="nav-icon">🚀</span>Mes Tunnels</div>
+    <div class="nav-item" onclick="window.location.href='/produits.html'"><span class="nav-icon">📦</span>Produits</div>
+    <div class="nav-item" onclick="window.location.href='/commandes.html'"><span class="nav-icon">📋</span>Commandes</div>
+    <div class="nav-section">Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/statistiques.html'"><span class="nav-icon">📈</span>Statistiques</div>
+    <div class="nav-item" onclick="window.location.href='/email-marketing.html'"><span class="nav-icon">📧</span>Email Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/contacts.html'"><span class="nav-icon">👥</span>Contacts</div>
+    <div class="nav-item" onclick="window.location.href='/whatsapp.html'"><span class="nav-icon">📱</span>WhatsApp</div>
+    <div class="nav-item" onclick="window.location.href='/affiliation.html'"><span class="nav-icon">🤝</span>Affiliation</div>
+    <div class="nav-item" onclick="window.location.href='/facebook-ads.html'"><span class="nav-icon">📢</span>Facebook Ads</div>
+    <div class="nav-section">Paramètres</div>
+    <div class="nav-item active"><span class="nav-icon">🔔</span>Notifications</div>
+    <div class="nav-item" onclick="window.location.href='/profil.html'"><span class="nav-icon">👤</span>Mon profil</div>
+    <div class="nav-item" onclick="window.location.href='/abonnement.html'"><span class="nav-icon">💳</span>Plans & Paiements</div>
+    <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span>Déconnexion</div>
+  </nav>
+  <div class="sidebar-footer"><div class="user-card"><div class="avatar" id="userAvatar">?</div><div><div style="font-size:.8rem;font-weight:500;" id="userName">—</div><div style="font-size:.68rem;color:var(--muted);" id="userPlan">—</div></div></div></div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">🔔 Notifications <span class="unread-badge" id="unreadBadge" style="display:none;">0</span></span>
+    </div>
+    <button class="btn btn-ghost" onclick="markAllRead()">✓ Tout marquer lu</button>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterNotifs('all',this)">Toutes</button>
+      <button class="filter-tab" onclick="filterNotifs('sale',this)">💰 Ventes</button>
+      <button class="filter-tab" onclick="filterNotifs('contact',this)">👥 Contacts</button>
+      <button class="filter-tab" onclick="filterNotifs('system',this)">⚙️ Système</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+</main>
+<script>
+  var SUPABASE_URL='https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY='VOTRE_ANON_KEY';
+  var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  var currentUser=null;
+  var allNotifs=[];
+  var readNotifs=JSON.parse(localStorage.getItem('fa_read_notifs')||'[]');
+
+  var SAMPLE_NOTIFS=[
+    {id:'n1',type:'sale',icon:'💰',color:'green',title:'Nouvelle vente !',desc:'Amadou Koné a acheté "Ma Formation" pour 9 900 FCFA.',time:'Il y a 2 min'},
+    {id:'n2',type:'contact',icon:'👤',color:'blue',title:'Nouveau contact',desc:'Fatou Diallo s\'est inscrite via votre tunnel "Mon Ebook".',time:'Il y a 15 min'},
+    {id:'n3',type:'sale',icon:'💰',color:'green',title:'Paiement confirmé',desc:'Moussa Traoré a payé 9 900 FCFA via MTN MoMo.',time:'Il y a 1h'},
+    {id:'n4',type:'system',icon:'⚡',color:'gold',title:'Tunnel publié !',desc:'Votre tunnel "Formation Excel Pro" est maintenant en ligne.',time:'Il y a 3h'},
+    {id:'n5',type:'system',icon:'🎉',color:'green',title:'Bienvenue sur FunnelAfrica !',desc:'Votre compte est actif. Créez votre premier tunnel de vente.',time:'Aujourd\'hui'},
+    {id:'n6',type:'contact',icon:'👥',color:'blue',title:'5 nouveaux contacts',desc:'5 personnes ont rejoint votre liste via vos tunnels aujourd\'hui.',time:'Hier'},
+    {id:'n7',type:'system',icon:'⚠️',color:'red',title:'Plan Starter limité',desc:'Vous avez atteint la limite de 1 tunnel. Upgradez pour créer plus.',time:'Il y a 2 jours'},
+  ];
+
+  sb.auth.getUser().then(function(r){
+    if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
+    currentUser=r.data.user;
+    sb.from('profiles').select('full_name,plan').eq('id',r.data.user.id).single().then(function(pr){
+      if(!pr.data)return;
+      var name=pr.data.full_name||r.data.user.email.split('@')[0];
+      var ini=name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+      document.getElementById('userAvatar').textContent=ini;
+      document.getElementById('userName').textContent=name;
+      document.getElementById('userPlan').textContent='Plan '+(pr.data.plan||'starter');
+      var p=pr.data.plan||'starter';
+      document.getElementById('planBadge').textContent='⚡ Plan '+p.charAt(0).toUpperCase()+p.slice(1);
+    });
+    loadNotifs();
+  });
+
+  function loadNotifs(){
+    allNotifs=SAMPLE_NOTIFS;
+    renderNotifs(allNotifs);
+    updateBadge();
+  }
+
+  function renderNotifs(notifs){
+    if(!notifs.length){
+      document.getElementById('notifList').innerHTML='<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:12px;">🔔</div><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucune notification</div><div style="font-size:.82rem;">Vos activités apparaîtront ici.</div></div>';
+      return;
+    }
+    document.getElementById('notifList').innerHTML=notifs.map(function(n,i){
+      var isRead=readNotifs.includes(n.id);
+      return '<div class="notif-item'+(isRead?'':' unread '+n.color)+'" onclick="markRead(\''+n.id+'\')" style="animation-delay:'+(i*.05)+'s">' +
+        '<div class="notif-icon '+n.color+'">'+n.icon+'</div>' +
+        '<div style="flex:1;"><div class="notif-title">'+n.title+'</div><div class="notif-desc">'+n.desc+'</div><div class="notif-time">'+n.time+'</div></div>' +
+        '<div class="notif-dot'+(isRead?' hidden':' '+n.color)+'"></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function filterNotifs(type,btn){
+    document.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    var f=type==='all'?allNotifs:allNotifs.filter(function(n){return n.type===type;});
+    renderNotifs(f);
+  }
+
+  function markRead(id){
+    if(!readNotifs.includes(id)){readNotifs.push(id);localStorage.setItem('fa_read_notifs',JSON.stringify(readNotifs));}
+    renderNotifs(allNotifs);updateBadge();
+  }
+
+  function markAllRead(){
+    readNotifs=allNotifs.map(function(n){return n.id;});
+    localStorage.setItem('fa_read_notifs',JSON.stringify(readNotifs));
+    renderNotifs(allNotifs);updateBadge();
+    showToast('✓ Toutes les notifications lues','success');
+  }
+
+  function updateBadge(){
+    var unread=allNotifs.filter(function(n){return !readNotifs.includes(n.id);}).length;
+    var b=document.getElementById('unreadBadge');
+    b.style.display=unread>0?'inline':'none';
+    b.textContent=unread;
+  }
+
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}
+  function logout(){sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';});}
+  function showToast(msg,type){var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00c89618',border:'#00c89640',color:'#00c896'};var t=document.getElementById('__toast');t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';t.textContent=msg;setTimeout(function(){t.style.opacity='1';},10);setTimeout(function(){t.style.opacity='0';},3500);}
+</script>
+</body>
+</html>
