@@ -448,7 +448,7 @@
   //  CONFIG — remplace par tes vraies clés
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   var METHODS = { wave:'📱 Wave', orange:'📱 Orange Money', mtn:'📱 MTN MoMo', cinetpay:'💳 CinetPay', card:'💳 Carte', fedapay:'📱 FedaPay' };
@@ -475,10 +475,17 @@
       var p = r.data;
       if (!p) return;
       currentProfile = p;
-      // Afficher le lien Admin CEO uniquement pour le propriétaire
-      if (user.email === 'kessahoud@gmail.com') {
+      // Afficher le lien Admin CEO : vérifie email OU role admin
+      var isCEO = user.email === 'kessahoud@gmail.com' || p.role === 'admin';
+      if (isCEO) {
         var adminEl = document.getElementById('adminLink');
         if (adminEl) adminEl.style.display = 'flex';
+        // Ajouter aussi un bouton flottant CEO discret
+        var fab = document.createElement('div');
+        fab.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:999;background:var(--danger);color:white;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:8px 14px;border-radius:20px;cursor:pointer;box-shadow:0 4px 14px #ff4d6d40;';
+        fab.textContent = '👑 Admin CEO';
+        fab.onclick = function(){ window.location.href='/admin.html'; };
+        document.body.appendChild(fab);
       }
       var name     = p.full_name || user.email.split('@')[0] || 'Vendeur';
       var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);

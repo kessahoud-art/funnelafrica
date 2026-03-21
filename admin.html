@@ -383,7 +383,17 @@
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">🚀 Tous les tunnels de la plateforme</span>
-          <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="allTunnelCount">—</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px;">
+              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:var(--surface);color:var(--text);" id="tfilter-all" onclick="filterAdminTunnels('all',this)">Tous</button>
+              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);" id="tfilter-live" onclick="filterAdminTunnels('live',this)">🟢 Actifs</button>
+              <button style="padding:5px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);" id="tfilter-draft" onclick="filterAdminTunnels('draft',this)">⚫ Brouillons</button>
+            </div>
+            <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="allTunnelCount">—</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:11px 20px;background:var(--surface2);font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+          <div>Tunnel</div><div>Vendeur</div><div>Statut</div><div>Vues</div><div>Revenus</div>
         </div>
         <div id="allTunnelsList">
           <div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div>
@@ -544,7 +554,7 @@
   //  SEUL ENDROIT À MODIFIER — ta clé anon
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   // ══════════════════════════════════════════
 
   // ⚠️ IMPORTANT — ton email CEO (toi seulement)
@@ -560,24 +570,64 @@
     if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
     currentUser = r.data.user;
 
-    // Vérifier que c'est bien toi le CEO
-    if (r.data.user.email !== CEO_EMAIL) {
-      window.location.href = '/funnelafrica-dashboard.html';
-      return;
-    }
+    // Vérifier CEO par email OU par role admin dans profiles
+    sb.from('profiles').select('role,full_name').eq('id', r.data.user.id).single().then(function(pr) {
+      var isCEO = r.data.user.email === CEO_EMAIL || (pr.data && pr.data.role === 'admin');
+      if (!isCEO) { window.location.href = '/funnelafrica-dashboard.html'; return; }
 
-    var name     = r.data.user.email.split('@')[0];
-    var initials = name.substring(0,2).toUpperCase();
-    document.getElementById('ceoAv').textContent   = initials;
-    document.getElementById('ceoName').textContent = name;
+      var name     = (pr.data && pr.data.full_name) || r.data.user.email.split('@')[0];
+      var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+      document.getElementById('ceoAv').textContent   = initials;
+      document.getElementById('ceoName').textContent = name;
 
-    loadAll();
-  });
+      loadAll();
+    });
 
   // ── CHARGER TOUT ──
   function loadAll() {
     loadVendors();
     loadKPIs();
+    loadAllTunnels();
+  }
+
+  // ── TOUS LES TUNNELS ──
+  var allAdminTunnels = [];
+  function loadAllTunnels() {
+    sb.from('tunnels').select('*,profiles(full_name,email)').order('created_at',{ascending:false}).then(function(r) {
+      allAdminTunnels = r.data || [];
+      renderAdminTunnels(allAdminTunnels);
+    });
+  }
+
+  function filterAdminTunnels(status, btn) {
+    document.querySelectorAll('[id^="tfilter-"]').forEach(function(b) {
+      b.style.background = 'transparent'; b.style.color = 'var(--muted)';
+    });
+    btn.style.background = 'var(--surface)'; btn.style.color = 'var(--text)';
+    var filtered = status === 'all' ? allAdminTunnels : allAdminTunnels.filter(function(t){return t.status===status;});
+    renderAdminTunnels(filtered);
+  }
+
+  function renderAdminTunnels(tunnels) {
+    document.getElementById('allTunnelCount').textContent = tunnels.length + ' tunnel'+(tunnels.length>1?'s':'');
+    if (!tunnels.length) {
+      document.getElementById('allTunnelsList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun tunnel</div>';
+      return;
+    }
+    document.getElementById('allTunnelsList').innerHTML = tunnels.map(function(t) {
+      var vendorName = (t.profiles&&t.profiles.full_name) || (t.profiles&&t.profiles.email&&t.profiles.email.split('@')[0]) || '—';
+      var status = t.status==='live'
+        ? '<span style="color:var(--green);font-size:.75rem;">🟢 Actif</span>'
+        : '<span style="color:var(--muted);font-size:.75rem;">⚫ Brouillon</span>';
+      var revenue = (t.revenue||0).toLocaleString('fr');
+      return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:.82rem;">' +
+        '<div style="font-weight:500;">' + t.name + '<div style="font-size:.7rem;color:var(--muted);font-family:monospace;">/t/' + (t.slug||'—') + '</div></div>' +
+        '<div style="font-size:.78rem;color:var(--muted);">' + vendorName + '</div>' +
+        status +
+        '<div style="color:var(--blue);font-family:\'Syne\',sans-serif;font-weight:700;">' + (t.views||0) + '</div>' +
+        '<div style="color:var(--green);font-family:\'Syne\',sans-serif;font-weight:700;">' + revenue + ' F</div>' +
+      '</div>';
+    }).join('');
   }
 
   // ── VENDEURS ──
