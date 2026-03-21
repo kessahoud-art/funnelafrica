@@ -250,7 +250,7 @@
         <div class="prop-group">
           <label class="prop-label">Couleur principale</label>
           <div class="color-row">
-            <input class="color-input" type="color" id="primaryColor" value="#00c896" oninput="updatePreview()">
+            <input class="color-input" type="color" id="primaryColor" value="#00c896" oninput="onColorPick(this.value)" onchange="onColorPick(this.value)">
             <input class="prop-input color-text" type="text" id="primaryColorText" value="#00c896" oninput="syncColor()">
           </div>
           <div class="color-presets">
@@ -286,7 +286,7 @@
 
 <script>
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var tunnelId = new URLSearchParams(window.location.search).get('tunnel');
   var tunnelData = null;
@@ -478,6 +478,7 @@
   function togglePropSection(header){header.parentElement.classList.toggle('collapsed');}
   function setDevice(d,btn){document.querySelectorAll('.device-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');var f=document.getElementById('previewFrame');f.className='preview-frame '+d;document.getElementById('previewIframe').style.height=d==='mobile'?'700px':d==='tablet'?'800px':'620px';}
   function selectEmoji(e,el){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(function(x){x.classList.remove('selected');});el.classList.add('selected');updatePreview();}
+  function onColorPick(val){document.getElementById('primaryColorText').value=val;document.querySelectorAll('.color-preset').forEach(function(p){p.classList.toggle('selected',p.style.background===val);});updatePreview();}
   function setColor(c){document.getElementById('primaryColor').value=c;document.getElementById('primaryColorText').value=c;document.querySelectorAll('.color-preset').forEach(function(p){p.classList.toggle('selected',p.style.background===c);});updatePreview();}
   function syncColor(){var v=document.getElementById('primaryColorText').value;if(/^#[0-9a-f]{6}$/i.test(v)){document.getElementById('primaryColor').value=v;updatePreview();}}
   function toggleVideo(){videoEnabled=!videoEnabled;document.getElementById('videoToggle').className='toggle-sw '+(videoEnabled?'on':'off');updatePreview();}

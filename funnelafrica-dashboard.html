@@ -98,7 +98,7 @@
   .order-method{font-size:.65rem;color:var(--muted);text-align:right;}
 
   /* QUICK ACTIONS */
-  .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;text-align:center;transition:all .2s;}
   .quick-btn:hover{border-color:var(--green);background:var(--green-dim);}
   .quick-btn-icon{font-size:1.3rem;margin-bottom:6px;}
@@ -180,18 +180,34 @@
       Commandes
     </div>
     <div class="nav-section-label">Marketing</div>
-    <div class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      Email Marketing
+    <div class="nav-item" onclick="window.location.href='/statistiques.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Statistiques
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="window.location.href='/whatsapp.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      WhatsApp
+    </div>
+    <div class="nav-item" onclick="window.location.href='/affiliation.html'">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-      Contacts
+      Affiliation
+    </div>
+    <div class="nav-item" onclick="window.location.href='/facebook-ads.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      Facebook Ads
+    </div>
+    <div class="nav-item" onclick="window.location.href='/espace-membre.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Espace membre
     </div>
     <div class="nav-section-label">Paramètres</div>
     <div class="nav-item" onclick="window.location.href='/abonnement.html'">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       Paiements & Plans
+    </div>
+    <div class="nav-item" id="adminLink" style="display:none;" onclick="window.location.href='/admin.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="color:var(--danger);">Admin CEO</span>
     </div>
     <div class="nav-item" onclick="logout()">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -331,17 +347,25 @@
                 <div class="quick-btn-icon">🚀</div>
                 <div class="quick-btn-label">Nouveau tunnel</div>
               </div>
+              <div class="quick-btn" onclick="window.location.href='/statistiques.html'">
+                <div class="quick-btn-icon">📊</div>
+                <div class="quick-btn-label">Statistiques</div>
+              </div>
+              <div class="quick-btn" onclick="window.location.href='/whatsapp.html'">
+                <div class="quick-btn-icon">📱</div>
+                <div class="quick-btn-label">WhatsApp</div>
+              </div>
               <div class="quick-btn" onclick="window.location.href='/abonnement.html'">
                 <div class="quick-btn-icon">⚡</div>
                 <div class="quick-btn-label">Upgrader plan</div>
               </div>
-              <div class="quick-btn">
-                <div class="quick-btn-icon">📧</div>
-                <div class="quick-btn-label">Envoyer email</div>
+              <div class="quick-btn" onclick="window.location.href='/affiliation.html'">
+                <div class="quick-btn-icon">🤝</div>
+                <div class="quick-btn-label">Affiliation</div>
               </div>
-              <div class="quick-btn">
-                <div class="quick-btn-icon">📊</div>
-                <div class="quick-btn-label">Statistiques</div>
+              <div class="quick-btn" onclick="window.location.href='/facebook-ads.html'">
+                <div class="quick-btn-icon">📢</div>
+                <div class="quick-btn-label">Facebook Ads</div>
               </div>
             </div>
           </div>
@@ -408,7 +432,7 @@
   //  CONFIG — remplace par tes vraies clés
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   var METHODS = { wave:'📱 Wave', orange:'📱 Orange Money', mtn:'📱 MTN MoMo', cinetpay:'💳 CinetPay', card:'💳 Carte', fedapay:'📱 FedaPay' };
@@ -435,6 +459,11 @@
       var p = r.data;
       if (!p) return;
       currentProfile = p;
+      // Afficher le lien Admin CEO uniquement pour le propriétaire
+      if (user.email === 'kessahoud@gmail.com') {
+        var adminEl = document.getElementById('adminLink');
+        if (adminEl) adminEl.style.display = 'flex';
+      }
       var name     = p.full_name || user.email.split('@')[0] || 'Vendeur';
       var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
       document.getElementById('userAvatar').textContent = initials;
