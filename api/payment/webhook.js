@@ -1,14 +1,13 @@
 // ============================================================
 //  api/payment/webhook.js
-//  Vercel Serverless Function — Webhook CinetPay
-//  CinetPay appelle cette URL automatiquement après paiement
+//  Vercel Serverless Function — Webhook FedaPay
+//  FedaPay appelle cette URL automatiquement après paiement
 //
-//  Variables d'environnement Vercel à ajouter :
-//  CINETPAY_API_KEY  = ta clé API CinetPay
-//  CINETPAY_SITE_ID  = ton site ID CinetPay
-//  SUPABASE_URL      = https://xxxxx.supabase.co
-//  SUPABASE_SERVICE_KEY = ta clé SERVICE (pas anon !) depuis
-//                         Supabase → Settings → API → service_role
+//  Variables Vercel requises :
+//  FEDAPAY_SECRET_KEY   = sk_live_xxxx
+//  SUPABASE_URL         = https://xxxxx.supabase.co
+//  SUPABASE_SERVICE_KEY = ta clé service_role Supabase
+//  APP_URL              = https://funnelafrica.vercel.app
 // ============================================================
 
 import { createClient } from '@supabase/supabase-js';
@@ -16,82 +15,89 @@ import { createClient } from '@supabase/supabase-js';
 export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  // CinetPay envoie POST avec les données du paiement
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
-    const { cpm_trans_id, cpm_site_id } = req.body;
+    const payload = req.body;
 
-    if (!cpm_trans_id) {
-      return res.status(400).json({ error: 'transaction_id manquant' });
+    console.log('FedaPay webhook reçu:', JSON.stringify(payload));
+
+    // FedaPay envoie l'événement dans payload
+    const eventName    = payload.name || payload.event;
+    const transaction  = payload.data?.object || payload.transaction;
+
+    // On traite uniquement les paiements approuvés
+    const isApproved = (
+      eventName === 'transaction.approved' ||
+      transaction?.status === 'approved'
+    );
+
+    if (!isApproved) {
+      console.log(`Événement ignoré: ${eventName}`);
+      return res.status(200).json({ message: 'Ignoré' });
     }
 
-    // ── 1. Vérifier le paiement auprès de CinetPay ──
-    const verifyRes = await fetch('https://api-checkout.cinetpay.com/v2/payment/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        apikey:         process.env.CINETPAY_API_KEY,
-        site_id:        process.env.CINETPAY_SITE_ID,
-        transaction_id: cpm_trans_id
-      })
-    });
+    // Récupérer l'order_id depuis les métadonnées
+    const metadata   = transaction?.metadata || {};
+    const orderId    = metadata.order_id || transaction?.custom_metadata?.order_id;
+    const amount     = transaction?.amount;
+    const currency   = transaction?.currency?.iso || 'XOF';
 
-    const verifyData = await verifyRes.json();
-
-    // Statut attendu = '00' pour paiement accepté
-    if (verifyData.code !== '00' || verifyData.data?.status !== 'ACCEPTED') {
-      console.log('Paiement non accepté:', verifyData);
-      return res.status(200).json({ message: 'Paiement non accepté — ignoré' });
+    if (!orderId) {
+      console.error('order_id manquant dans metadata');
+      return res.status(200).json({ message: 'order_id manquant' });
     }
 
-    // ── 2. Mettre à jour la commande dans Supabase ──
-    // On utilise la clé SERVICE pour bypasser le RLS
+    // ── Initialiser Supabase avec clé SERVICE ──
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_KEY
     );
 
-    // Trouver la commande par payment_ref
+    // ── Trouver la commande ──
     const { data: order, error: findErr } = await supabase
       .from('orders')
-      .select('*, tunnels(user_id, orders, revenue)')
-      .eq('payment_ref', cpm_trans_id)
+      .select('*, tunnels(user_id, name, orders, revenue)')
+      .eq('payment_ref', orderId)
       .single();
 
     if (findErr || !order) {
-      console.error('Commande introuvable:', cpm_trans_id);
-      return res.status(200).json({ message: 'Commande introuvable — ignorée' });
+      console.error('Commande introuvable:', orderId);
+      return res.status(200).json({ message: 'Commande introuvable' });
     }
 
-    // Éviter les doublons (webhook peut être appelé 2x)
+    // Éviter les doublons
     if (order.payment_status === 'paid') {
+      console.log('Déjà traité:', orderId);
       return res.status(200).json({ message: 'Déjà traité' });
     }
 
-    // Marquer la commande comme payée
+    // ── Marquer la commande comme payée ──
     await supabase
       .from('orders')
       .update({
         payment_status: 'paid',
-        paid_at: new Date().toISOString()
+        paid_at:        new Date().toISOString()
       })
       .eq('id', order.id);
 
-    // ── 3. Mettre à jour les stats du tunnel ──
+    console.log(`✅ Commande payée : ${orderId}`);
+
+    // ── Mettre à jour les stats du tunnel ──
     if (order.tunnel_id && order.tunnels) {
       await supabase
         .from('tunnels')
         .update({
           orders:  (order.tunnels.orders  || 0) + 1,
-          revenue: (order.tunnels.revenue || 0) + order.amount
+          revenue: (order.tunnels.revenue || 0) + (order.amount || 0)
         })
         .eq('id', order.tunnel_id);
     }
 
-    // ── 4. Ajouter le contact à la liste email ──
+    // ── Ajouter le contact à la liste email ──
     if (order.tunnels?.user_id) {
       await supabase
         .from('contacts')
@@ -101,20 +107,37 @@ export default async function handler(req, res) {
           name:      order.buyer_name,
           email:     order.buyer_email,
           phone:     order.buyer_phone,
-          country:   order.buyer_country,
+          country:   order.buyer_country || 'BJ',
           source:    'purchase'
         }, { onConflict: 'user_id,email' });
     }
 
-    // ── 5. (Optionnel) Envoyer email de confirmation ──
-    // await sendConfirmationEmail(order);
+    // ── Envoyer email de confirmation ──
+    const APP_URL = process.env.APP_URL || 'https://funnelafrica.vercel.app';
 
-    console.log(`✅ Paiement confirmé : ${cpm_trans_id} — ${order.amount} ${order.currency}`);
+    try {
+      await fetch(`${APP_URL}/api/email/confirmation`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyer_name:     order.buyer_name,
+          buyer_email:    order.buyer_email,
+          product_name:   order.tunnels?.name || 'Votre achat',
+          amount:         order.amount,
+          currency:       order.currency || 'XOF',
+          payment_method: order.payment_method || 'fedapay',
+          order_ref:      order.payment_ref
+        })
+      });
+    } catch (emailErr) {
+      console.error('Email error (non bloquant):', emailErr);
+    }
+
     return res.status(200).json({ message: 'OK' });
 
   } catch (err) {
     console.error('Webhook error:', err);
-    // Toujours retourner 200 à CinetPay sinon il réessaie
+    // Toujours retourner 200 pour éviter les retries
     return res.status(200).json({ error: 'Erreur interne — logged' });
   }
 }

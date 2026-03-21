@@ -1,11 +1,11 @@
 // ============================================================
 //  api/payment/initiate.js
-//  Vercel Serverless Function — Initier un paiement CinetPay
-//  
-//  Dans Vercel Dashboard → Settings → Environment Variables :
-//  CINETPAY_API_KEY    = ta clé API CinetPay
-//  CINETPAY_SITE_ID    = ton site ID CinetPay
-//  APP_URL             = https://funnelafrica.vercel.app
+//  Vercel Serverless Function — Initier un paiement FedaPay
+//
+//  Variables Vercel requises :
+//  FEDAPAY_SECRET_KEY = sk_live_xxxx
+//  FEDAPAY_PUBLIC_KEY = pk_live_xxxx
+//  APP_URL            = https://funnelafrica.vercel.app
 // ============================================================
 
 export default async function handler(req, res) {
@@ -31,55 +31,98 @@ export default async function handler(req, res) {
 
     // Validation
     if (!amount || !buyer_name || !buyer_email || !order_id) {
-      return res.status(400).json({ error: 'Champs manquants : amount, buyer_name, buyer_email, order_id' });
+      return res.status(400).json({
+        error: 'Champs manquants : amount, buyer_name, buyer_email, order_id'
+      });
     }
 
     if (amount < 100) {
-      return res.status(400).json({ error: 'Montant minimum : 100 FCFA' });
+      return res.status(400).json({ error: 'Montant minimum : 100 XOF' });
     }
 
     const APP_URL = process.env.APP_URL || 'https://funnelafrica.vercel.app';
 
-    // Appel API CinetPay
-    const response = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
+    // Séparer le nom complet
+    const nameParts  = buyer_name.trim().split(' ');
+    const firstName  = nameParts[0] || buyer_name;
+    const lastName   = nameParts.slice(1).join(' ') || firstName;
+
+    // ── Créer la transaction FedaPay ──
+    const response = await fetch('https://api.fedapay.com/v1/transactions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+        'Content-Type':  'application/json'
+      },
       body: JSON.stringify({
-        apikey:           process.env.CINETPAY_API_KEY,
-        site_id:          process.env.CINETPAY_SITE_ID,
-        transaction_id:   order_id,
-        amount:           amount,
-        currency:         currency,
-        description:      description,
-        notify_url:       `${APP_URL}/api/payment/webhook`,
-        return_url:       `${APP_URL}/merci.html?order=${order_id}`,
-        cancel_url:       `${APP_URL}/checkout.html?cancelled=1`,
-        customer_name:    buyer_name,
-        customer_email:   buyer_email,
-        customer_phone_number: buyer_phone || '',
-        channels:         'ALL',
-        metadata:         JSON.stringify({ tunnel_slug, order_id }),
-        lang:             'fr'
+        description:   description,
+        amount:        amount,
+        currency:      { iso: currency },
+        callback_url:  `${APP_URL}/merci.html?order=${order_id}`,
+        cancel_url:    `${APP_URL}/funnelafrica-checkout.html?cancelled=1`,
+        customer: {
+          firstname: firstName,
+          lastname:  lastName,
+          email:     buyer_email,
+          phone_number: {
+            number:  buyer_phone || '',
+            country: 'BJ'
+          }
+        },
+        metadata: {
+          order_id:    order_id,
+          tunnel_slug: tunnel_slug || ''
+        }
       })
     });
 
     const data = await response.json();
 
-    // CinetPay renvoie code 201 si succès
-    if (data.code !== '201') {
-      console.error('CinetPay error:', data);
+    if (!response.ok) {
+      console.error('FedaPay error:', data);
       return res.status(400).json({
-        error: data.message || 'Erreur CinetPay',
-        code: data.code
+        error: data.message || 'Erreur FedaPay',
+        details: data
       });
     }
 
-    // Retourner l'URL de paiement au frontend
+    const transaction = data.v1 || data;
+    const transactionId = transaction?.transaction?.id || transaction?.id;
+
+    if (!transactionId) {
+      return res.status(500).json({ error: 'ID de transaction manquant' });
+    }
+
+    // ── Générer le token de paiement ──
+    const tokenResponse = await fetch(
+      `https://api.fedapay.com/v1/transactions/${transactionId}/token`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+          'Content-Type':  'application/json'
+        }
+      }
+    );
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      console.error('FedaPay token error:', tokenData);
+      return res.status(500).json({ error: 'Erreur génération token' });
+    }
+
+    const token       = tokenData.token;
+    const paymentUrl  = `https://pay.fedapay.com/${token}`;
+
+    console.log(`✅ Transaction FedaPay créée : ${transactionId} — ${amount} ${currency}`);
+
     return res.status(200).json({
-      success:     true,
-      payment_url: data.data.payment_url,
-      payment_token: data.data.payment_token,
-      order_id:    order_id
+      success:        true,
+      payment_url:    paymentUrl,
+      transaction_id: transactionId,
+      token:          token,
+      order_id:       order_id
     });
 
   } catch (err) {
