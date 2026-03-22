@@ -75,7 +75,7 @@
   .preview-frame.mobile{width:375px;flex-shrink:0;}
   .right-panel{width:272px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
   .prop-section{border-bottom:1px solid var(--border);}
-  .prop-header{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;-webkit-tap-highlight-color:rgba(0,229,160,.1);}
+  .prop-header{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;-webkit-tap-highlight-color:rgba(0,229,160,.1);touch-action:manipulation;}
   .prop-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;display:flex;align-items:center;gap:6px;}
   .prop-toggle{font-size:.68rem;color:var(--muted);transition:transform .2s;display:inline-block;}
   .prop-section.collapsed .prop-toggle{transform:rotate(-90deg);}
@@ -535,7 +535,19 @@
     }
   }
 
-  function togglePropSection(header){header.parentElement.classList.toggle('collapsed');}
+  function togglePropSection(header) {
+    header.parentElement.classList.toggle('collapsed');
+  }
+
+  // Ajouter touchend sur tous les prop-headers pour Android
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.prop-header').forEach(function(h) {
+      h.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        togglePropSection(this);
+      });
+    });
+  });
   function setDevice(d,btn){document.querySelectorAll('.device-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');var f=document.getElementById('previewFrame');f.className='preview-frame '+d;document.getElementById('previewIframe').style.height=d==='mobile'?'700px':d==='tablet'?'800px':'620px';}
   function selectEmoji(e,el){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(function(x){x.classList.remove('selected');});el.classList.add('selected');updatePreview();}
   function onColorPick(val){document.getElementById('primaryColorText').value=val;document.querySelectorAll('.color-preset').forEach(function(p){p.classList.toggle('selected',p.style.background===val);});updatePreview();}
