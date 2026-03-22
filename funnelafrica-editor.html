@@ -3,129 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Éditeur — FunnelAfrica</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Éditeur Tunnel — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
 <style>
   :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:10px;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-  @media(max-width:800px){
-    body,html{height:auto !important;overflow:auto !important;min-height:100vh;}
-  }
-  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
-  .topbar-left{display:flex;align-items:center;gap:10px;}
-  .back-btn{color:var(--muted);font-size:.78rem;cursor:pointer;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;transition:all .2s;}
-  .back-btn:hover{background:var(--surface2);color:var(--text);}
-  .tunnel-name-input{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;outline:none;border-bottom:1.5px solid transparent;transition:border-color .2s;min-width:180px;padding:2px 4px;}
-  .tunnel-name-input:focus{border-color:var(--green);}
-  .status-pill{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;padding:3px 9px;border-radius:20px;}
-  .status-pill.draft{background:#6b7e9318;border:1px solid #6b7e9340;color:var(--muted);}
+
+  /* TOPBAR */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;}
+  .topbar-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;white-space:nowrap;flex-shrink:0;}
+  .back-btn:hover{color:var(--text);}
+  .tunnel-name-input{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;outline:none;min-width:0;flex:1;}
+  .status-pill{font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+  .status-pill.draft{background:#1e2a38;color:var(--muted);}
   .status-pill.live{background:#00c89618;border:1px solid #00c89640;color:var(--green);}
-  .topbar-right{display:flex;align-items:center;gap:8px;}
-  @media(max-width:800px){
-    .topbar-right .btn-ghost{display:none !important;}
-    .topbar-right .btn-primary{display:none !important;}
-    .topbar-right .btn-publish{display:none !important;}
-    .topbar-right .save-status span{display:none;}
-    .topbar-right{gap:4px !important;}
-    body,html{height:auto !important;overflow:auto !important;}
-    .editor-wrap{height:auto !important;overflow:visible !important;}
-    #floatPreviewBtn{display:none !important;}
-    #mobileFloatBtns{display:flex !important;}
-    .right-panel{padding-bottom:80px !important;}
-  }
+  .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .save-status{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .save-dot.saving{background:var(--gold);animation:pulse .8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .device-btns{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:2px;}
+  .device-btn{padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.72rem;color:var(--muted);border:none;background:transparent;transition:all .2s;}
+  .device-btn.active{background:var(--surface);color:var(--text);}
   .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
   .btn-primary{background:var(--green);color:#0a0f14;}
   .btn-primary:hover{background:#00dea8;}
   .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
   .btn-ghost:hover{color:var(--text);}
   .btn-publish{background:linear-gradient(135deg,var(--green),var(--green2));color:#0a0f14;}
-  .device-btns{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:2px;}
-  .device-btn{padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.72rem;color:var(--muted);border:none;background:transparent;transition:all .2s;}
-  .device-btn.active{background:var(--surface);color:var(--text);}
-  .save-status{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:4px;}
-  .save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
-  .save-dot.saving{background:var(--gold);animation:pulse .8s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  /* LAYOUT */
   .editor-layout{display:flex;flex:1;overflow:hidden;}
-  @media(max-width:800px){
-    .editor-layout{flex-direction:column !important;overflow-y:auto !important;height:auto !important;}
-    .left-panel{width:100% !important;min-height:auto !important;height:auto !important;border-right:none !important;border-bottom:1px solid var(--border) !important;display:flex !important;flex-direction:row !important;overflow-x:auto !important;overflow-y:hidden !important;flex-shrink:0 !important;padding:8px 10px !important;gap:6px !important;background:var(--surface) !important;scrollbar-width:none !important;}
-    .left-panel::-webkit-scrollbar{display:none !important;}
-    .left-panel .nav-section{display:none !important;}
-    .section-item{flex-direction:row !important;padding:7px 12px !important;min-width:auto !important;text-align:left !important;border-radius:20px !important;font-size:.75rem !important;font-weight:600 !important;gap:5px !important;flex-shrink:0 !important;border-left:none !important;background:var(--surface2) !important;border:1px solid var(--border) !important;white-space:nowrap !important;}
-    .section-item.active{background:#00c89620 !important;border-color:var(--green) !important;color:var(--green) !important;}
-    .section-item .section-icon{font-size:.85rem !important;}
-    .preview-wrap{display:none !important;}
-    .right-panel{width:100% !important;max-width:100% !important;border-left:none !important;flex:1 !important;overflow-y:auto !important;min-height:60vh !important;}
-    .prop-body{padding:10px 12px !important;}
-    .device-btns{display:none !important;}
-    .topbar{padding:8px 12px !important;}
-    .topbar .btn-ghost{display:none !important;}
-  }
+
+  /* LEFT PANEL */
   .left-panel{width:190px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-  .panel-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:12px 14px 8px;}
+  .nav-section{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:12px 14px 4px;font-family:'Syne',sans-serif;}
   .section-item{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .2s;font-size:.8rem;}
   .section-item:hover{background:var(--surface2);}
   .section-item.active{background:#00c89610;border-left-color:var(--green);color:var(--green);}
   .section-icon{font-size:.85rem;flex-shrink:0;}
+
+  /* PREVIEW */
   .preview-wrap{flex:1;background:#141e2a;display:flex;flex-direction:column;overflow:hidden;}
-  .preview-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
-  .preview-url{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.68rem;color:var(--muted);flex:1;font-family:monospace;}
-  .preview-frame-wrap{flex:1;overflow:auto;display:flex;justify-content:center;padding:12px;}
+  .preview-toolbar{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0;}
+  .preview-url{font-size:.72rem;color:var(--muted);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+  .preview-frame-wrap{flex:1;overflow:auto;display:flex;justify-content:center;padding:16px;}
   .preview-frame{background:white;border-radius:8px;overflow:hidden;transition:all .3s;box-shadow:0 20px 60px #00000060;}
-  .preview-frame.desktop{width:100%;max-width:900px;}
-  .preview-frame.tablet{width:768px;flex-shrink:0;}
-  .preview-frame.mobile{width:375px;flex-shrink:0;}
-  .right-panel{width:272px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .preview-frame.desktop{width:100%;min-height:600px;}
+  .preview-frame.tablet{width:768px;min-height:700px;flex-shrink:0;}
+  .preview-frame.mobile{width:375px;min-height:700px;flex-shrink:0;}
+  .preview-frame iframe{width:100%;border:none;display:block;}
+
+  /* RIGHT PANEL */
+  .right-panel{width:280px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
   .prop-section{border-bottom:1px solid var(--border);}
-  .prop-header{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;-webkit-tap-highlight-color:rgba(0,229,160,.1);touch-action:manipulation;}
+  .prop-header{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+  .prop-header:hover{background:var(--surface2);}
   .prop-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;display:flex;align-items:center;gap:6px;}
-  .prop-toggle{font-size:.68rem;color:var(--muted);transition:transform .2s;display:inline-block;}
+  .prop-toggle{font-size:.68rem;color:var(--muted);transition:transform .2s;}
   .prop-section.collapsed .prop-toggle{transform:rotate(-90deg);}
-  .prop-body{padding:10px 14px 14px;overflow:hidden;max-height:3000px;transition:max-height .35s ease;}
-  .prop-section.collapsed .prop-body{max-height:0 !important;padding-top:0 !important;padding-bottom:0 !important;overflow:hidden !important;}
-  @media(max-width:800px){
-    .prop-section.collapsed .prop-body{max-height:none !important;height:auto !important;padding:10px 14px 14px !important;display:block !important;overflow:visible !important;}
-    .prop-section.collapsed .prop-toggle{transform:none !important;}
-    .prop-header{background:var(--surface2);border-radius:6px;margin-bottom:2px;}
-  }
+  .prop-body{padding:10px 14px 14px;}
+  .prop-section.collapsed .prop-body{display:none;}
   .prop-group{margin-bottom:10px;}
   .prop-group:last-child{margin-bottom:0;}
   .prop-label{font-size:.65rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;display:block;}
-  .prop-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;color:var(--text);font-size:.8rem;outline:none;transition:border-color .2s;}
+  .prop-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif;}
   .prop-input:focus{border-color:var(--green);}
-  .prop-input::placeholder{color:#3a4f65;}
-  .prop-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;color:var(--text);font-size:.8rem;outline:none;resize:vertical;min-height:70px;line-height:1.5;transition:border-color .2s;}
+  .prop-textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;resize:vertical;min-height:72px;font-family:'DM Sans',sans-serif;}
   .prop-textarea:focus{border-color:var(--green);}
-  .prop-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;color:var(--text);font-size:.8rem;outline:none;cursor:pointer;}
-  .prop-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-  .color-row{display:flex;align-items:center;gap:7px;}
-  .color-input{width:32px;height:32px;border:2px solid var(--border);border-radius:7px;cursor:pointer;background:none;padding:2px;flex-shrink:0;}
-  .color-text{flex:1;}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
-  .toggle-label{font-size:.8rem;}
-  .toggle-sw{width:34px;height:18px;border-radius:9px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
-  .toggle-sw.on{background:var(--green);}
-  .toggle-sw.off{background:var(--surface2);border:1px solid var(--border);}
-  .toggle-sw::after{content:'';position:absolute;width:12px;height:12px;background:white;border-radius:50%;top:3px;transition:left .2s;}
-  .toggle-sw.on::after{left:19px;}
-  .toggle-sw.off::after{left:3px;}
-  .emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:5px;}
-  .emoji-opt{padding:5px;text-align:center;border-radius:5px;cursor:pointer;font-size:1rem;transition:background .2s;border:1.5px solid transparent;}
+  .emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:4px;}
+  .emoji-opt{font-size:1.2rem;text-align:center;padding:6px;border-radius:6px;cursor:pointer;border:1.5px solid transparent;transition:all .2s;}
   .emoji-opt:hover{background:var(--surface2);}
-  .emoji-opt.selected{background:#00c89618;border-color:var(--green);}
-  .color-presets{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
-  .color-preset{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0;}
-  .color-preset:hover{transform:scale(1.2);}
-  .color-preset.selected{border-color:white;transform:scale(1.15);}
-  #__toast{position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 14px;border-radius:8px;font-size:.78rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(8px);display:none;}
-  ::-webkit-scrollbar{width:3px;}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .emoji-opt.selected{border-color:var(--green);background:#00c89618;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .toggle-sw{width:38px;height:22px;border-radius:11px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+  .toggle-sw::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:left .2s;}
+  .toggle-sw.on{background:var(--green);}
+  .toggle-sw.on::after{left:19px;}
+  .color-presets{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+  .color-preset{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+  .color-preset:hover,.color-preset.selected{border-color:white;transform:scale(1.1);}
+  .color-picker-wrap{display:flex;align-items:center;gap:8px;margin-top:4px;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
 </style>
-<link rel="stylesheet" href="/mobile.css">
 </head>
 <body>
 <div id="__toast"></div>
@@ -144,28 +110,18 @@
       <button class="device-btn" onclick="setDevice('tablet',this)">📱</button>
       <button class="device-btn" onclick="setDevice('mobile',this)">📲</button>
     </div>
-    <button class="btn btn-ghost" onclick="previewPublic()" id="previewBtn">👁 Aperçu</button>
+    <button class="btn btn-ghost" onclick="previewPublic()">👁 Aperçu</button>
     <button class="btn btn-primary" onclick="saveTunnel(false)">💾 Sauvegarder</button>
     <button class="btn btn-publish" id="publishBtn" onclick="togglePublish()">🚀 Publier</button>
   </div>
 </div>
 
-<!-- BOUTONS FLOTTANTS MOBILE -->
-<div id="mobileFloatBtns" style="position:fixed;bottom:0;left:0;right:0;z-index:998;background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;gap:8px;display:none;">
-  <button onclick="saveTunnel(false)" style="flex:1;padding:12px;border-radius:11px;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">💾 Sauvegarder</button>
-  <button id="publishBtnMobile" onclick="togglePublish()" style="flex:1;padding:12px;border-radius:11px;background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">🚀 Publier</button>
-  <button onclick="previewPublic()" style="padding:12px 14px;border-radius:11px;background:var(--surface2);border:1.5px solid var(--border);color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">👁</button>
-</div>
-<div id="floatPreviewBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:999;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;padding:12px 18px;border-radius:30px;box-shadow:0 6px 20px #00e5a040;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="previewPublic()">
-  👁 Voir l'aperçu
-</div>
-
 <!-- EDITOR -->
 <div class="editor-layout">
 
-  <!-- LEFT -->
+  <!-- LEFT : SECTIONS -->
   <div class="left-panel">
-    <div class="panel-title">Sections</div>
+    <div class="nav-section">Sections</div>
     <div class="section-item active" onclick="activateSection('hero',this)"><span class="section-icon">🎯</span>Hero</div>
     <div class="section-item" onclick="activateSection('benefits',this)"><span class="section-icon">✅</span>Bénéfices</div>
     <div class="section-item" onclick="activateSection('video',this)"><span class="section-icon">🎬</span>Vidéo</div>
@@ -175,11 +131,11 @@
     <div class="section-item" onclick="activateSection('advanced',this)"><span class="section-icon">⚙️</span>Avancé</div>
   </div>
 
-  <!-- CENTER -->
+  <!-- CENTER : PREVIEW -->
   <div class="preview-wrap">
-    <div class="preview-bar">
-      <div class="preview-url" id="previewUrl">funnelafrica.vercel.app/t/...</div>
-      <button class="btn btn-ghost" style="padding:4px 9px;font-size:.68rem;" onclick="copyLink()">📋 Lien</button>
+    <div class="preview-toolbar">
+      <span class="preview-url" id="previewUrl">funnelafrica.vercel.app/t/...</span>
+      <button class="btn btn-ghost" onclick="copyLink()" style="font-size:.7rem;padding:5px 10px;">📋 Lien</button>
     </div>
     <div class="preview-frame-wrap">
       <div class="preview-frame desktop" id="previewFrame">
@@ -188,7 +144,7 @@
     </div>
   </div>
 
-  <!-- RIGHT -->
+  <!-- RIGHT : PROPERTIES -->
   <div class="right-panel">
 
     <!-- HERO -->
@@ -197,13 +153,13 @@
         <div class="prop-header-title">🎯 Hero</div><span class="prop-toggle">▼</span>
       </div>
       <div class="prop-body">
-        <div class="prop-group"><label class="prop-label">Titre principal</label><input class="prop-input" id="heroTitle" placeholder="Maîtrisez Excel en 30 jours" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Sous-titre</label><input class="prop-input" id="heroSubtitle" placeholder="Même si vous débutez" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Description</label><textarea class="prop-textarea" id="heroDesc" placeholder="La seule formation conçue pour les professionnels africains..." oninput="updatePreview()"></textarea></div>
-        <div class="prop-group"><label class="prop-label">Badge</label><input class="prop-input" id="heroBadge" placeholder="Formation · Accès immédiat" oninput="updatePreview()"></div>
+        <div class="prop-group"><label class="prop-label">Titre principal</label><input class="prop-input" id="heroTitle" placeholder="Maîtrisez Excel en 30 jours" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Sous-titre</label><input class="prop-input" id="heroSubtitle" placeholder="Même si vous débutez" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Description</label><textarea class="prop-textarea" id="heroDesc" placeholder="La seule formation..." oninput="onFormChange()"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Badge</label><input class="prop-input" id="heroBadge" placeholder="Formation · Accès immédiat" oninput="onFormChange()"></div>
         <div class="prop-group">
           <label class="prop-label">Icône</label>
-          <div class="emoji-grid" id="emojiGrid">
+          <div class="emoji-grid">
             <div class="emoji-opt selected" onclick="selectEmoji('📘',this)">📘</div>
             <div class="emoji-opt" onclick="selectEmoji('🎯',this)">🎯</div>
             <div class="emoji-opt" onclick="selectEmoji('🚀',this)">🚀</div>
@@ -221,62 +177,56 @@
       </div>
     </div>
 
-    <!-- BENEFITS -->
+    <!-- BÉNÉFICES -->
     <div class="prop-section collapsed" id="props-benefits">
       <div class="prop-header" onclick="togglePropSection(this)"><div class="prop-header-title">✅ Bénéfices</div><span class="prop-toggle">▼</span></div>
       <div class="prop-body">
-        <div class="prop-group"><label class="prop-label">Bénéfice 1</label><input class="prop-input" id="benefit1" placeholder="Créez des tableaux professionnels" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Bénéfice 2</label><input class="prop-input" id="benefit2" placeholder="Maîtrisez les formules avancées" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Bénéfice 3</label><input class="prop-input" id="benefit3" placeholder="Automatisez vos tâches" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Bénéfice 4</label><input class="prop-input" id="benefit4" placeholder="Créez des graphiques percutants" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Bénéfice 5</label><input class="prop-input" id="benefit5" placeholder="Boostez votre productivité" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Bénéfice 6</label><input class="prop-input" id="benefit6" placeholder="Décrochez de meilleures opportunités" oninput="updatePreview()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 1</label><input class="prop-input" id="benefit1" placeholder="Créez des tableaux professionnels" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 2</label><input class="prop-input" id="benefit2" placeholder="Maîtrisez les formules" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 3</label><input class="prop-input" id="benefit3" placeholder="Automatisez votre travail" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 4</label><input class="prop-input" id="benefit4" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 5</label><input class="prop-input" id="benefit5" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Bénéfice 6</label><input class="prop-input" id="benefit6" oninput="onFormChange()"></div>
       </div>
     </div>
 
-    <!-- VIDEO -->
+    <!-- VIDÉO -->
     <div class="prop-section collapsed" id="props-video">
       <div class="prop-header" onclick="togglePropSection(this)"><div class="prop-header-title">🎬 Vidéo</div><span class="prop-toggle">▼</span></div>
       <div class="prop-body">
-        <div class="toggle-row"><span class="toggle-label">Afficher une vidéo</span><div class="toggle-sw off" id="videoToggle" onclick="toggleVideo()"></div></div>
-        <div class="prop-group" style="margin-top:8px;"><label class="prop-label">Lien YouTube</label><input class="prop-input" id="videoUrl" placeholder="https://youtube.com/watch?v=..." oninput="updatePreview()"></div>
+        <div class="prop-group">
+          <div class="toggle-row"><span style="font-size:.82rem;">Activer la vidéo</span><div class="toggle-sw off" id="videoToggle" onclick="toggleVideo()"></div></div>
+          <input class="prop-input" id="videoUrl" placeholder="https://youtube.com/watch?v=..." oninput="onFormChange()">
+        </div>
       </div>
     </div>
 
-    <!-- TESTIMONIALS -->
+    <!-- TÉMOIGNAGES -->
     <div class="prop-section collapsed" id="props-testimonials">
       <div class="prop-header" onclick="togglePropSection(this)"><div class="prop-header-title">⭐ Témoignages</div><span class="prop-toggle">▼</span></div>
       <div class="prop-body">
-        <div class="prop-group"><label class="prop-label">Texte 1</label><textarea class="prop-textarea" id="testi1text" placeholder="Cette formation a changé ma carrière..." oninput="updatePreview()" style="min-height:55px;"></textarea></div>
-        <div class="prop-row">
-          <div class="prop-group"><label class="prop-label">Nom</label><input class="prop-input" id="testi1name" placeholder="Amadou K." oninput="updatePreview()"></div>
-          <div class="prop-group"><label class="prop-label">Ville</label><input class="prop-input" id="testi1city" placeholder="Cotonou" oninput="updatePreview()"></div>
-        </div>
-        <div class="prop-group" style="margin-top:8px;"><label class="prop-label">Texte 2</label><textarea class="prop-textarea" id="testi2text" placeholder="J'ai eu ma première mission en 2 semaines..." oninput="updatePreview()" style="min-height:55px;"></textarea></div>
-        <div class="prop-row">
-          <div class="prop-group"><label class="prop-label">Nom</label><input class="prop-input" id="testi2name" placeholder="Fatou D." oninput="updatePreview()"></div>
-          <div class="prop-group"><label class="prop-label">Ville</label><input class="prop-input" id="testi2city" placeholder="Dakar" oninput="updatePreview()"></div>
-        </div>
+        <div class="prop-group"><label class="prop-label">Témoignage 1 — Texte</label><textarea class="prop-textarea" id="testi1text" placeholder="Cette formation a changé ma vie..." oninput="onFormChange()"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Nom</label><input class="prop-input" id="testi1name" placeholder="Amadou Koné" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Ville</label><input class="prop-input" id="testi1city" placeholder="Abidjan" oninput="onFormChange()"></div>
+        <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+        <div class="prop-group"><label class="prop-label">Témoignage 2 — Texte</label><textarea class="prop-textarea" id="testi2text" oninput="onFormChange()"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Nom</label><input class="prop-input" id="testi2name" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Ville</label><input class="prop-input" id="testi2city" oninput="onFormChange()"></div>
       </div>
     </div>
 
-    <!-- OFFER -->
+    <!-- OFFRE & PRIX -->
     <div class="prop-section collapsed" id="props-offer">
       <div class="prop-header" onclick="togglePropSection(this)"><div class="prop-header-title">💰 Offre & Prix</div><span class="prop-toggle">▼</span></div>
       <div class="prop-body">
-        <div class="prop-row">
-          <div class="prop-group"><label class="prop-label">Prix (FCFA)</label><input class="prop-input" type="number" id="price" placeholder="9900" oninput="updatePreview()"></div>
-          <div class="prop-group"><label class="prop-label">Prix barré</label><input class="prop-input" type="number" id="oldPrice" placeholder="25000" oninput="updatePreview()"></div>
-        </div>
-        <div class="prop-group"><label class="prop-label">Texte bouton</label><input class="prop-input" id="btnText" placeholder="Accéder maintenant →" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Garantie</label><input class="prop-input" id="guarantee" placeholder="Satisfait ou remboursé 7 jours" oninput="updatePreview()"></div>
-        <div class="prop-group">
-          <label class="prop-label">Ce qui est inclus</label>
-          <input class="prop-input" id="inc1" placeholder="Accès à vie" oninput="updatePreview()" style="margin-bottom:5px;">
-          <input class="prop-input" id="inc2" placeholder="Mises à jour gratuites" oninput="updatePreview()" style="margin-bottom:5px;">
-          <input class="prop-input" id="inc3" placeholder="Support WhatsApp" oninput="updatePreview()" style="margin-bottom:5px;">
-          <input class="prop-input" id="inc4" placeholder="Certificat de réussite" oninput="updatePreview()">
-        </div>
+        <div class="prop-group"><label class="prop-label">Prix (FCFA)</label><input class="prop-input" type="number" id="offerPrice" placeholder="9900" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Prix barré (FCFA)</label><input class="prop-input" type="number" id="offerOldPrice" placeholder="25000" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Texte bouton</label><input class="prop-input" id="btnText" placeholder="Accéder maintenant →" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Garantie</label><input class="prop-input" id="guarantee" placeholder="Satisfait ou remboursé 7 jours" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Inclus 1</label><input class="prop-input" id="include1" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Inclus 2</label><input class="prop-input" id="include2" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Inclus 3</label><input class="prop-input" id="include3" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">Inclus 4</label><input class="prop-input" id="include4" oninput="onFormChange()"></div>
       </div>
     </div>
 
@@ -284,9 +234,12 @@
     <div class="prop-section collapsed" id="props-faq">
       <div class="prop-header" onclick="togglePropSection(this)"><div class="prop-header-title">❓ FAQ</div><span class="prop-toggle">▼</span></div>
       <div class="prop-body">
-        <div class="prop-group"><label class="prop-label">Q1</label><input class="prop-input" id="faq1q" placeholder="Pour qui est cette formation ?" oninput="updatePreview()"><textarea class="prop-textarea" id="faq1a" placeholder="Cette formation est pour..." oninput="updatePreview()" style="min-height:50px;margin-top:4px;"></textarea></div>
-        <div class="prop-group"><label class="prop-label">Q2</label><input class="prop-input" id="faq2q" placeholder="Comment accéder après paiement ?" oninput="updatePreview()"><textarea class="prop-textarea" id="faq2a" placeholder="Dès votre paiement confirmé..." oninput="updatePreview()" style="min-height:50px;margin-top:4px;"></textarea></div>
-        <div class="prop-group"><label class="prop-label">Q3</label><input class="prop-input" id="faq3q" placeholder="Quels modes de paiement ?" oninput="updatePreview()"><textarea class="prop-textarea" id="faq3a" placeholder="MTN MoMo, Moov, Wave..." oninput="updatePreview()" style="min-height:50px;margin-top:4px;"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Q1</label><input class="prop-input" id="faq1q" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">R1</label><textarea class="prop-textarea" id="faq1a" style="min-height:50px;" oninput="onFormChange()"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Q2</label><input class="prop-input" id="faq2q" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">R2</label><textarea class="prop-textarea" id="faq2a" style="min-height:50px;" oninput="onFormChange()"></textarea></div>
+        <div class="prop-group"><label class="prop-label">Q3</label><input class="prop-input" id="faq3q" oninput="onFormChange()"></div>
+        <div class="prop-group"><label class="prop-label">R3</label><textarea class="prop-textarea" id="faq3a" style="min-height:50px;" oninput="onFormChange()"></textarea></div>
       </div>
     </div>
 
@@ -296,83 +249,94 @@
       <div class="prop-body">
         <div class="prop-group">
           <label class="prop-label">Couleur principale</label>
-          <div class="color-row">
-            <input class="color-input" type="color" id="primaryColor" value="#00c896" oninput="onColorPick(this.value)" onchange="onColorPick(this.value)">
-            <input class="prop-input color-text" type="text" id="primaryColorText" value="#00c896" oninput="syncColor()">
-          </div>
           <div class="color-presets">
-            <div class="color-preset selected" style="background:#00c896;" onclick="setColor('#00c896')"></div>
-            <div class="color-preset" style="background:#f5a623;" onclick="setColor('#f5a623')"></div>
-            <div class="color-preset" style="background:#4da6ff;" onclick="setColor('#4da6ff')"></div>
-            <div class="color-preset" style="background:#ff4d6d;" onclick="setColor('#ff4d6d')"></div>
-            <div class="color-preset" style="background:#a78bfa;" onclick="setColor('#a78bfa')"></div>
-            <div class="color-preset" style="background:#f97316;" onclick="setColor('#f97316')"></div>
-            <div class="color-preset" style="background:#ec4899;" onclick="setColor('#ec4899')"></div>
-            <div class="color-preset" style="background:#14b8a6;" onclick="setColor('#14b8a6')"></div>
+            <div class="color-preset selected" style="background:#00c896;" onclick="onColorPick('#00c896',this)" oninput="onColorPick(this.value,this)" onchange="onColorPick(this.value,this)"></div>
+            <div class="color-preset" style="background:#4da6ff;" onclick="onColorPick('#4da6ff',this)"></div>
+            <div class="color-preset" style="background:#a78bfa;" onclick="onColorPick('#a78bfa',this)"></div>
+            <div class="color-preset" style="background:#f5a623;" onclick="onColorPick('#f5a623',this)"></div>
+            <div class="color-preset" style="background:#ff6b9d;" onclick="onColorPick('#ff6b9d',this)"></div>
+            <div class="color-preset" style="background:#ff4d6d;" onclick="onColorPick('#ff4d6d',this)"></div>
+            <div class="color-preset" style="background:#00d4aa;" onclick="onColorPick('#00d4aa',this)"></div>
+            <div class="color-preset" style="background:#f59e0b;" onclick="onColorPick('#f59e0b',this)"></div>
           </div>
-        </div>
-        <div class="prop-group"><label class="prop-label">Photo vendeur (URL)</label><input class="prop-input" id="vendorPhoto" placeholder="https://..." oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Nom vendeur affiché</label><input class="prop-input" id="vendorName" placeholder="Kessahou Delphin" oninput="updatePreview()"></div>
-        <div class="prop-group"><label class="prop-label">Pixel Facebook ID</label><input class="prop-input" id="pixelId" placeholder="1234567890123456" oninput="updatePreview()"></div>
-        <div class="toggle-row"><span class="toggle-label">Timer d'urgence</span><div class="toggle-sw off" id="timerToggle" onclick="toggleTimer()"></div></div>
-        <div class="toggle-row"><span class="toggle-label">Upsell après achat</span><div class="toggle-sw off" id="upsellToggle" onclick="toggleUpsell()"></div></div>
-        <div id="upsellConfig" style="display:none;margin-top:8px;">
-          <div class="prop-group"><label class="prop-label">Prix upsell (FCFA)</label><input class="prop-input" type="number" id="upsellPrice" placeholder="29900" oninput="updatePreview()"></div>
-          <div class="prop-group"><label class="prop-label">Titre upsell</label><input class="prop-input" id="upsellTitle" placeholder="Coaching 1-on-1 Express" oninput="updatePreview()"></div>
-        </div>
-        <div class="prop-group" style="margin-top:8px;">
-          <label class="prop-label">Slug URL</label>
-          <input class="prop-input" id="tunnelSlug" placeholder="ma-formation-excel" oninput="updatePreview()">
-          <div style="font-size:.65rem;color:var(--muted);margin-top:3px;">/t/<strong id="slugPreview">...</strong></div>
-        </div>
-        <div class="prop-group" style="margin-top:8px;">
-          <label class="prop-label">Fichier produit (PDF / Ebook / ZIP)</label>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div style="display:flex;gap:6px;">
-              <input class="prop-input" id="downloadUrl" placeholder="URL du fichier..." oninput="onFormChange()" style="flex:1;font-size:.72rem;">
-              <button onclick="triggerFileUpload()" style="background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;padding:7px 10px;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">⬆️ Upload</button>
-            </div>
-            <input type="file" id="fileUploadInput" accept=".pdf,.epub,.zip,.docx,.mp4,.mp3" style="display:none;" onchange="uploadFile(this)">
-            <div id="uploadProgress" style="display:none;background:var(--surface2);border-radius:6px;padding:6px 10px;font-size:.7rem;color:var(--muted);">⏳ Upload en cours...</div>
-            <div id="uploadSuccess" style="display:none;background:#00c89615;border:1px solid #00c89640;border-radius:6px;padding:6px 10px;font-size:.7rem;color:var(--green);">✓ Fichier uploadé — lien copié !</div>
-            <div style="font-size:.62rem;color:var(--muted);line-height:1.5;">Formats : PDF · EPUB · ZIP · MP4 · MP3 · Max 50 Mo<br>Partagé automatiquement après paiement</div>
+          <div class="color-picker-wrap">
+            <input type="color" id="colorPicker" value="#00c896" style="width:32px;height:32px;border:none;border-radius:50%;cursor:pointer;padding:0;" oninput="onColorPick(this.value,null)" onchange="onColorPick(this.value,null)">
+            <input class="prop-input" id="colorHex" value="#00c896" placeholder="#00c896" style="width:90px;" oninput="onColorHexInput(this.value)">
           </div>
         </div>
         <div class="prop-group">
-          <label class="prop-label">Email de confirmation personnalisé</label>
+          <label class="prop-label">Slug URL</label>
+          <input class="prop-input" id="tunnelSlug" placeholder="ma-formation-excel" oninput="onFormChange()">
+          <div style="font-size:.65rem;color:var(--muted);margin-top:3px;">/t/<strong id="slugPreview">...</strong></div>
+        </div>
+        <div class="prop-group">
+          <label class="prop-label">Photo vendeur (URL)</label>
+          <input class="prop-input" id="vendorPhoto" placeholder="https://..." oninput="onFormChange()">
+        </div>
+        <div class="prop-group">
+          <label class="prop-label">Nom vendeur</label>
+          <input class="prop-input" id="vendorName" placeholder="Votre nom" oninput="onFormChange()">
+        </div>
+        <div class="prop-group">
+          <label class="prop-label">Pixel Facebook ID</label>
+          <input class="prop-input" id="pixelId" placeholder="123456789012345" oninput="onFormChange()">
+        </div>
+        <div class="prop-group">
+          <div class="toggle-row"><span style="font-size:.82rem;">Timer d'urgence</span><div class="toggle-sw off" id="timerToggle" onclick="toggleTimer()"></div></div>
+        </div>
+        <div class="prop-group">
+          <div class="toggle-row"><span style="font-size:.82rem;">Upsell après achat</span><div class="toggle-sw off" id="upsellToggle" onclick="toggleUpsell()"></div></div>
+          <div id="upsellConfig" style="display:none;margin-top:8px;">
+            <input class="prop-input" id="upsellTitle" placeholder="Titre de l'upsell" style="margin-bottom:6px;" oninput="onFormChange()">
+            <input class="prop-input" type="number" id="upsellPrice" placeholder="Prix upsell (FCFA)" oninput="onFormChange()">
+          </div>
+        </div>
+        <div class="prop-group">
+          <label class="prop-label">Fichier produit (PDF / Ebook)</label>
+          <div style="display:flex;gap:6px;">
+            <input class="prop-input" id="downloadUrl" placeholder="URL du fichier..." oninput="onFormChange()" style="flex:1;font-size:.72rem;">
+            <button onclick="triggerFileUpload()" style="background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;padding:7px 10px;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">⬆️</button>
+          </div>
+          <input type="file" id="fileUploadInput" accept=".pdf,.epub,.zip,.docx,.mp4,.mp3" style="display:none;" onchange="uploadFile(this)">
+          <div id="uploadProgress" style="display:none;font-size:.7rem;color:var(--muted);margin-top:4px;">⏳ Upload...</div>
+          <div id="uploadSuccess" style="display:none;font-size:.7rem;color:var(--green);margin-top:4px;">✓ Uploadé !</div>
+        </div>
+        <div class="prop-group">
+          <label class="prop-label">Message après achat</label>
           <input class="prop-input" id="thankYouMsg" placeholder="Merci ! Voici votre accès..." oninput="onFormChange()">
         </div>
       </div>
     </div>
 
-  </div>
-</div>
+  </div><!-- /right-panel -->
+</div><!-- /editor-layout -->
 
 <script>
   var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
   var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  var tunnelId = new URLSearchParams(window.location.search).get('tunnel');
-  var tunnelData = null;
-  var saveTimer = null;
-  var previewTimeout = null;
-  var selectedEmoji = '📘';
-  var isPublished = false;
-  var videoEnabled = false;
-  var timerEnabled = false;
-  var upsellEnabled = false;
 
+  var tunnelId      = new URLSearchParams(window.location.search).get('tunnel');
+  var tunnelData    = null;
+  var saveTimer     = null;
+  var previewTimeout= null;
+  var selectedEmoji = '📘';
+  var isPublished   = false;
+  var videoEnabled  = false;
+  var timerEnabled  = false;
+  var upsellEnabled = false;
+  var primaryColor  = '#00c896';
+  var currentUser   = null;
+
+  // ── AUTH ──
   sb.auth.getUser().then(function(r) {
     if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
     if (!tunnelId) { window.location.href = '/funnelafrica-dashboard.html'; return; }
-    // Afficher la barre mobile si petit écran
-    if (window.innerWidth <= 800) {
-      var bar = document.getElementById('mobileFloatBtns');
-      if (bar) bar.style.display = 'flex';
-    }
+    currentUser = r.data.user;
     loadTunnel();
   });
 
+  // ── LOAD ──
   function loadTunnel() {
     sb.from('tunnels').select('*').eq('id', tunnelId).single().then(function(r) {
       if (r.error || !r.data) { showToast('Tunnel introuvable','error'); return; }
@@ -394,62 +358,70 @@
     document.getElementById('heroTitle').value = cfg.title || t.name || '';
     document.getElementById('heroSubtitle').value = cfg.subtitle || '';
     document.getElementById('heroDesc').value = cfg.desc || '';
-    document.getElementById('heroBadge').value = cfg.badge || 'Formation en ligne · Accès immédiat';
+    document.getElementById('heroBadge').value = cfg.badge || '';
     if (cfg.emoji) { selectedEmoji = cfg.emoji; document.querySelectorAll('.emoji-opt').forEach(function(e){e.classList.toggle('selected',e.textContent===cfg.emoji);}); }
     var benefits = cfg.benefits || [];
     for (var i=1;i<=6;i++){var el=document.getElementById('benefit'+i);if(el)el.value=benefits[i-1]||'';}
-    if (cfg.video_url) { document.getElementById('videoUrl').value = cfg.video_url; }
+    if (cfg.video_url) document.getElementById('videoUrl').value = cfg.video_url;
     videoEnabled = cfg.video_enabled || false;
     document.getElementById('videoToggle').className = 'toggle-sw ' + (videoEnabled?'on':'off');
     var testis = cfg.testimonials || [];
     if (testis[0]) { document.getElementById('testi1text').value=testis[0].text||''; document.getElementById('testi1name').value=testis[0].name||''; document.getElementById('testi1city').value=testis[0].city||''; }
     if (testis[1]) { document.getElementById('testi2text').value=testis[1].text||''; document.getElementById('testi2name').value=testis[1].name||''; document.getElementById('testi2city').value=testis[1].city||''; }
-    document.getElementById('price').value = t.price || cfg.price || '';
-    document.getElementById('oldPrice').value = t.old_price || cfg.old_price || '';
-    document.getElementById('btnText').value = cfg.btn_text || 'Accéder maintenant →';
-    document.getElementById('guarantee').value = cfg.guarantee || 'Satisfait ou remboursé 7 jours';
+    document.getElementById('offerPrice').value    = t.price     || cfg.price     || '';
+    document.getElementById('offerOldPrice').value = t.old_price || cfg.old_price || '';
+    document.getElementById('btnText').value   = cfg.btn_text  || '';
+    document.getElementById('guarantee').value = cfg.guarantee || '';
     var includes = cfg.includes || [];
-    for (var j=1;j<=4;j++){var incEl=document.getElementById('inc'+j);if(incEl)incEl.value=includes[j-1]||'';}
-    var faqs = cfg.faq || [];
-    if (faqs[0]){document.getElementById('faq1q').value=faqs[0].q||'';document.getElementById('faq1a').value=faqs[0].a||'';}
-    if (faqs[1]){document.getElementById('faq2q').value=faqs[1].q||'';document.getElementById('faq2a').value=faqs[1].a||'';}
-    if (faqs[2]){document.getElementById('faq3q').value=faqs[2].q||'';document.getElementById('faq3a').value=faqs[2].a||'';}
-    if (cfg.primary_color){document.getElementById('primaryColor').value=cfg.primary_color;document.getElementById('primaryColorText').value=cfg.primary_color;}
-    document.getElementById('vendorPhoto').value = cfg.vendor_photo || '';
-    document.getElementById('vendorName').value = cfg.vendor_name || '';
-    document.getElementById('pixelId').value = cfg.pixel_id || '';
-    timerEnabled = cfg.timer_enabled || false;
-    upsellEnabled = cfg.upsell && cfg.upsell.enabled || false;
-    document.getElementById('timerToggle').className = 'toggle-sw '+(timerEnabled?'on':'off');
-    document.getElementById('upsellToggle').className = 'toggle-sw '+(upsellEnabled?'on':'off');
-    document.getElementById('upsellConfig').style.display = upsellEnabled?'block':'none';
-    if (cfg.upsell){document.getElementById('upsellPrice').value=cfg.upsell.price||'';document.getElementById('upsellTitle').value=cfg.upsell.title||'';}
+    for (var j=1;j<=4;j++){var inc=document.getElementById('include'+j);if(inc)inc.value=includes[j-1]||'';}
+    var faq = cfg.faq || [];
+    if (faq[0]) { document.getElementById('faq1q').value=faq[0].q||''; document.getElementById('faq1a').value=faq[0].a||''; }
+    if (faq[1]) { document.getElementById('faq2q').value=faq[1].q||''; document.getElementById('faq2a').value=faq[1].a||''; }
+    if (faq[2]) { document.getElementById('faq3q').value=faq[2].q||''; document.getElementById('faq3a').value=faq[2].a||''; }
+    if (cfg.primary_color) { primaryColor=cfg.primary_color; document.getElementById('colorPicker').value=primaryColor; document.getElementById('colorHex').value=primaryColor; }
+    document.getElementById('vendorPhoto').value  = cfg.vendor_photo  || '';
+    document.getElementById('vendorName').value   = cfg.vendor_name   || '';
+    document.getElementById('pixelId').value      = cfg.pixel_id      || '';
     document.getElementById('downloadUrl').value  = cfg.download_url  || '';
     document.getElementById('thankYouMsg').value  = cfg.thank_you_msg || '';
+    timerEnabled  = cfg.timer_enabled  || false;
+    upsellEnabled = cfg.upsell && cfg.upsell.enabled || false;
+    document.getElementById('timerToggle').className  = 'toggle-sw ' + (timerEnabled?'on':'off');
+    document.getElementById('upsellToggle').className = 'toggle-sw ' + (upsellEnabled?'on':'off');
+    document.getElementById('upsellConfig').style.display = upsellEnabled?'block':'none';
+    if (cfg.upsell) { document.getElementById('upsellPrice').value=cfg.upsell.price||''; document.getElementById('upsellTitle').value=cfg.upsell.title||''; }
   }
 
+  // ── GET CONFIG ──
   function getConfig() {
     var slug = document.getElementById('tunnelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-');
     return {
-      title: document.getElementById('heroTitle').value.trim(),
-      subtitle: document.getElementById('heroSubtitle').value.trim(),
-      desc: document.getElementById('heroDesc').value.trim(),
-      badge: document.getElementById('heroBadge').value.trim(),
-      emoji: selectedEmoji,
-      price: parseInt(document.getElementById('price').value)||0,
-      old_price: parseInt(document.getElementById('oldPrice').value)||0,
-      btn_text: document.getElementById('btnText').value.trim(),
-      guarantee: document.getElementById('guarantee').value.trim(),
-      benefits: [1,2,3,4,5,6].map(function(i){return document.getElementById('benefit'+i).value.trim();}).filter(Boolean),
-      includes: [1,2,3,4].map(function(i){return document.getElementById('inc'+i).value.trim();}).filter(Boolean),
-      testimonials: [{text:document.getElementById('testi1text').value.trim(),name:document.getElementById('testi1name').value.trim(),city:document.getElementById('testi1city').value.trim()},{text:document.getElementById('testi2text').value.trim(),name:document.getElementById('testi2name').value.trim(),city:document.getElementById('testi2city').value.trim()}].filter(function(t){return t.text;}),
-      faq: [{q:document.getElementById('faq1q').value.trim(),a:document.getElementById('faq1a').value.trim()},{q:document.getElementById('faq2q').value.trim(),a:document.getElementById('faq2a').value.trim()},{q:document.getElementById('faq3q').value.trim(),a:document.getElementById('faq3a').value.trim()}].filter(function(f){return f.q;}),
-      video_url: document.getElementById('videoUrl').value.trim(),
+      title:      document.getElementById('heroTitle').value.trim(),
+      subtitle:   document.getElementById('heroSubtitle').value.trim(),
+      desc:       document.getElementById('heroDesc').value.trim(),
+      badge:      document.getElementById('heroBadge').value.trim(),
+      emoji:      selectedEmoji,
+      benefits:   [1,2,3,4,5,6].map(function(i){return document.getElementById('benefit'+i).value.trim();}).filter(Boolean),
       video_enabled: videoEnabled,
-      primary_color: document.getElementById('primaryColor').value,
-      vendor_photo: document.getElementById('vendorPhoto').value.trim(),
-      vendor_name: document.getElementById('vendorName').value.trim(),
-      pixel_id: document.getElementById('pixelId').value.trim(),
+      video_url:  document.getElementById('videoUrl').value.trim(),
+      testimonials: [
+        {text:document.getElementById('testi1text').value.trim(),name:document.getElementById('testi1name').value.trim(),city:document.getElementById('testi1city').value.trim()},
+        {text:document.getElementById('testi2text').value.trim(),name:document.getElementById('testi2name').value.trim(),city:document.getElementById('testi2city').value.trim()}
+      ].filter(function(t){return t.text;}),
+      price:     parseInt(document.getElementById('offerPrice').value)||0,
+      old_price: parseInt(document.getElementById('offerOldPrice').value)||0,
+      btn_text:  document.getElementById('btnText').value.trim(),
+      guarantee: document.getElementById('guarantee').value.trim(),
+      includes:  [1,2,3,4].map(function(i){return document.getElementById('include'+i).value.trim();}).filter(Boolean),
+      faq: [
+        {q:document.getElementById('faq1q').value.trim(),a:document.getElementById('faq1a').value.trim()},
+        {q:document.getElementById('faq2q').value.trim(),a:document.getElementById('faq2a').value.trim()},
+        {q:document.getElementById('faq3q').value.trim(),a:document.getElementById('faq3a').value.trim()}
+      ].filter(function(f){return f.q;}),
+      primary_color: primaryColor,
+      vendor_photo:  document.getElementById('vendorPhoto').value.trim(),
+      vendor_name:   document.getElementById('vendorName').value.trim(),
+      pixel_id:      document.getElementById('pixelId').value.trim(),
       timer_enabled: timerEnabled,
       upsell: {enabled:upsellEnabled,price:parseInt(document.getElementById('upsellPrice').value)||0,title:document.getElementById('upsellTitle').value.trim()},
       slug: slug,
@@ -458,62 +430,33 @@
     };
   }
 
-  function updatePreview() {
-    var slug = document.getElementById('tunnelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-');
-    document.getElementById('slugPreview').textContent = slug||'...';
-    document.getElementById('previewUrl').textContent = 'funnelafrica.vercel.app/t/'+(slug||'...');
-    clearTimeout(previewTimeout);
-    previewTimeout = setTimeout(generatePreview, 280);
+  // ── AUTO SAVE ──
+  function onFormChange() {
     clearTimeout(saveTimer);
-    setSaveStatus('saving');
     saveTimer = setTimeout(function(){saveTunnel(true);},2000);
+    updatePreview();
+    var slug = document.getElementById('tunnelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-');
+    document.getElementById('slugPreview').textContent = slug || '...';
+    document.getElementById('previewUrl').textContent = 'funnelafrica.vercel.app/t/' + (slug || '...');
   }
+  function onNameChange(){updatePreview();}
 
-  function generatePreview() {
-    var cfg = getConfig();
-    var color = cfg.primary_color || '#00c896';
-    var title = cfg.title || 'Votre titre ici';
-    var sub = cfg.subtitle || 'Votre sous-titre';
-    var desc = cfg.desc || 'Description de votre offre...';
-    var price = cfg.price ? cfg.price.toLocaleString('fr')+' FCFA' : '— FCFA';
-    var oldP = cfg.old_price ? cfg.old_price.toLocaleString('fr')+' FCFA' : '';
-    var btn = cfg.btn_text || 'Accéder maintenant →';
-    var badge = cfg.badge || 'Formation en ligne';
-    var emoji = cfg.emoji || '📘';
-    var name = cfg.vendor_name || 'Votre nom';
-    var benefitsHtml = (cfg.benefits.length?cfg.benefits:['Bénéfice 1','Bénéfice 2','Bénéfice 3']).map(function(b){return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1e2a38;"><span style="color:'+color+';font-weight:700;">✓</span><span style="font-size:.88rem;">'+b+'</span></div>';}).join('');
-    var includesHtml = (cfg.includes.length?cfg.includes:['Accès à vie','Support WhatsApp']).map(function(inc){return '<div style="display:flex;align-items:center;gap:8px;font-size:.8rem;padding:3px 0;"><span style="color:'+color+';">✓</span>'+inc+'</div>';}).join('');
-    var testiHtml = cfg.testimonials.map(function(t){return '<div style="background:#111820;border:1px solid #1e2a38;border-radius:10px;padding:14px;margin-bottom:10px;"><p style="font-size:.82rem;color:#a0b4c8;font-style:italic;margin-bottom:8px;">"'+t.text+'"</p><div style="font-size:.75rem;font-weight:600;">'+t.name+' · '+t.city+'</div></div>';}).join('');
-    var faqHtml = cfg.faq.map(function(f){return '<div style="background:#111820;border:1px solid #1e2a38;border-radius:8px;padding:12px 14px;margin-bottom:8px;"><div style="font-weight:600;font-size:.85rem;margin-bottom:6px;">'+f.q+'</div><div style="font-size:.8rem;color:#8fa5bc;">'+f.a+'</div></div>';}).join('');
-    var videoHtml = '';
-    if (videoEnabled && cfg.video_url) {
-      var ytId = cfg.video_url.replace('https://www.youtube.com/watch?v=','').replace('https://youtu.be/','').split('&')[0];
-      videoHtml = '<div style="margin:20px 0;border-radius:10px;overflow:hidden;aspect-ratio:16/9;"><iframe src="https://www.youtube.com/embed/'+ytId+'" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>';
-    }
-    var timerHtml = timerEnabled?'<div style="background:#1a0800;border:1px solid #f5a62340;border-radius:8px;padding:10px;text-align:center;margin-bottom:14px;font-size:.8rem;color:#f5a623;">⏰ Offre limitée — expire dans <strong>23:45:12</strong></div>':'';
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:\'DM Sans\',sans-serif;background:#0a0f14;color:#e8f0f8;}</style><link rel="stylesheet" href="/mobile.css">
-</head><body><div style="max-width:720px;margin:0 auto;padding:24px 20px;">'
-    +'<div style="text-align:center;margin-bottom:14px;"><span style="background:'+color+'18;border:1px solid '+color+'40;color:'+color+';padding:5px 14px;border-radius:20px;font-size:.72rem;font-weight:700;font-family:Syne,sans-serif;">'+emoji+' '+badge+'</span></div>'
-    +timerHtml
-    +'<div style="text-align:center;margin-bottom:28px;"><div style="font-size:2.8rem;margin-bottom:10px;">'+emoji+'</div><h1 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:clamp(1.4rem,4vw,2rem);margin-bottom:8px;line-height:1.15;">'+title+'</h1><h2 style="font-size:1rem;color:'+color+';font-weight:600;margin-bottom:12px;">'+sub+'</h2><p style="color:#8fa5bc;font-size:.88rem;line-height:1.7;max-width:520px;margin:0 auto;">'+desc+'</p></div>'
-    +videoHtml
-    +(cfg.benefits.length?'<div style="background:#111820;border:1px solid #1e2a38;border-radius:12px;padding:18px;margin-bottom:22px;"><h3 style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:12px;color:'+color+';">✅ Ce que vous allez apprendre</h3>'+benefitsHtml+'</div>':'')
-    +(testiHtml?'<h3 style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:10px;text-align:center;">⭐ Ils ont déjà réussi</h3>'+testiHtml+'<div style="margin-bottom:20px;"></div>':'')
-    +'<div style="background:#111820;border:2px solid '+color+';border-radius:14px;padding:22px;margin-bottom:22px;text-align:center;">'+(oldP?'<div style="font-size:.82rem;color:#6b7e93;text-decoration:line-through;margin-bottom:4px;">'+oldP+'</div>':'')+'<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:2rem;color:'+color+';margin-bottom:6px;">'+price+'</div><div style="font-size:.72rem;color:#6b7e93;margin-bottom:14px;">Paiement unique · Accès immédiat</div><div style="margin-bottom:14px;text-align:left;">'+includesHtml+'</div><a href="#" style="display:block;background:'+color+';color:#0a0f14;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.95rem;padding:14px;border-radius:10px;text-decoration:none;margin-bottom:8px;">'+btn+'</a>'+(cfg.guarantee?'<div style="font-size:.7rem;color:#6b7e93;">🛡️ '+cfg.guarantee+'</div>':'')+'</div>'
-    +(faqHtml?'<h3 style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:10px;">❓ Questions fréquentes</h3>'+faqHtml+'<div style="margin-bottom:20px;"></div>':'')
-    +'<div style="text-align:center;padding:16px 0;border-top:1px solid #1e2a38;font-size:.72rem;color:#6b7e93;">'+(cfg.vendor_photo?'<img src="'+cfg.vendor_photo+'" style="width:44px;height:44px;border-radius:50%;margin-bottom:6px;display:block;margin-left:auto;margin-right:auto;">':'')+'<strong style="color:#e8f0f8;">'+name+'</strong><br>Propulsé par FunnelAfrica</div>'
-    +'</div></body></html>';
-    document.getElementById('previewIframe').srcdoc = html;
-  }
-
+  // ── SAVE ──
   function saveTunnel(silent) {
     if (!tunnelId) return;
-    var cfg = getConfig();
+    var cfg  = getConfig();
     var name = document.getElementById('tunnelNameInput').value.trim();
     setSaveStatus('saving');
-    sb.from('tunnels').update({name:name||tunnelData.name,slug:cfg.slug||tunnelData.slug,price:cfg.price,old_price:cfg.old_price,page_config:cfg,updated_at:new Date().toISOString()}).eq('id',tunnelId).then(function(r){
-      if (r.error){setSaveStatus('error');if(!silent)showToast('Erreur : '+r.error.message,'error');}
-      else{setSaveStatus('saved');if(!silent)showToast('✓ Sauvegardé !','success');}
+    sb.from('tunnels').update({
+      name:        name || (tunnelData&&tunnelData.name) || 'Mon tunnel',
+      slug:        cfg.slug || (tunnelData&&tunnelData.slug),
+      price:       cfg.price,
+      old_price:   cfg.old_price,
+      page_config: cfg,
+      updated_at:  new Date().toISOString()
+    }).eq('id', tunnelId).then(function(r) {
+      if (r.error) { setSaveStatus('error'); if (!silent) showToast('Erreur : '+r.error.message,'error'); }
+      else { setSaveStatus('saved'); if (!silent) showToast('✓ Sauvegardé !','success'); }
     });
   }
 
@@ -524,133 +467,126 @@
     else{dot.style.background='var(--danger)';text.textContent='Erreur';}
   }
 
+  // ── PUBLISH ──
   function togglePublish() {
     saveTunnel(true);
-    var newStatus = isPublished?'draft':'live';
-    sb.from('tunnels').update({status:newStatus}).eq('id',tunnelId).then(function(r){
-      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+    var newStatus = isPublished ? 'draft' : 'live';
+    sb.from('tunnels').update({status:newStatus}).eq('id',tunnelId).then(function(r) {
+      if (r.error) { showToast('Erreur : '+r.error.message,'error'); return; }
       isPublished = !isPublished;
       updateStatusUI();
-      showToast(isPublished?'🚀 Publié ! Partagez votre lien.':'⚫ Dépublié.','success');
+      showToast(isPublished ? '🚀 Publié ! Partagez votre lien.' : '⚫ Dépublié.','success');
     });
   }
 
   function updateStatusUI() {
-    var pill    = document.getElementById('statusPill');
-    var btn     = document.getElementById('publishBtn');
-    var btnMob  = document.getElementById('publishBtnMobile');
+    var pill=document.getElementById('statusPill'),btn=document.getElementById('publishBtn');
     if (isPublished) {
-      pill.className = 'status-pill live';
-      pill.textContent = '🟢 En ligne';
-      if (btn) { btn.textContent = '⚫ Dépublier'; btn.style.cssText = 'background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);'; }
-      if (btnMob) { btnMob.textContent = '⚫ Dépublier'; btnMob.style.background = '#ff4d6d30'; btnMob.style.color = 'var(--danger)'; btnMob.style.border = '1.5px solid #ff4d6d40'; }
+      pill.className='status-pill live'; pill.textContent='🟢 En ligne';
+      btn.textContent='⚫ Dépublier'; btn.style.cssText='background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);padding:7px 14px;border-radius:8px;font-family:Syne,sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;';
     } else {
-      pill.className = 'status-pill draft';
-      pill.textContent = 'Brouillon';
-      if (btn) { btn.textContent = '🚀 Publier'; btn.style.cssText = 'background:linear-gradient(135deg,#00c896,#00a87a);color:#0a0f14;border:none;'; }
-      if (btnMob) { btnMob.textContent = '🚀 Publier'; btnMob.style.background = 'linear-gradient(135deg,var(--green),var(--green2))'; btnMob.style.color = '#0a0f14'; btnMob.style.border = 'none'; }
+      pill.className='status-pill draft'; pill.textContent='Brouillon';
+      btn.textContent='🚀 Publier'; btn.style.cssText='background:linear-gradient(135deg,#00c896,#00a87a);color:#0a0f14;padding:7px 14px;border-radius:8px;font-family:Syne,sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;border:none;';
     }
   }
 
+  // ── SECTIONS ──
   function activateSection(id,el) {
     document.querySelectorAll('.section-item').forEach(function(s){s.classList.remove('active');});
     el.classList.add('active');
-    // Sur mobile — expand directement la bonne section, collapse les autres
     document.querySelectorAll('.prop-section').forEach(function(s){s.classList.add('collapsed');});
     var target = document.getElementById('props-'+id);
-    if (target) {
-      target.classList.remove('collapsed');
-      // Scroll vers la section
-      setTimeout(function(){
-        target.scrollIntoView({behavior:'smooth', block:'start'});
-      }, 50);
-    }
+    if (target) { target.classList.remove('collapsed'); target.scrollIntoView({behavior:'smooth',block:'start'}); }
   }
 
   function togglePropSection(header) {
     header.parentElement.classList.toggle('collapsed');
   }
 
-  // Ajouter touchend sur tous les prop-headers pour Android
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.prop-header').forEach(function(h) {
-      h.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        togglePropSection(this);
-      });
-    });
-  });
-  function setDevice(d,btn){document.querySelectorAll('.device-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');var f=document.getElementById('previewFrame');f.className='preview-frame '+d;document.getElementById('previewIframe').style.height=d==='mobile'?'700px':d==='tablet'?'800px':'620px';}
-  function selectEmoji(e,el){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(function(x){x.classList.remove('selected');});el.classList.add('selected');updatePreview();}
-  function onColorPick(val){document.getElementById('primaryColorText').value=val;document.querySelectorAll('.color-preset').forEach(function(p){p.classList.toggle('selected',p.style.background===val);});updatePreview();}
-  function setColor(c){document.getElementById('primaryColor').value=c;document.getElementById('primaryColorText').value=c;document.querySelectorAll('.color-preset').forEach(function(p){p.classList.toggle('selected',p.style.background===c);});updatePreview();}
-  function syncColor(){var v=document.getElementById('primaryColorText').value;if(/^#[0-9a-f]{6}$/i.test(v)){document.getElementById('primaryColor').value=v;updatePreview();}}
-  function toggleVideo(){videoEnabled=!videoEnabled;document.getElementById('videoToggle').className='toggle-sw '+(videoEnabled?'on':'off');updatePreview();}
-  function toggleTimer(){timerEnabled=!timerEnabled;document.getElementById('timerToggle').className='toggle-sw '+(timerEnabled?'on':'off');updatePreview();}
-  function toggleUpsell(){upsellEnabled=!upsellEnabled;document.getElementById('upsellToggle').className='toggle-sw '+(upsellEnabled?'on':'off');document.getElementById('upsellConfig').style.display=upsellEnabled?'block':'none';updatePreview();}
-  function triggerFileUpload() {
-    document.getElementById('fileUploadInput').click();
+  // ── PREVIEW ──
+  function updatePreview() {
+    clearTimeout(previewTimeout);
+    previewTimeout = setTimeout(buildPreview, 280);
   }
 
-  function uploadFile(input) {
-    var file = input.files[0];
-    if (!file) return;
-
-    // Vérifier la taille (50 Mo max)
-    if (file.size > 50 * 1024 * 1024) {
-      showToast('Fichier trop lourd — maximum 50 Mo','error');
-      return;
+  function buildPreview() {
+    var cfg   = getConfig();
+    var color = cfg.primary_color || '#00c896';
+    var videoHtml = '';
+    if (cfg.video_enabled && cfg.video_url) {
+      var ytId = cfg.video_url.replace('https://www.youtube.com/watch?v=','').replace('https://youtu.be/','').split('&')[0];
+      videoHtml = '<div style="margin:20px 0;border-radius:10px;overflow:hidden;aspect-ratio:16/9;"><iframe src="https://www.youtube.com/embed/'+ytId+'" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>';
     }
-
-    var progress = document.getElementById('uploadProgress');
-    var success  = document.getElementById('uploadSuccess');
-    progress.style.display = 'block';
-    progress.textContent   = '⏳ Upload en cours... 0%';
-    success.style.display  = 'none';
-
-    // Nom unique pour éviter les collisions
-    var ext      = file.name.split('.').pop();
-    var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    var path     = 'products/' + currentUser.id + '/' + Date.now() + '_' + safeName;
-
-    sb.storage.from('funnelafrica-files').upload(path, file, {
-      cacheControl: '3600',
-      upsert: false,
-      onUploadProgress: function(p) {
-        var pct = Math.round((p.loaded / p.total) * 100);
-        progress.textContent = '⏳ Upload en cours... ' + pct + '%';
-      }
-    }).then(function(r) {
-      progress.style.display = 'none';
-      if (r.error) {
-        showToast('Erreur upload : ' + r.error.message, 'error');
-        return;
-      }
-      // Obtenir l'URL publique
-      var urlResult = sb.storage.from('funnelafrica-files').getPublicUrl(path);
-      var publicUrl = urlResult.data.publicUrl;
-      document.getElementById('downloadUrl').value = publicUrl;
-      success.style.display = 'block';
-      success.textContent   = '✓ Fichier uploadé : ' + file.name;
-      navigator.clipboard.writeText(publicUrl).catch(function(){});
-      onFormChange();
-      showToast('✓ Fichier uploadé avec succès !', 'success');
-      setTimeout(function(){ success.style.display='none'; }, 5000);
-    });
+    var benefitsHtml = cfg.benefits.length ? '<div style="background:#111820;border:1px solid #1e2a38;border-radius:12px;padding:16px;margin-bottom:20px;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:'+color+';margin-bottom:10px;">✅ Ce que vous allez apprendre</div>'+cfg.benefits.map(function(b){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1e2a38;font-size:.82rem;color:#a0b8c8;"><span style="color:'+color+';">✓</span>'+b+'</div>';}).join('')+'</div>' : '';
+    var testiHtml = cfg.testimonials.length ? '<div style="margin-bottom:20px;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;text-align:center;margin-bottom:10px;">⭐ Ils ont déjà réussi</div>'+cfg.testimonials.map(function(t){return '<div style="background:#111820;border:1px solid #1e2a38;border-radius:10px;padding:14px;margin-bottom:8px;"><div style="font-size:.8rem;color:#a0b8c8;font-style:italic;margin-bottom:8px;">"'+t.text+'"</div><div style="font-size:.75rem;font-weight:600;">'+t.name+' — '+t.city+'</div></div>';}).join('')+'</div>' : '';
+    var includesHtml = cfg.includes.length ? cfg.includes.map(function(i){return '<div style="display:flex;align-items:center;gap:8px;font-size:.8rem;padding:3px 0;"><span style="color:'+color+';">✓</span>'+i+'</div>';}).join('') : '';
+    var faqHtml = cfg.faq.length ? '<div style="margin-bottom:20px;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;margin-bottom:10px;">❓ FAQ</div>'+cfg.faq.map(function(f){return '<div style="background:#111820;border:1px solid #1e2a38;border-radius:8px;padding:12px;margin-bottom:6px;"><div style="font-weight:600;font-size:.82rem;margin-bottom:4px;">'+f.q+'</div><div style="font-size:.78rem;color:#6b7e93;">'+f.a+'</div></div>';}).join('')+'</div>' : '';
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:DM Sans,sans-serif;background:#0a0f14;color:#e8f0f8;padding:20px;max-width:700px;margin:0 auto;}</style></head><body>';
+    html += '<div style="text-align:center;margin-bottom:8px;"><span style="background:#'+color.replace('#','')+'20;border:1px solid #'+color.replace('#','')+'40;color:'+color+';padding:5px 16px;border-radius:20px;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;">'+(cfg.badge||'Formation · Accès immédiat')+'</span></div>';
+    html += '<div style="text-align:center;font-size:2.5rem;margin:10px 0;">'+selectedEmoji+'</div>';
+    html += '<h1 style="font-family:Syne,sans-serif;font-weight:800;font-size:1.6rem;text-align:center;margin-bottom:8px;line-height:1.2;">'+(cfg.title||'Titre de votre formation')+'</h1>';
+    if (cfg.subtitle) html += '<h2 style="font-size:1rem;text-align:center;color:'+color+';margin-bottom:10px;">'+(cfg.subtitle)+'</h2>';
+    if (cfg.desc) html += '<p style="color:#6b7e93;font-size:.88rem;text-align:center;line-height:1.7;margin-bottom:20px;">'+(cfg.desc)+'</p>';
+    html += videoHtml + benefitsHtml + testiHtml;
+    html += '<div style="background:#111820;border:2px solid '+color+';border-radius:14px;padding:20px;text-align:center;margin-bottom:20px;">';
+    if (cfg.old_price) html += '<div style="font-size:.85rem;color:#6b7e93;text-decoration:line-through;margin-bottom:4px;">'+cfg.old_price.toLocaleString('fr')+' FCFA</div>';
+    html += '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:2rem;color:'+color+';margin-bottom:4px;">'+(cfg.price||0).toLocaleString('fr')+' FCFA</div>';
+    html += '<div style="font-size:.72rem;color:#6b7e93;margin-bottom:14px;">Paiement unique · Accès immédiat</div>';
+    html += includesHtml ? '<div style="text-align:left;margin-bottom:14px;">'+includesHtml+'</div>' : '';
+    html += '<div style="background:'+color+';color:#0a0f14;padding:14px;border-radius:10px;font-family:Syne,sans-serif;font-weight:800;font-size:1rem;cursor:pointer;">'+(cfg.btn_text||'Accéder maintenant →')+'</div>';
+    if (cfg.guarantee) html += '<div style="font-size:.72rem;color:#6b7e93;margin-top:8px;">🛡️ '+cfg.guarantee+'</div>';
+    html += '</div>';
+    html += faqHtml;
+    if (cfg.vendor_name) html += '<div style="text-align:center;padding:16px;border-top:1px solid #1e2a38;font-size:.75rem;color:#6b7e93;">Par <strong style="color:#e8f0f8;">'+cfg.vendor_name+'</strong></div>';
+    html += '</body></html>';
+    var iframe = document.getElementById('previewIframe');
+    iframe.srcdoc = html;
   }
 
-  function onNameChange(){updatePreview();}
+  // ── CONTROLS ──
+  function toggleVideo(){videoEnabled=!videoEnabled;document.getElementById('videoToggle').className='toggle-sw '+(videoEnabled?'on':'off');updatePreview();}
+  function toggleTimer(){timerEnabled=!timerEnabled;document.getElementById('timerToggle').className='toggle-sw '+(timerEnabled?'on':'off');onFormChange();}
+  function toggleUpsell(){upsellEnabled=!upsellEnabled;document.getElementById('upsellToggle').className='toggle-sw '+(upsellEnabled?'on':'off');document.getElementById('upsellConfig').style.display=upsellEnabled?'block':'none';updatePreview();}
+  function selectEmoji(e,el){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(function(o){o.classList.remove('selected');});el.classList.add('selected');updatePreview();}
+  function onColorPick(val,el){primaryColor=val;document.getElementById('colorPicker').value=val;document.getElementById('colorHex').value=val;if(el&&el.classList){document.querySelectorAll('.color-preset').forEach(function(p){p.classList.remove('selected');});el.classList.add('selected');}updatePreview();}
+  function onColorHexInput(v){if(/^#[0-9a-fA-F]{6}$/.test(v)){onColorPick(v,null);}}
+  function setDevice(d,btn){document.querySelectorAll('.device-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');var f=document.getElementById('previewFrame');f.className='preview-frame '+d;document.getElementById('previewIframe').style.height=d==='mobile'?'700px':d==='tablet'?'800px':'620px';}
   function previewPublic(){var slug=document.getElementById('tunnelSlug').value.trim();if(!slug){showToast('Ajoutez un slug dans Avancé','error');return;}window.open('/funnelafrica-tunnel-public.html?t='+slug,'_blank');}
   function copyLink(){var slug=document.getElementById('tunnelSlug').value.trim();if(!slug){showToast('Ajoutez un slug dans Avancé','error');return;}navigator.clipboard.writeText('https://funnelafrica.vercel.app/t/'+slug).then(function(){showToast('✓ Lien copié !','success');});}
   function goBack(){saveTunnel(true);setTimeout(function(){window.location.href='/funnelafrica-dashboard.html';},500);}
 
+  // ── UPLOAD FICHIER ──
+  function triggerFileUpload(){document.getElementById('fileUploadInput').click();}
+  function uploadFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 50*1024*1024) { showToast('Fichier trop lourd — max 50 Mo','error'); return; }
+    var progress = document.getElementById('uploadProgress');
+    var success  = document.getElementById('uploadSuccess');
+    progress.style.display = 'block';
+    success.style.display  = 'none';
+    var path = 'products/' + (currentUser ? currentUser.id : 'anon') + '/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    sb.storage.from('funnelafrica-files').upload(path, file, {cacheControl:'3600',upsert:false}).then(function(r) {
+      progress.style.display = 'none';
+      if (r.error) { showToast('Erreur upload : '+r.error.message,'error'); return; }
+      var urlResult = sb.storage.from('funnelafrica-files').getPublicUrl(path);
+      var publicUrl = urlResult.data.publicUrl;
+      document.getElementById('downloadUrl').value = publicUrl;
+      success.style.display = 'block';
+      onFormChange();
+      showToast('✓ Fichier uploadé !','success');
+      setTimeout(function(){success.style.display='none';},4000);
+    });
+  }
+
+  // ── TOAST ──
   function showToast(msg,type){
     var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00c89618',border:'#00c89640',color:'#00c896'};
     var t=document.getElementById('__toast');
-    t.style.cssText='position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 14px;border-radius:8px;font-size:.78rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(8px);';
+    t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';
     t.textContent=msg;
-    setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
-    setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)';},3500);
+    setTimeout(function(){t.style.opacity='1';},10);
+    setTimeout(function(){t.style.opacity='0';},3500);
   }
 </script>
 </body>
