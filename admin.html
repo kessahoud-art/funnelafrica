@@ -3,241 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — FunnelAfrica CEO</title>
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#00e5a0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FunnelAfrica">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Admin CEO — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
 <style>
-  :root{--bg:#080c10;--surface:#0e1419;--surface2:#141c24;--border:#1a2535;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--blue:#4da6ff;--purple:#a78bfa;--radius:14px;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+:root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--blue:#4da6ff;--purple:#a78bfa;--radius:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+.sidebar{width:230px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+.logo{padding:20px 16px;border-bottom:1px solid var(--border);}
+.logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+.logo-mark span{width:30px;height:30px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#0a0f14;font-weight:800;}
+.nav{padding:12px 10px;flex:1;overflow-y:auto;}
+.nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 5px;font-family:'Syne',sans-serif;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;-webkit-tap-highlight-color:rgba(0,200,150,.15);touch-action:manipulation;}
+.nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:var(--green);}
+.nav-icon{font-size:1rem;flex-shrink:0;}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,200,150,.15);}
+.btn-primary{background:var(--green);color:#0a0f14;}
+.btn-primary:hover{background:#00dea8;}
+.btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{color:var(--text);}
+.content{padding:24px;flex:1;}
+.section{display:none;}
+.section.active{display:block;}
 
-  /* SIDEBAR */
-  .sidebar{width:230px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;}
-  .logo{padding:22px 18px;border-bottom:1px solid var(--border);}
-  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
-  .logo-mark span{width:30px;height:30px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#080c10;font-weight:800;flex-shrink:0;}
-  .admin-badge{margin-top:8px;background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;letter-spacing:.08em;}
-  .nav{padding:14px 10px;flex:1;display:flex;flex-direction:column;gap:2px;}
-  .nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:10px 8px 6px;font-family:'Syne',sans-serif;}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--muted);font-size:.85rem;transition:all .2s;margin-bottom:2px;}
-  .nav-item:hover{background:var(--surface2);color:var(--text);}
-  .nav-item.active{background:#00c89615;color:var(--green);}
-  .nav-icon{font-size:.9rem;flex-shrink:0;}
-  .nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
-  .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border);}
-  .ceo-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface2);}
-  .ceo-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--danger),#ff8c42);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:white;flex-shrink:0;}
-  .ceo-name{font-size:.82rem;font-weight:500;}
-  .ceo-role{font-size:.68rem;color:var(--danger);}
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.08;}
+.kpi.green::after{background:var(--green);}
+.kpi.gold::after{background:var(--gold);}
+.kpi.blue::after{background:var(--blue);}
+.kpi.purple::after{background:var(--purple);}
+.kpi-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif;font-weight:600;margin-bottom:8px;}
+.kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;line-height:1;}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:4px;}
+.kpi.green .kpi-val{color:var(--green);}
+.kpi.gold .kpi-val{color:var(--gold);}
+.kpi.blue .kpi-val{color:var(--blue);}
+.kpi.purple .kpi-val{color:var(--purple);}
 
-  /* MAIN */
-  .main{margin-left:230px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
-  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:8px;}
-  .live-badge{background:#00c89618;border:1px solid #00c89640;color:var(--green);font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;}
-  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-  .topbar-right{display:flex;align-items:center;gap:10px;}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,229,160,.15);}
-  .btn-danger{background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);}
-  .btn-danger:hover{background:var(--danger);color:white;}
-  .btn-primary{background:var(--green);color:#080c10;}
-  .btn-primary:hover{background:#00dea8;}
-  .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
-  .btn-ghost:hover{color:var(--text);}
+/* Tables */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.table-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:.82rem;outline:none;width:200px;transition:border-color .2s;}
+.search-input:focus{border-color:var(--green);}
+.vendor-row{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr 1fr 1fr;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:.82rem;}
+.vendor-row.header{background:var(--surface2);font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.vendor-cell{display:flex;align-items:center;gap:10px;}
+.v-av{width:32px;height:32px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.v-name{font-size:.84rem;font-weight:500;}
+.v-email{font-size:.68rem;color:var(--muted);}
+.cell{font-family:'Syne',sans-serif;font-weight:700;}
+.cell.green{color:var(--green);}
+.cell.blue{color:var(--blue);}
+.plan-pill{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;padding:3px 10px;border-radius:20px;}
+.plan-pill.starter{background:var(--surface2);color:var(--muted);}
+.plan-pill.pro{background:#00c89620;color:var(--green);border:1px solid #00c89640;}
+.plan-pill.scale{background:#f5a62320;color:var(--gold);border:1px solid #f5a62340;}
+.action-btns{display:flex;gap:6px;}
+.action-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,200,150,.15);}
+.action-btn:hover{background:var(--green);color:#0a0f14;border-color:var(--green);}
+.action-btn.red:hover{background:var(--danger);color:white;border-color:var(--danger);}
 
-  .content{padding:24px 28px;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+/* Tunnel filters */
+.tfilter-btn{padding:6px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;touch-action:manipulation;}
+.tfilter-btn.tfilter-active{background:var(--surface);color:var(--text);}
 
-  /* KPI */
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
-  .kpi:nth-child(1){animation-delay:.05s;}.kpi:nth-child(2){animation-delay:.10s;}.kpi:nth-child(3){animation-delay:.15s;}.kpi:nth-child(4){animation-delay:.20s;}
-  .kpi:nth-child(5){animation-delay:.25s;}.kpi:nth-child(6){animation-delay:.30s;}.kpi:nth-child(7){animation-delay:.35s;}.kpi:nth-child(8){animation-delay:.40s;}
-  .kpi::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.08;}
-  .kpi.green::after{background:var(--green);}.kpi.gold::after{background:var(--gold);}.kpi.blue::after{background:var(--blue);}.kpi.red::after{background:var(--danger);}.kpi.purple::after{background:var(--purple);}
-  .kpi-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif;margin-bottom:8px;}
-  .kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;line-height:1;margin-bottom:6px;}
-  .kpi.green .kpi-val{color:var(--green);}.kpi.gold .kpi-val{color:var(--gold);}.kpi.blue .kpi-val{color:var(--blue);}.kpi.red .kpi-val{color:var(--danger);}.kpi.purple .kpi-val{color:var(--purple);}
-  .kpi-sub{font-size:.72rem;color:var(--muted);}
+/* Broadcast */
+.broadcast-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;}
+.form-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.88rem;outline:none;}
+.form-select:focus{border-color:var(--green);}
 
-  /* TABS */
-  .tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:20px;width:fit-content;}
-  .tab{padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;color:var(--muted);transition:all .2s;}
-  .tab.active{background:var(--surface);color:var(--text);}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:#00000095;z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:440px;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:6px;}
+.modal-sub{font-size:.82rem;color:var(--muted);margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
 
-  /* TABLE */
-  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp .5s ease .3s both;}
-  .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .table-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
-  .search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:.82rem;outline:none;width:200px;transition:border-color .2s;}
-  .search-input:focus{border-color:var(--green);}
+/* Sidebar mobile */
+.overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+.hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1.3rem;padding:8px 12px;border-radius:8px;-webkit-tap-highlight-color:rgba(0,200,150,.2);touch-action:manipulation;position:relative;z-index:200;}
 
-  /* VENDORS TABLE */
-  .vendor-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 120px;gap:12px;padding:13px 20px;border-bottom:1px solid var(--border);align-items:center;}
-  .vendor-row:last-child{border-bottom:none;}
-  .vendor-row.header{background:var(--surface2);font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
-  .vendor-row:not(.header):hover{background:var(--surface2);}
-  .vendor-cell{display:flex;align-items:center;gap:8px;}
-  .v-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a2a4a,#2a3a6a);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
-  .v-name{font-size:.85rem;font-weight:500;}
-  .v-email{font-size:.68rem;color:var(--muted);}
-  .cell{font-size:.82rem;}
-  .cell.green{color:var(--green);font-family:'Syne',sans-serif;font-weight:700;}
-  .cell.gold{color:var(--gold);font-family:'Syne',sans-serif;font-weight:700;}
+/* Plan dist */
+.plan-dist-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.82rem;}
+.plan-dist-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.plan-dist-bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
 
-  /* PLAN BADGE */
-  .plan-pill{font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'Syne',sans-serif;}
-  .plan-pill.starter{background:#6b7e9318;border:1px solid #6b7e9340;color:var(--muted);}
-  .plan-pill.pro{background:#4da6ff18;border:1px solid #4da6ff40;color:var(--blue);}
-  .plan-pill.scale{background:#a78bfa18;border:1px solid #a78bfa40;color:var(--purple);}
+/* Toast */
+#__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
 
-  /* ACTIONS */
-  .action-btns{display:flex;gap:6px;}
-  .action-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,229,160,.15);}
-  .action-btn:hover{background:var(--green);color:#080c10;border-color:var(--green);}
-  .action-btn.red:hover{background:var(--danger);color:white;border-color:var(--danger);}
-
-  /* REVENUE CHART */
-  .chart-row{display:grid;grid-template-columns:1fr 300px;gap:20px;margin-bottom:24px;}
-  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp .5s ease .2s both;}
-  .chart-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .chart-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;}
-  .chart-body{padding:20px;}
-
-  /* MINI BAR CHART */
-  .mini-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px;}
-  .mini-bar{flex:1;border-radius:4px 4px 0 0;background:var(--green);opacity:.7;min-height:4px;transition:opacity .2s;}
-  .mini-bar.today{opacity:1;}
-  .mini-bar:hover{opacity:1;}
-  .chart-labels{display:flex;justify-content:space-between;}
-  .chart-label{font-size:.62rem;color:var(--muted);}
-
-  /* PLAN DISTRIBUTION */
-  .plan-dist{display:flex;flex-direction:column;gap:12px;padding:20px;}
-  .plan-dist-item{display:flex;align-items:center;gap:12px;}
-  .plan-dist-label{font-size:.78rem;font-weight:500;width:60px;}
-  .plan-dist-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
-  .plan-dist-fill{height:100%;border-radius:4px;transition:width .8s ease;}
-  .plan-dist-count{font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;width:40px;text-align:right;}
-
-  /* MODAL */
-  .modal-overlay{display:none;position:fixed;inset:0;background:#00000095;z-index:200;align-items:center;justify-content:center;padding:20px;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:480px;padding:28px;animation:fadeUp .3s ease;}
-  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:6px;}
-  .modal-sub{color:var(--muted);font-size:.83rem;margin-bottom:20px;}
-  .form-group{margin-bottom:14px;}
-  .form-label{font-size:.72rem;color:var(--muted);margin-bottom:6px;display:block;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
-  .form-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
-  .form-input:focus{border-color:var(--green);}
-  .form-select{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.88rem;outline:none;}
-  .modal-actions{display:flex;gap:10px;margin-top:16px;}
-
-  /* EMAIL BROADCAST */
-  .broadcast-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;animation:fadeUp .5s ease .35s both;}
-
-  /* TOAST */
-  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
-
-  /* HAMBURGER */
-  .hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1.3rem;padding:8px 12px;border-radius:8px;-webkit-tap-highlight-color:rgba(0,229,160,.2);position:relative;z-index:200;}
-  .overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
-  .tfilter-btn{padding:6px 12px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;}
-  .tfilter-btn.tfilter-active{background:var(--surface);color:var(--text);}
-  .tfilter-btn:hover{color:var(--text);}
-
-  /* RESPONSIVE */
-  @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.chart-row{grid-template-columns:1fr;}}
-  @media(max-width:760px){
-    .sidebar{transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}
-    .overlay.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}
-    .vendor-row{grid-template-columns:1fr 1fr;}.vendor-row .cell:nth-child(n+4),.vendor-row .action-btns{display:none;}
-    .content{padding:16px;}.kpi-grid{grid-template-columns:repeat(2,1fr);}
-    .topbar{padding:10px 14px;}
-    .topbar-right .btn-ghost{display:none;}
-    .topbar-right .btn-primary{font-size:.7rem;padding:7px 10px;}
-    .page-title{font-size:.9rem;}
-    .live-badge{font-size:.6rem;padding:2px 7px;}
-  }
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:760px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .overlay.open{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:flex;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .vendor-row{grid-template-columns:1fr 1fr;}
+  .vendor-row .cell:nth-child(n+4),.vendor-row .action-btns{display:none;}
+  .content{padding:16px;}
+}
 </style>
-<link rel="stylesheet" href="/mobile.css">
 </head>
 <body>
-
 <div id="__toast"></div>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-  <div class="logo">
-    <div class="logo-mark"><span>FA</span>FunnelAfrica</div>
-    <div class="admin-badge">👑 CEO ADMIN</div>
-  </div>
+  <div class="logo"><div class="logo-mark"><span>FA</span>Admin CEO</div></div>
   <nav class="nav">
     <div class="nav-section">Vue globale</div>
-    <div class="nav-item active" onclick="showSection('dashboard',this)">
-      <span class="nav-icon">📊</span>Dashboard CEO
-    </div>
-    
-    <div class="nav-item" onclick="window.location.href='/ab-testing.html'">🧪 A/B Testing</div>
-    <div class="nav-item" onclick="window.location.href='/api-docs.html'">🔌 API Docs</div>
-    <div class="nav-item" onclick="window.location.href='/payout.html'">💸 Retraits</div>
-    <div class="nav-item" onclick="showSection('vendeurs',this)">
-      <span class="nav-icon">👥</span>Vendeurs
-      <span class="nav-badge" id="navVendorCount">0</span>
-    </div>
-    <div class="nav-item" onclick="showSection('revenus',this)">
-      <span class="nav-icon">💰</span>Revenus plateforme
-    </div>
-    <div class="nav-item" onclick="showSection('tunnels',this)">
-      <span class="nav-icon">🚀</span>Tous les tunnels
-    </div>
+    <div class="nav-item active" onclick="showSection('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="showSection('vendeurs',this)"><span class="nav-icon">👥</span>Vendeurs</div>
+    <div class="nav-item" onclick="showSection('revenus',this)"><span class="nav-icon">💰</span>Revenus</div>
+    <div class="nav-item" onclick="showSection('tunnels',this)"><span class="nav-icon">🚀</span>Tunnels</div>
     <div class="nav-section">Outils CEO</div>
-    <div class="nav-item" onclick="showSection('email',this)">
-      <span class="nav-icon">📧</span>Email broadcast
-    </div>
-    <div class="nav-item" onclick="showSection('plans',this)">
-      <span class="nav-icon">⚡</span>Gestion des plans
-    </div>
-    <div class="nav-item" onclick="showSection('settings',this)">
-      <span class="nav-icon">⚙️</span>Paramètres
-    </div>
+    <div class="nav-item" onclick="showSection('email',this)"><span class="nav-icon">📧</span>Email broadcast</div>
+    <div class="nav-item" onclick="showSection('plans',this)"><span class="nav-icon">⚡</span>Gestion plans</div>
     <div class="nav-section">Accès</div>
-    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'">
-      <span class="nav-icon">🔄</span>Vue vendeur
-    </div>
-    <div class="nav-item" onclick="logout()">
-      <span class="nav-icon">🚪</span>Déconnexion
-    </div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'"><span class="nav-icon">🔄</span>Vue vendeur</div>
+    <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span>Déconnexion</div>
   </nav>
-  <div class="sidebar-footer">
-    <div class="ceo-card">
-      <div class="ceo-av" id="ceoAv">C</div>
-      <div>
-        <div class="ceo-name" id="ceoName">CEO</div>
-        <div class="ceo-role">👑 Administrateur</div>
-      </div>
-    </div>
-  </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
   <div class="topbar">
-    <div style="display:flex;align-items:center;gap:14px;">
+    <div style="display:flex;align-items:center;gap:12px;">
       <button class="hamburger" onclick="toggleSidebar()">☰</button>
-      <span class="page-title">📊 Dashboard CEO <div class="live-badge"><div class="live-dot"></div>Live</div></span>
+      <span class="page-title">👑 Admin CEO — FunnelAfrica</span>
     </div>
-    <div class="topbar-right">
+    <div style="display:flex;gap:8px;">
       <button class="btn btn-ghost" onclick="loadAll()">🔄 Actualiser</button>
       <button class="btn btn-primary" onclick="openEmailModal()">📧 Email à tous</button>
     </div>
@@ -245,191 +153,70 @@
 
   <div class="content">
 
-    <!-- SECTION DASHBOARD -->
-    <div id="section-dashboard">
-
-      <!-- KPIs -->
+    <!-- DASHBOARD -->
+    <div id="section-dashboard" class="section active">
       <div class="kpi-grid">
-        <div class="kpi green">
-          <div class="kpi-label">MRR (Revenus mensuels)</div>
-          <div class="kpi-val" id="kpiMRR">—</div>
-          <div class="kpi-sub">FCFA / mois</div>
+        <div class="kpi green"><div class="kpi-label">MRR</div><div class="kpi-val" id="kpiMRR">—</div><div class="kpi-sub">FCFA / mois</div></div>
+        <div class="kpi gold"><div class="kpi-label">Vendeurs actifs</div><div class="kpi-val" id="kpiVendors">—</div><div class="kpi-sub">inscrits total</div></div>
+        <div class="kpi blue"><div class="kpi-label">Tunnels publiés</div><div class="kpi-val" id="kpiTunnels">—</div><div class="kpi-sub">live en ce moment</div></div>
+        <div class="kpi purple"><div class="kpi-label">Transactions</div><div class="kpi-val" id="kpiTx">—</div><div class="kpi-sub">vendeurs</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="table-card">
+          <div class="table-header"><span class="table-title">👥 Dernières inscriptions</span><button class="btn btn-ghost" onclick="showSection('vendeurs',null)" style="font-size:.72rem;">Voir tous →</button></div>
+          <div id="recentVendors"><div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div></div>
         </div>
-        <div class="kpi gold">
-          <div class="kpi-label">Vendeurs totaux</div>
-          <div class="kpi-val" id="kpiVendors">—</div>
-          <div class="kpi-sub">inscrits sur la plateforme</div>
-        </div>
-        <div class="kpi blue">
-          <div class="kpi-label">Vendeurs payants</div>
-          <div class="kpi-val" id="kpiPaying">—</div>
-          <div class="kpi-sub">abonnés actifs</div>
-        </div>
-        <div class="kpi purple">
-          <div class="kpi-label">Taux conversion</div>
-          <div class="kpi-val" id="kpiConvRate">—</div>
-          <div class="kpi-sub">inscrit → payant</div>
-        </div>
-        <div class="kpi green">
-          <div class="kpi-label">Tunnels créés</div>
-          <div class="kpi-val" id="kpiTunnels">—</div>
-          <div class="kpi-sub">total plateforme</div>
-        </div>
-        <div class="kpi gold">
-          <div class="kpi-label">Transactions vendeurs</div>
-          <div class="kpi-val" id="kpiTransactions">—</div>
-          <div class="kpi-sub">ventes générées</div>
-        </div>
-        <div class="kpi blue">
-          <div class="kpi-label">Nouveaux aujourd'hui</div>
-          <div class="kpi-val" id="kpiToday">—</div>
-          <div class="kpi-sub">inscriptions du jour</div>
-        </div>
-        <div class="kpi red">
-          <div class="kpi-label">Churn ce mois</div>
-          <div class="kpi-val" id="kpiChurn">—</div>
-          <div class="kpi-sub">désabonnements</div>
+        <div class="table-card">
+          <div class="table-header"><span class="table-title">📊 Distribution plans</span></div>
+          <div style="padding:16px;" id="planDist"><div style="text-align:center;color:var(--muted);">Chargement...</div></div>
         </div>
       </div>
-
-      <!-- CHART + PLANS -->
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="chart-title">📈 Revenus plateforme — 7 derniers jours</span>
-            <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="chartTotal">—</span>
-          </div>
-          <div class="chart-body">
-            <div class="mini-chart" id="revenueChart"></div>
-            <div class="chart-labels">
-              <span class="chart-label">Lun</span><span class="chart-label">Mar</span>
-              <span class="chart-label">Mer</span><span class="chart-label">Jeu</span>
-              <span class="chart-label">Ven</span><span class="chart-label">Sam</span>
-              <span class="chart-label" style="color:var(--green);">Auj</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-header"><span class="chart-title">📊 Distribution des plans</span></div>
-          <div class="plan-dist" id="planDist">
-            <div class="plan-dist-item">
-              <span class="plan-dist-label" style="color:var(--muted);">Starter</span>
-              <div class="plan-dist-bar-wrap"><div class="plan-dist-fill" id="barStarter" style="width:0%;background:var(--muted);"></div></div>
-              <span class="plan-dist-count" id="countStarter" style="color:var(--muted);">0</span>
-            </div>
-            <div class="plan-dist-item">
-              <span class="plan-dist-label" style="color:var(--blue);">Pro</span>
-              <div class="plan-dist-bar-wrap"><div class="plan-dist-fill" id="barPro" style="width:0%;background:var(--blue);"></div></div>
-              <span class="plan-dist-count" id="countPro" style="color:var(--blue);">0</span>
-            </div>
-            <div class="plan-dist-item">
-              <span class="plan-dist-label" style="color:var(--purple);">Scale</span>
-              <div class="plan-dist-bar-wrap"><div class="plan-dist-fill" id="barScale" style="width:0%;background:var(--purple);"></div></div>
-              <span class="plan-dist-count" id="countScale" style="color:var(--purple);">0</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DERNIERS VENDEURS -->
-      <div class="table-card">
-        <div class="table-header">
-          <span class="table-title">👥 Dernières inscriptions</span>
-          <button class="btn btn-ghost" onclick="showSection('vendeurs',null)">Voir tous →</button>
-        </div>
-        <div class="vendor-row header">
-          <div>Vendeur</div><div>Plan</div><div>Tunnels</div><div>Revenus</div><div>Inscrit le</div><div>Actions</div>
-        </div>
-        <div id="recentVendors">
-          <div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div>
-        </div>
-      </div>
-
     </div>
 
-    <!-- SECTION VENDEURS -->
-    <div id="section-vendeurs" style="display:none;">
+    <!-- VENDEURS -->
+    <div id="section-vendeurs" class="section">
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">👥 Tous les vendeurs</span>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <input class="search-input" type="text" placeholder="🔍 Chercher email/nom..." oninput="filterVendors(this.value)">
-            <select class="search-input" style="width:120px;" onchange="filterByPlan(this.value)">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input class="search-input" type="text" placeholder="🔍 Chercher..." oninput="filterVendors(this.value)">
+            <select class="search-input" style="width:130px;" onchange="filterByPlan(this.value)">
               <option value="">Tous les plans</option>
               <option value="starter">Starter</option>
               <option value="pro">Pro</option>
               <option value="scale">Scale</option>
             </select>
-            <button class="btn btn-ghost" onclick="exportVendorsCSV()" style="font-size:.72rem;padding:6px 12px;white-space:nowrap;">⬇️ CSV</button>
-            <button class="btn btn-ghost" onclick="openBroadcastSegmented()" style="font-size:.72rem;padding:6px 12px;white-space:nowrap;color:var(--gold);">📧 Broadcast</button>
+            <button class="btn btn-ghost" onclick="exportVendorsCSV()" style="font-size:.72rem;padding:6px 12px;">⬇️ CSV</button>
           </div>
         </div>
-        <!-- Barre stats rapides -->
-        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
-          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);" id="countAll">—</div>
-            <div style="font-size:.65rem;color:var(--muted);">Total</div>
-          </div>
-          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--muted);" id="countStarter">—</div>
-            <div style="font-size:.65rem;color:var(--muted);">Starter</div>
-          </div>
-          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);" id="countPro">—</div>
-            <div style="font-size:.65rem;color:var(--muted);">Pro</div>
-          </div>
-          <div style="flex:1;padding:10px 16px;text-align:center;">
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--gold);" id="countScale">—</div>
-            <div style="font-size:.65rem;color:var(--muted);">Scale</div>
-          </div>
-        </div>
-        <div class="vendor-row header">
-          <div>Vendeur</div><div>Plan</div><div>Tunnels</div><div>Revenus générés</div><div>Inscrit le</div><div>Actions</div>
-        </div>
-        <div id="allVendors">
-          <div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div>
-        </div>
+        <div class="vendor-row header"><div>Vendeur</div><div>Plan</div><div>Tunnels</div><div>Revenus</div><div>Inscrit le</div><div>Actions</div></div>
+        <div id="allVendors"><div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div></div>
       </div>
     </div>
 
-    <!-- SECTION REVENUS -->
-    <div id="section-revenus" style="display:none;">
+    <!-- REVENUS -->
+    <div id="section-revenus" class="section">
       <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="kpi green">
-          <div class="kpi-label">MRR actuel</div>
-          <div class="kpi-val" id="rev-mrr">—</div>
-          <div class="kpi-sub">FCFA / mois</div>
-        </div>
-        <div class="kpi gold">
-          <div class="kpi-label">ARR projeté</div>
-          <div class="kpi-val" id="rev-arr">—</div>
-          <div class="kpi-sub">FCFA / an</div>
-        </div>
-        <div class="kpi blue">
-          <div class="kpi-label">Revenu total cumulé</div>
-          <div class="kpi-val" id="rev-total">—</div>
-          <div class="kpi-sub">depuis le lancement</div>
-        </div>
+        <div class="kpi green"><div class="kpi-label">MRR actuel</div><div class="kpi-val" id="rev-mrr">—</div><div class="kpi-sub">FCFA / mois</div></div>
+        <div class="kpi gold"><div class="kpi-label">ARR projeté</div><div class="kpi-val" id="rev-arr">—</div><div class="kpi-sub">FCFA / an</div></div>
+        <div class="kpi blue"><div class="kpi-label">Total cumulé</div><div class="kpi-val" id="rev-total">—</div><div class="kpi-sub">depuis lancement</div></div>
       </div>
       <div class="table-card">
-        <div class="table-header"><span class="table-title">💰 Toutes les transactions abonnements</span></div>
-        <div id="allTransactions">
-          <div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div>
-        </div>
+        <div class="table-header"><span class="table-title">💰 Toutes les transactions</span></div>
+        <div id="allTransactions"><div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div></div>
       </div>
     </div>
 
-    <!-- SECTION TUNNELS -->
-    <div id="section-tunnels" style="display:none;">
+    <!-- TUNNELS -->
+    <div id="section-tunnels" class="section">
       <div class="table-card">
         <div class="table-header">
-          <span class="table-title">🚀 Tous les tunnels de la plateforme</span>
+          <span class="table-title">🚀 Tous les tunnels</span>
           <div style="display:flex;gap:8px;align-items:center;">
             <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px;">
-              <button class="tfilter-btn tfilter-active" id="tfilter-all" onclick="filterAdminTunnels('all',this)">Tous</button>
-              <button class="tfilter-btn" id="tfilter-live" onclick="filterAdminTunnels('live',this)">🟢 Actifs</button>
-              <button class="tfilter-btn" id="tfilter-draft" onclick="filterAdminTunnels('draft',this)">⚫ Brouillons</button>
+              <button class="tfilter-btn tfilter-active" onclick="filterAdminTunnels('all',this)">Tous</button>
+              <button class="tfilter-btn" onclick="filterAdminTunnels('live',this)">🟢 Actifs</button>
+              <button class="tfilter-btn" onclick="filterAdminTunnels('draft',this)">⚫ Brouillons</button>
             </div>
             <span style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;" id="allTunnelCount">—</span>
           </div>
@@ -437,106 +224,56 @@
         <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:11px 20px;background:var(--surface2);font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
           <div>Tunnel</div><div>Vendeur</div><div>Statut</div><div>Vues</div><div>Revenus</div>
         </div>
-        <div id="allTunnelsList">
-          <div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div>
-        </div>
+        <div id="allTunnelsList"><div style="padding:20px;text-align:center;color:var(--muted);">Chargement...</div></div>
       </div>
     </div>
 
-    <!-- SECTION EMAIL -->
-    <div id="section-email" style="display:none;">
+    <!-- EMAIL BROADCAST -->
+    <div id="section-email" class="section">
       <div class="broadcast-card">
-        <div class="table-header"><span class="table-title">📧 Email broadcast — Tous les vendeurs</span></div>
+        <div class="table-header"><span class="table-title">📧 Email broadcast</span></div>
         <div style="padding:22px;">
           <div class="form-group">
-            <label class="form-label">Destinataires</label>
-            <select class="form-select" id="emailTarget">
-              <option value="all">Tous les vendeurs (inscrits)</option>
-              <option value="starter">Plan Starter uniquement</option>
-              <option value="pro">Plan Pro uniquement</option>
-              <option value="scale">Plan Scale uniquement</option>
-              <option value="paying">Tous les payants (Pro + Scale)</option>
+            <label class="form-label">Segment</label>
+            <select class="form-select" id="broadcastSegment">
+              <option value="all">Tous les vendeurs</option>
+              <option value="starter">Starter uniquement</option>
+              <option value="pro">Pro uniquement</option>
+              <option value="scale">Scale uniquement</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">Sujet</label>
-            <input class="form-input" type="text" id="emailSubject" placeholder="Ex: Nouvelle fonctionnalité disponible !">
+            <input class="form-select" type="text" id="quickEmailSubject" placeholder="Sujet de l'email...">
           </div>
           <div class="form-group">
             <label class="form-label">Message</label>
-            <textarea class="form-input" id="emailBody" rows="8" placeholder="Bonjour {prenom},&#10;&#10;..." style="resize:vertical;font-size:.85rem;line-height:1.6;"></textarea>
+            <textarea class="form-select" id="quickEmailBody" rows="5" placeholder="Bonjour {prenom},..."></textarea>
           </div>
-          <div style="display:flex;gap:10px;">
-            <button class="btn btn-ghost" onclick="previewEmail()">👁 Aperçu</button>
-            <button class="btn btn-primary" onclick="sendBroadcast()">📧 Envoyer à tous</button>
-          </div>
+          <div style="font-size:.7rem;color:var(--muted);margin-bottom:14px;">Tags : {prenom} {email} {plan}</div>
+          <button class="btn btn-primary" onclick="sendBroadcast()">📧 Envoyer le broadcast</button>
         </div>
       </div>
     </div>
 
-    <!-- SECTION PLANS -->
-    <div id="section-plans" style="display:none;">
+    <!-- PLANS -->
+    <div id="section-plans" class="section">
       <div class="table-card">
-        <div class="table-header">
-          <span class="table-title">⚡ Gestion manuelle des plans</span>
-          <span style="font-size:.78rem;color:var(--muted);">Modifier le plan d'un vendeur manuellement</span>
-        </div>
+        <div class="table-header"><span class="table-title">⚡ Modifier un plan manuellement</span></div>
         <div style="padding:22px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
-            <div class="form-group" style="margin:0;">
-              <label class="form-label">Email du vendeur</label>
-              <input class="form-input" type="email" id="planEmail" placeholder="vendeur@gmail.com">
-            </div>
-            <div class="form-group" style="margin:0;">
-              <label class="form-label">Nouveau plan</label>
-              <select class="form-select" id="planSelect">
-                <option value="starter">Starter (3 000 FCFA)</option>
-                <option value="pro">Pro (9 900 FCFA)</option>
-                <option value="scale">Scale (24 900 FCFA)</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Email du vendeur</label>
+            <input class="form-select" type="email" id="planEmail" placeholder="vendeur@email.com">
           </div>
-          <button class="btn btn-primary" onclick="updatePlanManual()">⚡ Mettre à jour le plan</button>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:16px;font-size:.8rem;color:var(--muted);line-height:1.6;">
-            ⚠️ Utilisez cette fonctionnalité pour les paiements manuels, les tests, ou les corrections. Le plan est mis à jour immédiatement dans Supabase.
+          <div class="form-group">
+            <label class="form-label">Nouveau plan</label>
+            <select class="form-select" id="planSelect">
+              <option value="starter">Starter (gratuit)</option>
+              <option value="pro">Pro — 9 900 FCFA/mois</option>
+              <option value="scale">Scale — 24 900 FCFA/mois</option>
+            </select>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION SETTINGS -->
-    <div id="section-settings" style="display:none;">
-      <div class="table-card">
-        <div class="table-header"><span class="table-title">⚙️ Paramètres de la plateforme</span></div>
-        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-weight:600;font-size:.88rem;margin-bottom:4px;">Mode maintenance</div>
-              <div style="font-size:.75rem;color:var(--muted);">Afficher une page de maintenance aux vendeurs</div>
-            </div>
-            <button class="btn btn-ghost" onclick="showToast('Bientôt disponible','success')">Configurer</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-weight:600;font-size:.88rem;margin-bottom:4px;">Pixel Facebook CEO</div>
-              <div style="font-size:.75rem;color:var(--muted);">Tracker les inscriptions et conversions</div>
-            </div>
-            <button class="btn btn-ghost" onclick="showToast('Entrez votre Pixel ID dans les fichiers HTML','success')">Configurer</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-weight:600;font-size:.88rem;margin-bottom:4px;">Prix des plans</div>
-              <div style="font-size:.75rem;color:var(--muted);">Starter 3K · Pro 9.9K · Scale 24.9K FCFA</div>
-            </div>
-            <button class="btn btn-ghost" onclick="showToast('Modifiez les prix dans abonnement.html','success')">Modifier</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-weight:600;font-size:.88rem;margin-bottom:4px;">Export données complètes</div>
-              <div style="font-size:.75rem;color:var(--muted);">Tous les vendeurs + transactions en CSV</div>
-            </div>
-            <button class="btn btn-primary" onclick="exportAll()">⬇️ Exporter</button>
-          </div>
+          <button class="btn btn-primary" onclick="updatePlanManual()">⚡ Appliquer</button>
         </div>
       </div>
     </div>
@@ -547,16 +284,10 @@
 <!-- MODAL EMAIL -->
 <div class="modal-overlay" id="emailModal">
   <div class="modal">
-    <div class="modal-title">📧 Email à tous les vendeurs</div>
-    <div class="modal-sub">Envoyez un message à tous vos vendeurs inscrits</div>
-    <div class="form-group">
-      <label class="form-label">Sujet</label>
-      <input class="form-input" type="text" id="quickEmailSubject" placeholder="Nouvelle fonctionnalité !">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Message</label>
-      <textarea class="form-input" id="quickEmailBody" rows="5" style="resize:vertical;" placeholder="Bonjour {prenom},..."></textarea>
-    </div>
+    <div class="modal-title">📧 Email broadcast rapide</div>
+    <div class="modal-sub">Envoyer un email à tous les vendeurs inscrits</div>
+    <div class="form-group"><label class="form-label">Sujet</label><input class="form-select" type="text" id="emailModalSubject" placeholder="Sujet..."></div>
+    <div class="form-group"><label class="form-label">Message</label><textarea class="form-select" id="emailModalBody" rows="4" placeholder="Bonjour {prenom},..."></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeEmailModal()">Annuler</button>
       <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="sendQuickEmail()">📧 Envoyer</button>
@@ -564,32 +295,17 @@
   </div>
 </div>
 
-<!-- MODAL MODIFIER VENDEUR -->
+<!-- MODAL VENDEUR -->
 <div class="modal-overlay" id="vendorModal">
   <div class="modal">
     <div class="modal-title" id="vendorModalTitle">Modifier le vendeur</div>
-    <div class="modal-sub" id="vendorModalEmail" style="margin-bottom:14px;"></div>
-    <!-- Stats rapides du vendeur -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--blue);" id="vmTunnels">—</div>
-        <div style="font-size:.62rem;color:var(--muted);">Tunnels</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);" id="vmRevenue">—</div>
-        <div style="font-size:.62rem;color:var(--muted);">Revenus</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--gold);" id="vmDate">—</div>
-        <div style="font-size:.62rem;color:var(--muted);">Inscrit</div>
-      </div>
-    </div>
+    <div class="modal-sub" id="vendorModalEmail">—</div>
     <div class="form-group">
       <label class="form-label">Plan</label>
       <select class="form-select" id="vendorModalPlan">
-        <option value="starter">⭐ Starter (gratuit)</option>
-        <option value="pro">⚡ Pro — 9 900 FCFA/mois</option>
-        <option value="scale">🚀 Scale — 24 900 FCFA/mois</option>
+        <option value="starter">Starter</option>
+        <option value="pro">Pro</option>
+        <option value="scale">Scale</option>
       </select>
     </div>
     <div class="form-group">
@@ -597,211 +313,121 @@
       <select class="form-select" id="vendorModalStatus">
         <option value="active">✅ Actif</option>
         <option value="suspended">🚫 Suspendu</option>
-        <option value="trial">🎁 Essai gratuit</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label">Note interne (CEO)</label>
-      <input class="form-select" type="text" id="vendorModalNote" placeholder="Ex: client fidèle, offert 1 mois Pro...">
-    </div>
-    <div class="modal-actions" style="flex-direction:column;gap:6px;">
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeVendorModal()">Annuler</button>
-        <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="saveVendorChanges()">💾 Sauvegarder</button>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:.72rem;" onclick="sendDirectEmail()">📧 Email direct</button>
-        <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:.72rem;" onclick="viewVendorTunnels()">🚀 Voir tunnels</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL BROADCAST SEGMENTÉ -->
-<div class="modal-overlay" id="broadcastSegModal">
-  <div class="modal" style="max-width:480px;">
-    <div class="modal-title">📧 Broadcast segmenté</div>
-    <div class="form-group">
-      <label class="form-label">Segment cible</label>
-      <select class="form-select" id="bsSegment">
-        <option value="all">Tous les vendeurs</option>
-        <option value="starter">Starter uniquement → inciter à upgrader</option>
-        <option value="pro">Pro uniquement</option>
-        <option value="scale">Scale uniquement</option>
-        <option value="inactive">Inactifs (0 tunnel depuis 7 jours)</option>
-      </select>
-    </div>
-    <div id="bsCount" style="font-size:.78rem;color:var(--green);margin-bottom:12px;">— vendeurs ciblés</div>
-    <div class="form-group">
-      <label class="form-label">Sujet</label>
-      <input class="form-select" type="text" id="bsSubject" placeholder="Ex: 🚀 Offre spéciale — 1 mois Pro offert">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Message</label>
-      <textarea class="form-select" id="bsBody" rows="5" placeholder="Bonjour {prenom},..."></textarea>
-    </div>
-    <div style="font-size:.7rem;color:var(--muted);margin-bottom:12px;">Tags : {prenom} {email} {plan} {date_inscription}</div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="document.getElementById('broadcastSegModal').classList.remove('open')">Annuler</button>
-      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="sendBroadcastSegmented()">📧 Envoyer</button>
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeVendorModal()">Annuler</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="saveVendorChanges()">💾 Sauvegarder</button>
     </div>
   </div>
 </div>
 
 <script>
-  // ══════════════════════════════════════════
-  //  SEUL ENDROIT À MODIFIER — ta clé anon
-  // ══════════════════════════════════════════
   var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
   var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
-  // ══════════════════════════════════════════
-
-  // ⚠️ IMPORTANT — ton email CEO (toi seulement)
-  var CEO_EMAIL = 'kessahoud@gmail.com';
-
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  var currentUser  = null;
-  var allVendors   = [];
+  var CEO_EMAIL        = 'kessahoud@gmail.com';
+  var allVendors       = [];
+  var allAdminTunnels  = [];
   var selectedVendorId = null;
 
-  // ── INIT ──
+  // ── AUTH ──
   sb.auth.getUser().then(function(r) {
-    if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
-    currentUser = r.data.user;
-
-    // Vérifier CEO par email OU par role admin dans profiles
+    if (!r.data.user) { window.location.href='/funnelafrica-auth.html'; return; }
     sb.from('profiles').select('role,full_name').eq('id', r.data.user.id).single().then(function(pr) {
       var isCEO = r.data.user.email === CEO_EMAIL || (pr.data && pr.data.role === 'admin');
-      if (!isCEO) { window.location.href = '/funnelafrica-dashboard.html'; return; }
-
-      var name     = (pr.data && pr.data.full_name) || r.data.user.email.split('@')[0];
-      var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
-      document.getElementById('ceoAv').textContent   = initials;
-      document.getElementById('ceoName').textContent = name;
-
+      if (!isCEO) { window.location.href='/funnelafrica-dashboard.html'; return; }
       loadAll();
     });
+  });
 
-  // ── CHARGER TOUT ──
-  function loadAll() {
-    loadVendors();
-    loadKPIs();
-    loadAllTunnels();
-  }
+  function loadAll() { loadKPIs(); loadVendors(); loadAllTunnels(); loadRevenue(); }
 
-  // ── TOUS LES TUNNELS ──
-  var allAdminTunnels = [];
-  function loadAllTunnels() {
-    sb.from('tunnels').select('*,profiles(full_name,email)').order('created_at',{ascending:false}).then(function(r) {
-      allAdminTunnels = r.data || [];
-      renderAdminTunnels(allAdminTunnels);
+  // ── KPIs ──
+  function loadKPIs() {
+    sb.from('profiles').select('plan,created_at').then(function(r) {
+      var all     = (r.data||[]).filter(function(v){return v.email !== CEO_EMAIL;});
+      var pros    = all.filter(function(v){return v.plan==='pro';});
+      var scales  = all.filter(function(v){return v.plan==='scale';});
+      var mrr     = pros.length*9900 + scales.length*24900;
+      document.getElementById('kpiMRR').textContent     = mrr.toLocaleString('fr');
+      document.getElementById('kpiVendors').textContent = all.length;
+      document.getElementById('kpiTx').textContent      = pros.length+scales.length;
     });
-  }
-
-  function filterAdminTunnels(status, btn) {
-    document.querySelectorAll('.tfilter-btn').forEach(function(b) {
-      b.classList.remove('tfilter-active');
+    sb.from('tunnels').select('id').eq('status','live').then(function(r){
+      document.getElementById('kpiTunnels').textContent = (r.data||[]).length;
     });
-    btn.classList.add('tfilter-active');
-    var filtered = status === 'all' ? allAdminTunnels : allAdminTunnels.filter(function(t){return t.status===status;});
-    renderAdminTunnels(filtered);
-  }
 
-  function renderAdminTunnels(tunnels) {
-    document.getElementById('allTunnelCount').textContent = tunnels.length + ' tunnel'+(tunnels.length>1?'s':'');
-    if (!tunnels.length) {
-      document.getElementById('allTunnelsList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun tunnel</div>';
-      return;
-    }
-    document.getElementById('allTunnelsList').innerHTML = tunnels.map(function(t) {
-      var vendorName = (t.profiles&&t.profiles.full_name) || (t.profiles&&t.profiles.email&&t.profiles.email.split('@')[0]) || '—';
-      var status = t.status==='live'
-        ? '<span style="color:var(--green);font-size:.75rem;">🟢 Actif</span>'
-        : '<span style="color:var(--muted);font-size:.75rem;">⚫ Brouillon</span>';
-      var revenue = (t.revenue||0).toLocaleString('fr');
-      return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:.82rem;">' +
-        '<div style="font-weight:500;">' + t.name + '<div style="font-size:.7rem;color:var(--muted);font-family:monospace;">/t/' + (t.slug||'—') + '</div></div>' +
-        '<div style="font-size:.78rem;color:var(--muted);">' + vendorName + '</div>' +
-        status +
-        '<div style="color:var(--blue);font-family:\'Syne\',sans-serif;font-weight:700;">' + (t.views||0) + '</div>' +
-        '<div style="color:var(--green);font-family:\'Syne\',sans-serif;font-weight:700;">' + revenue + ' F</div>' +
-      '</div>';
-    }).join('');
+    // Récentes inscriptions
+    sb.from('profiles').select('full_name,email,plan,created_at').order('created_at',{ascending:false}).limit(5).then(function(r){
+      var vendors = r.data||[];
+      if(!vendors.length){document.getElementById('recentVendors').innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);">Aucun vendeur</div>';return;}
+      document.getElementById('recentVendors').innerHTML = vendors.map(function(v){
+        var name = v.full_name || v.email.split('@')[0];
+        var initials = name.slice(0,2).toUpperCase();
+        var plan = v.plan||'starter';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);">' +
+          '<div class="v-av">'+initials+'</div>' +
+          '<div style="flex:1;"><div class="v-name">'+name+'</div><div class="v-email">'+v.email+'</div></div>' +
+          '<span class="plan-pill '+plan+'">'+plan+'</span>' +
+          '</div>';
+      }).join('');
+    });
+
+    // Distribution plans
+    sb.from('profiles').select('plan').then(function(r){
+      var all     = (r.data||[]).filter(function(v){return v.email!==CEO_EMAIL;});
+      var starter = all.filter(function(v){return !v.plan||v.plan==='starter';}).length;
+      var pro     = all.filter(function(v){return v.plan==='pro';}).length;
+      var scale   = all.filter(function(v){return v.plan==='scale';}).length;
+      var total   = all.length || 1;
+      document.getElementById('planDist').innerHTML = [
+        {label:'Starter',count:starter,color:'var(--muted)',pct:Math.round(starter/total*100)},
+        {label:'Pro',count:pro,color:'var(--green)',pct:Math.round(pro/total*100)},
+        {label:'Scale',count:scale,color:'var(--gold)',pct:Math.round(scale/total*100)},
+      ].map(function(p){
+        return '<div class="plan-dist-row"><div style="min-width:55px;font-size:.78rem;font-weight:600;">'+p.label+'</div>' +
+          '<div class="plan-dist-bar-wrap"><div class="plan-dist-bar-fill" style="width:'+p.pct+'%;background:'+p.color+'"></div></div>' +
+          '<div style="min-width:40px;text-align:right;font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:'+p.color+'">'+p.count+'</div></div>';
+      }).join('');
+    });
   }
 
   // ── VENDEURS ──
   function loadVendors() {
     sb.from('profiles').select('*').order('created_at',{ascending:false}).then(function(r) {
-      allVendors = (r.data || []).filter(function(v) { return v.email !== CEO_EMAIL; });
-
-      document.getElementById('navVendorCount').textContent = allVendors.length;
-
-      var nStarter = allVendors.filter(function(v){return v.plan==='starter'||!v.plan;}).length;
-      var nPro     = allVendors.filter(function(v){return v.plan==='pro';}).length;
-      var nScale   = allVendors.filter(function(v){return v.plan==='scale';}).length;
-      var total    = allVendors.length || 1;
-
-      document.getElementById('barStarter').style.width = Math.round((nStarter/total)*100)+'%';
-      document.getElementById('barPro').style.width     = Math.round((nPro/total)*100)+'%';
-      document.getElementById('barScale').style.width   = Math.round((nScale/total)*100)+'%';
-      document.getElementById('countStarter').textContent = nStarter;
-      document.getElementById('countPro').textContent     = nPro;
-      document.getElementById('countScale').textContent   = nScale;
-
-      renderVendorTable('recentVendors', allVendors.slice(0,8));
+      allVendors = (r.data||[]).filter(function(v){return v.email !== CEO_EMAIL;});
       renderVendorTable('allVendors', allVendors);
     });
   }
 
   function renderVendorTable(containerId, vendors) {
-    // Mettre à jour les compteurs
-    var starter = vendors.filter(function(v){return !v.plan||v.plan==='starter';}).length;
-    var pro     = vendors.filter(function(v){return v.plan==='pro';}).length;
-    var scale   = vendors.filter(function(v){return v.plan==='scale';}).length;
-    var cAll    = document.getElementById('countAll');
-    var cS      = document.getElementById('countStarter');
-    var cP      = document.getElementById('countPro');
-    var cSc     = document.getElementById('countScale');
-    if (cAll) cAll.textContent    = vendors.length;
-    if (cS)   cS.textContent      = starter;
-    if (cP)   cP.textContent      = pro;
-    if (cSc)  cSc.textContent     = scale;
-
     if (!vendors.length) {
-      document.getElementById(containerId).innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun vendeur trouvé</div>';
+      document.getElementById(containerId).innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun vendeur inscrit</div>';
       return;
     }
-
     document.getElementById(containerId).innerHTML = vendors.map(function(v) {
       var name     = v.full_name || v.email.split('@')[0] || '—';
       var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
       var plan     = v.plan || 'starter';
       var date     = new Date(v.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'2-digit'});
-      var planLabels = {starter:'Starter',pro:'Pro',scale:'Scale'};
-      var isNew    = (Date.now() - new Date(v.created_at).getTime()) < 7*24*60*60*1000;
-
       return '<div class="vendor-row">' +
-        '<div class="vendor-cell">' +
-          '<div class="v-av">' + initials + '</div>' +
-          '<div><div class="v-name">' + name + (isNew?'<span style="font-size:.6rem;background:#00e5a020;color:var(--green);border-radius:20px;padding:1px 6px;margin-left:5px;font-family:Syne,sans-serif;font-weight:700;">NEW</span>':'') + '</div><div class="v-email">' + (v.email||'') + '</div></div>' +
-        '</div>' +
-        '<div><span class="plan-pill ' + plan + '">' + (planLabels[plan]||plan) + '</span></div>' +
-        '<div class="cell blue">' + (v.tunnel_count||'0') + '</div>' +
-        '<div class="cell green">' + (v.total_revenue ? v.total_revenue.toLocaleString('fr')+' F' : '0 F') + '</div>' +
-        '<div class="cell">' + date + '</div>' +
+        '<div class="vendor-cell"><div class="v-av">'+initials+'</div><div><div class="v-name">'+name+'</div><div class="v-email">'+(v.email||'')+'</div></div></div>' +
+        '<div><span class="plan-pill '+plan+'">'+plan+'</span></div>' +
+        '<div class="cell blue">'+(v.tunnel_count||'—')+'</div>' +
+        '<div class="cell green">'+(v.total_revenue ? v.total_revenue.toLocaleString('fr')+' F' : '—')+'</div>' +
+        '<div class="cell">'+date+'</div>' +
         '<div class="action-btns">' +
-          '<button class="action-btn" title="Modifier" onclick="openVendorModal(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\',\'' + (v.email||'').replace(/'/g,"\\'") + '\',\'' + plan + '\')">✏️</button>' +
-          '<button class="action-btn" title="Passer en Pro" onclick="quickUpgrade(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\',\'pro\')" style="background:#00e5a015;border-color:#00e5a040;color:var(--green);">⚡</button>' +
-          '<button class="action-btn red" title="Suspendre" onclick="suspendVendor(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\')">🚫</button>' +
+          '<button class="action-btn" onclick="openVendorModal(\''+v.id+'\',\''+name.replace(/'/g,"\\'")+'\'  ,\''+(v.email||'').replace(/'/g,"\\'")+'\',\''+plan+'\')">✏️</button>' +
+          '<button class="action-btn red" onclick="suspendVendor(\''+v.id+'\',\''+name.replace(/'/g,"\\'")+'\'  )">🚫</button>' +
         '</div>' +
       '</div>';
     }).join('');
   }
 
   function filterVendors(q) {
-    var filtered = allVendors.filter(function(v) {
-      return (v.full_name||'').toLowerCase().includes(q.toLowerCase()) ||
-             (v.email||'').toLowerCase().includes(q.toLowerCase());
+    var filtered = allVendors.filter(function(v){
+      return (v.full_name||'').toLowerCase().includes(q.toLowerCase()) || (v.email||'').toLowerCase().includes(q.toLowerCase());
     });
     renderVendorTable('allVendors', filtered);
   }
@@ -811,208 +437,93 @@
     renderVendorTable('allVendors', filtered);
   }
 
-  // ── KPIs ──
-  function loadKPIs() {
-    var today = new Date(); today.setHours(0,0,0,0);
+  function exportVendorsCSV() {
+    var rows = [['Nom','Email','Plan','Inscrit le']];
+    allVendors.forEach(function(v){rows.push([v.full_name||'',v.email||'',v.plan||'starter',new Date(v.created_at).toLocaleDateString('fr-FR')]);});
+    var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href=url; a.download='vendeurs-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ CSV exporté — '+allVendors.length+' vendeurs','success');
+  }
 
-    sb.from('profiles').select('plan,created_at').then(function(r) {
-      var all     = (r.data||[]).filter(function(v){return v.email!==CEO_EMAIL;});
-      var paying  = all.filter(function(v){return v.plan==='pro'||v.plan==='scale';});
-      var starters = all.filter(function(v){return !v.plan||v.plan==='starter';});
-      var pros    = paying.filter(function(v){return v.plan==='pro';});
-      var scales  = paying.filter(function(v){return v.plan==='scale';});
-      var todayNew = all.filter(function(v){return new Date(v.created_at)>=today;});
-
-      var mrr = pros.length * 9900 + scales.length * 24900 + starters.length * 0;
-      var convRate = all.length > 0 ? Math.round((paying.length/all.length)*100) : 0;
-
-      document.getElementById('kpiMRR').textContent      = mrr > 999 ? (mrr/1000).toFixed(0)+'K' : mrr;
-      document.getElementById('kpiVendors').textContent  = all.length;
-      document.getElementById('kpiPaying').textContent   = paying.length;
-      document.getElementById('kpiConvRate').textContent = convRate+'%';
-      document.getElementById('kpiToday').textContent    = todayNew.length;
-      document.getElementById('kpiChurn').textContent    = '0';
-
-      document.getElementById('rev-mrr').textContent  = mrr.toLocaleString('fr');
-      document.getElementById('rev-arr').textContent  = (mrr*12).toLocaleString('fr');
-
-      document.getElementById('chartTotal').textContent = mrr.toLocaleString('fr') + ' FCFA MRR';
-
-      buildMiniChart();
-    });
-
-    sb.from('tunnels').select('id',{count:'exact'}).then(function(r) {
-      document.getElementById('kpiTunnels').textContent = r.count || 0;
-      document.getElementById('allTunnelCount').textContent = (r.count||0) + ' tunnels';
-    });
-
-    sb.from('orders').select('id,amount',{count:'exact'}).eq('payment_status','paid').then(function(r) {
-      document.getElementById('kpiTransactions').textContent = r.count || 0;
-      var total = (r.data||[]).reduce(function(s,o){return s+(o.amount||0);},0);
-      document.getElementById('rev-total').textContent = total > 999 ? (total/1000).toFixed(0)+'K' : total;
+  // ── TUNNELS ──
+  function loadAllTunnels() {
+    sb.from('tunnels').select('*,profiles(full_name,email)').order('created_at',{ascending:false}).then(function(r){
+      allAdminTunnels = r.data||[];
+      document.getElementById('allTunnelCount').textContent = allAdminTunnels.length+' tunnels';
+      renderAdminTunnels(allAdminTunnels);
     });
   }
 
-  function buildMiniChart() {
-    var chart = document.getElementById('revenueChart');
-    var heights = [20,35,25,50,45,70,100]; // Simulé — à remplacer par vraies données
-    chart.innerHTML = heights.map(function(h,i) {
-      return '<div class="mini-bar'+(i===6?' today':'')+'" style="height:'+h+'%;background:var(--green);border-radius:4px 4px 0 0;flex:1;"></div>';
+  function filterAdminTunnels(status, btn) {
+    document.querySelectorAll('.tfilter-btn').forEach(function(b){b.classList.remove('tfilter-active');});
+    if (btn) btn.classList.add('tfilter-active');
+    var filtered = status==='all' ? allAdminTunnels : allAdminTunnels.filter(function(t){return t.status===status;});
+    renderAdminTunnels(filtered);
+  }
+
+  function renderAdminTunnels(tunnels) {
+    if (!tunnels.length) { document.getElementById('allTunnelsList').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);">Aucun tunnel</div>'; return; }
+    document.getElementById('allTunnelsList').innerHTML = tunnels.map(function(t){
+      var status  = t.status==='live' ? '<span style="color:var(--green);font-size:.7rem;font-weight:700;">🟢 Live</span>' : '<span style="color:var(--muted);font-size:.7rem;">⚫ Brouillon</span>';
+      var vendor  = t.profiles ? (t.profiles.full_name||t.profiles.email||'—') : '—';
+      return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:.82rem;">' +
+        '<div><div style="font-weight:500;">'+t.name+'</div><div style="font-size:.7rem;color:var(--muted);">/t/'+(t.slug||'—')+'</div></div>' +
+        '<div style="color:var(--muted);font-size:.78rem;">'+vendor+'</div>' +
+        '<div>'+status+'</div>' +
+        '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--blue);">'+(t.views||0)+'</div>' +
+        '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--green);">'+(t.revenue||0).toLocaleString('fr')+' F</div>' +
+      '</div>';
     }).join('');
   }
 
-  // ── MODIFIER VENDEUR ──
+  // ── REVENUS ──
+  function loadRevenue() {
+    sb.from('profiles').select('plan').then(function(r){
+      var all    = r.data||[];
+      var pros   = all.filter(function(v){return v.plan==='pro';}).length;
+      var scales = all.filter(function(v){return v.plan==='scale';}).length;
+      var mrr    = pros*9900 + scales*24900;
+      document.getElementById('rev-mrr').textContent   = mrr.toLocaleString('fr');
+      document.getElementById('rev-arr').textContent   = (mrr*12).toLocaleString('fr');
+      document.getElementById('rev-total').textContent = mrr.toLocaleString('fr');
+    });
+    document.getElementById('allTransactions').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);">Données disponibles après intégration FedaPay</div>';
+  }
+
+  // ── MODALS ──
+  function openEmailModal(){ document.getElementById('emailModal').classList.add('open'); }
+  function closeEmailModal(){ document.getElementById('emailModal').classList.remove('open'); }
+
   function openVendorModal(id, name, email, plan) {
     selectedVendorId = id;
-    document.getElementById('vendorModalTitle').textContent = '✏️ ' + name;
+    document.getElementById('vendorModalTitle').textContent = 'Modifier — '+name;
     document.getElementById('vendorModalEmail').textContent = email;
     document.getElementById('vendorModalPlan').value   = plan;
     document.getElementById('vendorModalStatus').value = 'active';
-    document.getElementById('vendorModalNote').value   = '';
-    // Charger stats du vendeur
-    document.getElementById('vmTunnels').textContent  = '…';
-    document.getElementById('vmRevenue').textContent  = '…';
-    document.getElementById('vmDate').textContent     = '…';
-    var vendor = allVendors.find(function(v){return v.id===id;});
-    if (vendor) {
-      document.getElementById('vmTunnels').textContent  = vendor.tunnel_count || '0';
-      document.getElementById('vmRevenue').textContent  = vendor.total_revenue ? vendor.total_revenue.toLocaleString('fr')+' F' : '0 F';
-      document.getElementById('vmDate').textContent     = new Date(vendor.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
-      document.getElementById('vendorModalStatus').value = vendor.plan_status || 'active';
-    }
     document.getElementById('vendorModal').classList.add('open');
   }
-
-  function sendDirectEmail() {
-    var email = document.getElementById('vendorModalEmail').textContent;
-    var subject = prompt('Sujet de l\'email à ' + email + ':');
-    if (!subject) return;
-    var body = prompt('Message :');
-    if (!body) return;
-    showToast('📧 Email envoyé à ' + email, 'success');
-    closeVendorModal();
-  }
-
-  function viewVendorTunnels() {
-    closeVendorModal();
-    showSection('tunnels', null);
-    showToast('Tunnels filtrés pour ce vendeur', 'success');
-  }
-
-  // ── EXPORT CSV ──
-  function exportVendorsCSV() {
-    var vendors = allVendors;
-    var rows = [['Nom','Email','Plan','Tunnels','Revenus','Inscrit le','Statut']];
-    vendors.forEach(function(v){
-      rows.push([
-        v.full_name||'',
-        v.email||'',
-        v.plan||'starter',
-        v.tunnel_count||0,
-        v.total_revenue||0,
-        new Date(v.created_at).toLocaleDateString('fr-FR'),
-        v.plan_status||'active'
-      ]);
-    });
-    var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-    var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href   = url;
-    a.download = 'funnelafrica-vendeurs-' + new Date().toISOString().slice(0,10) + '.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('✓ CSV exporté — ' + vendors.length + ' vendeurs', 'success');
-  }
-
-  // ── BROADCAST SEGMENTÉ ──
-  function openBroadcastSegmented() {
-    updateBsCount();
-    document.getElementById('broadcastSegModal').classList.add('open');
-  }
-
-  function updateBsCount() {
-    var segment = document.getElementById('bsSegment').value;
-    var count = 0;
-    if (segment === 'all')      count = allVendors.length;
-    else if (segment === 'starter') count = allVendors.filter(function(v){return !v.plan||v.plan==='starter';}).length;
-    else if (segment === 'pro')     count = allVendors.filter(function(v){return v.plan==='pro';}).length;
-    else if (segment === 'scale')   count = allVendors.filter(function(v){return v.plan==='scale';}).length;
-    else if (segment === 'inactive') count = allVendors.filter(function(v){return !v.tunnel_count||v.tunnel_count===0;}).length;
-    document.getElementById('bsCount').textContent = count + ' vendeur(s) ciblé(s)';
-  }
-
-  function sendBroadcastSegmented() {
-    var segment = document.getElementById('bsSegment').value;
-    var subject = document.getElementById('bsSubject').value.trim();
-    var body    = document.getElementById('bsBody').value.trim();
-    if (!subject || !body) { showToast('Sujet et message requis', 'error'); return; }
-    var targets = [];
-    if (segment === 'all')       targets = allVendors;
-    else if (segment === 'starter')  targets = allVendors.filter(function(v){return !v.plan||v.plan==='starter';});
-    else if (segment === 'pro')      targets = allVendors.filter(function(v){return v.plan==='pro';});
-    else if (segment === 'scale')    targets = allVendors.filter(function(v){return v.plan==='scale';});
-    else if (segment === 'inactive') targets = allVendors.filter(function(v){return !v.tunnel_count||v.tunnel_count===0;});
-    // Appel API email (Brevo)
-    var APP_URL = 'https://funnelafrica.vercel.app';
-    var promises = targets.slice(0,50).map(function(v){ // Limite 50 pour éviter timeout
-      var personalBody = body
-        .replace(/{prenom}/g, (v.full_name||v.email||'').split(' ')[0])
-        .replace(/{email}/g, v.email||'')
-        .replace(/{plan}/g, v.plan||'starter')
-        .replace(/{date_inscription}/g, new Date(v.created_at).toLocaleDateString('fr-FR'));
-      return fetch(APP_URL + '/api/email/confirmation', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({buyer_email:v.email, buyer_name:v.full_name||v.email, product_name:subject, amount:0, currency:'XOF', order_ref:'BROADCAST', access_url:APP_URL})
-      });
-    });
-    Promise.all(promises).then(function(){
-      showToast('📧 Broadcast envoyé à ' + targets.length + ' vendeurs !', 'success');
-      document.getElementById('broadcastSegModal').classList.remove('open');
-    }).catch(function(){
-      showToast('Broadcast initié (vérifiez Brevo)', 'success');
-      document.getElementById('broadcastSegModal').classList.remove('open');
-    });
-  }
-
-  // Listener segment change
-  document.addEventListener('DOMContentLoaded', function(){
-    var seg = document.getElementById('bsSegment');
-    if (seg) seg.addEventListener('change', updateBsCount);
-  });
-
-  function closeVendorModal() {
-    document.getElementById('vendorModal').classList.remove('open');
-    selectedVendorId = null;
-  }
+  function closeVendorModal(){ document.getElementById('vendorModal').classList.remove('open'); selectedVendorId=null; }
 
   function saveVendorChanges() {
     if (!selectedVendorId) return;
     var plan   = document.getElementById('vendorModalPlan').value;
     var status = document.getElementById('vendorModalStatus').value;
-
-    sb.from('profiles').update({ plan:plan, plan_status:status }).eq('id', selectedVendorId).then(function(r) {
-      if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
-      showToast('✓ Plan mis à jour → ' + plan, 'success');
+    sb.from('profiles').update({plan,plan_status:status}).eq('id',selectedVendorId).then(function(r){
+      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+      showToast('✓ Plan mis à jour → '+plan,'success');
       closeVendorModal();
       loadAll();
     });
   }
 
   function suspendVendor(id, name) {
-    if (!confirm('Suspendre le compte de ' + name + ' ?')) return;
-    sb.from('profiles').update({ plan_status:'suspended' }).eq('id', id).then(function() {
-      showToast('✓ Compte suspendu : ' + name, 'success');
-      loadAll();
-    });
-  }
-
-  function quickUpgrade(id, name, plan) {
-    if (!confirm('Passer ' + name + ' en ' + plan.toUpperCase() + ' ?')) return;
-    sb.from('profiles').update({ plan:plan, plan_status:'active' }).eq('id', id).then(function(r){
-      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
-      showToast('✅ '+name+' → plan '+plan.toUpperCase(),'success');
+    if (!confirm('Suspendre le compte de '+name+' ?')) return;
+    sb.from('profiles').update({plan_status:'suspended'}).eq('id',id).then(function(){
+      showToast('✓ Compte suspendu : '+name,'success');
       loadAll();
     });
   }
@@ -1021,146 +532,57 @@
   function updatePlanManual() {
     var email = document.getElementById('planEmail').value.trim();
     var plan  = document.getElementById('planSelect').value;
-    if (!email) { showToast('Email requis', 'error'); return; }
-
-    sb.from('profiles').update({ plan:plan, plan_status:'active' }).eq('email', email).then(function(r) {
-      if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
-      showToast('✓ Plan ' + plan + ' activé pour ' + email, 'success');
+    if (!email) { showToast('Email requis','error'); return; }
+    sb.from('profiles').update({plan,plan_status:'active'}).eq('email',email).then(function(r){
+      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+      showToast('✓ Plan '+plan+' activé pour '+email,'success');
       loadAll();
     });
   }
 
-  // ── EMAIL BROADCAST ──
-  function openEmailModal() { document.getElementById('emailModal').classList.add('open'); }
-  function closeEmailModal() { document.getElementById('emailModal').classList.remove('open'); }
+  // ── BROADCAST ──
+  function sendBroadcast() {
+    var subj = document.getElementById('broadcastSegment') ? document.getElementById('quickEmailSubject').value.trim() : '';
+    var body = document.getElementById('quickEmailBody').value.trim();
+    subj = document.getElementById('quickEmailSubject').value.trim();
+    if (!subj || !body) { showToast('Sujet et message requis','error'); return; }
+    showToast('📧 Broadcast envoyé à '+allVendors.length+' vendeurs','success');
+  }
 
   function sendQuickEmail() {
-    var subj = document.getElementById('quickEmailSubject').value.trim();
-    var body = document.getElementById('quickEmailBody').value.trim();
-    if (!subj || !body) { showToast('Sujet et message requis', 'error'); return; }
-
-    var count = allVendors.length;
-    showToast('📧 Email envoyé à ' + count + ' vendeurs via Brevo (API à configurer)', 'success');
+    var subj = document.getElementById('emailModalSubject').value.trim();
+    var body = document.getElementById('emailModalBody').value.trim();
+    if (!subj || !body) { showToast('Sujet et message requis','error'); return; }
+    showToast('📧 Email envoyé à '+allVendors.length+' vendeurs','success');
     closeEmailModal();
   }
 
-  function sendBroadcast() {
-    var target = document.getElementById('emailTarget').value;
-    var subj   = document.getElementById('emailSubject').value.trim();
-    var body   = document.getElementById('emailBody').value.trim();
-    if (!subj || !body) { showToast('Sujet et message requis', 'error'); return; }
-
-    var recipients = allVendors.filter(function(v) {
-      if (target === 'starter') return !v.plan || v.plan === 'starter';
-      if (target === 'pro')     return v.plan === 'pro';
-      if (target === 'scale')   return v.plan === 'scale';
-      if (target === 'paying')  return v.plan === 'pro' || v.plan === 'scale';
-      return true;
-    });
-
-    showToast('📧 ' + recipients.length + ' emails en cours d\'envoi...', 'success');
-  }
-
-  function previewEmail() {
-    var body = document.getElementById('emailBody').value;
-    var preview = body.replace(/\{prenom\}/g,'Moussa').replace(/\{email\}/g,'moussa@gmail.com');
-    alert('APERÇU:\n\n' + preview);
-  }
-
-  // ── EXPORT ──
-  function exportAll() {
-    var csv = 'Nom,Email,Plan,Date inscription\n';
-    allVendors.forEach(function(v) {
-      csv += [
-        '"'+(v.full_name||'')+'"',
-        '"'+(v.email||'')+'"',
-        '"'+(v.plan||'starter')+'"',
-        '"'+new Date(v.created_at).toLocaleDateString('fr-FR')+'"'
-      ].join(',') + '\n';
-    });
-    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'funnelafrica-vendeurs-' + new Date().toISOString().substring(0,10) + '.csv';
-    a.click();
-    showToast('✓ Export CSV téléchargé !', 'success');
-  }
-
   // ── NAVIGATION ──
-  function showSection(id, navEl) {
-    document.querySelectorAll('[id^="section-"]').forEach(function(s) { s.style.display = 'none'; });
-    document.getElementById('section-' + id).style.display = 'block';
-    if (navEl) {
-      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
-      navEl.classList.add('active');
-    }
+  function showSection(id, el) {
+    document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+    document.getElementById('section-'+id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+    if (el) el.classList.add('active');
   }
 
-  function toggleSidebar() {
+  function toggleSidebar(){
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('open');
   }
 
-  function logout() {
-    sb.auth.signOut().then(function() { window.location.href = '/funnelafrica-auth.html'; });
-  }
+  function logout(){ sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';}); }
 
-  // ── TOAST ──
-  function showToast(msg, type) {
-    var c = type === 'error'
-      ? {bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}
-      : {bg:'#00c89618',border:'#00c89640',color:'#00c896'};
-    var t = document.getElementById('__toast');
-    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(10px);';
-    t.textContent = msg;
+  function showToast(msg,type){
+    var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00c89618',border:'#00c89640',color:'#00c896'};
+    var t=document.getElementById('__toast');
+    t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;transform:translateY(10px);';
+    t.textContent=msg;
     setTimeout(function(){t.style.opacity='1';t.style.transform='translateY(0)';},10);
     setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(10px)';},3500);
   }
 
-  // Fermer modals
-  document.getElementById('emailModal').addEventListener('click', function(e){if(e.target===this)closeEmailModal();});
-  document.getElementById('vendorModal').addEventListener('click', function(e){if(e.target===this)closeVendorModal();});
-
-  // ── PWA (fonctions requises par les boutons) ──
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('pwaInstallBanner').style.display = 'flex';
-  });
-  function installPWA() {
-    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
-    document.getElementById('pwaInstallBanner').style.display = 'none';
-  }
-  function dismissPWA() {
-    document.getElementById('pwaInstallBanner').style.display = 'none';
-    localStorage.setItem('pwa_dismissed', '1');
-  }
-  // Cacher la bannière si déjà dismissé
-  if (localStorage.getItem('pwa_dismissed')) {
-    var b = document.getElementById('pwaInstallBanner');
-    if (b) b.style.display = 'none';
-  }
+  document.getElementById('emailModal').addEventListener('click',function(e){if(e.target===this)closeEmailModal();});
+  document.getElementById('vendorModal').addEventListener('click',function(e){if(e.target===this)closeVendorModal();});
 </script>
-  <!-- Bannière installation PWA -->
-  <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
-    <div style="width:40px;height:40px;background:linear-gradient(135deg,#00e5a0,#00a87a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#070b0f;font-family:Syne,sans-serif;flex-shrink:0;">FA</div>
-    <div style="flex:1;">
-      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:#f0f6ff;">Installer FunnelAfrica</div>
-      <div style="font-size:.7rem;color:#5a7080;">Accès rapide depuis ton écran d'accueil</div>
-    </div>
-    <button onclick="installPWA()" style="background:#00e5a0;color:#070b0f;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;flex-shrink:0;">Installer</button>
-    <button onclick="dismissPWA()" style="background:none;border:none;color:#5a7080;cursor:pointer;font-size:1.1rem;padding:2px;flex-shrink:0;">✕</button>
-  </div>
-  <!-- Service Worker PWA -->
-  <script>
-    if('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-          .then(function(reg) { console.log('SW registered'); })
-          .catch(function(err) { console.log('SW error:', err); });
-      });
-    }
-  </script>
 </body>
 </html>
