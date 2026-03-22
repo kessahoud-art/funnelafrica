@@ -1,351 +1,217 @@
+   // ============================================================
+//  api/email/sequence.js — Séquences email automatiques
+//  P2 : Templates HTML premium via templates.js
+//  P3 : Séquences vendeur → acheteurs intégrées
+//  IA  : Tips Groq personnalisés dans chaque email
 // ============================================================
-//  api/email/sequence.js
-//  Vercel Serverless Function — Séquences email automatiques
-//  Appelée depuis le webhook auth Supabase ou manuellement
-//
-//  Variables Vercel :
-//  BREVO_API_KEY = xkeysib-xxxxx
-//  FROM_EMAIL    = kessahoud@gmail.com
-//  FROM_NAME     = FunnelAfrica
-//  APP_URL       = https://funnelafrica.vercel.app
-// ============================================================
+const { createClient } = require('@supabase/supabase-js');
+const {
+  tplWelcome, tplRelance, tplUpgrade,
+  tplBuyerFollowup, generateAITip, sendBrevo
+} = require('./templates');
+
+const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const APP_URL   = process.env.APP_URL   || 'https://funnelafrica.vercel.app';
+const FROM_NAME = process.env.FROM_NAME  || 'FunnelAfrica';
+const FROM_EMAIL= process.env.FROM_EMAIL || 'noreply@funnelafrica.com';
 
 module.exports = async function handler(req, res) {
-
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST requis' });
 
   try {
-    const {
-      type,         // 'welcome' | 'relance' | 'upgrade'
-      to_email,
-      to_name,
-      tunnel_name,  // pour l'email de relance
-      tunnel_url    // lien public du tunnel
-    } = req.body;
+    const { type, to_email, to_name, tunnel_name, tunnel_url,
+            buyer_name, buyer_email, product_name, access_url,
+            vendor_name, vendor_message, primary_color,
+            tunnel_count, revenue, day } = req.body;
 
-    if (!type || !to_email || !to_name) {
-      return res.status(400).json({ error: 'type, to_email, to_name requis' });
-    }
+    if (!type) return res.status(400).json({ error: 'type requis' });
 
-    const APP_URL   = process.env.APP_URL || 'https://funnelafrica.vercel.app';
-    const FROM_NAME = process.env.FROM_NAME  || 'FunnelAfrica';
-    const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@funnelafrica.com';
+    let email_data = null;
 
-    let subject, htmlContent;
+    // ══ SÉQUENCES CEO → VENDEURS ══
 
-    // ══════════════════════════════════════════
-    //  EMAIL 1 — BIENVENUE (J+0)
-    //  Envoyé dès l'inscription
-    // ══════════════════════════════════════════
+    // 1. Bienvenue J+0
     if (type === 'welcome') {
-      subject = `Bienvenue sur FunnelAfrica, ${to_name.split(' ')[0]} ! 🚀`;
-      htmlContent = `
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#0a0f14;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f14;padding:32px 16px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-
-      <!-- LOGO -->
-      <tr><td align="center" style="padding-bottom:24px;">
-        <span style="font-size:1.4rem;font-weight:800;color:#00c896;">⚡ FunnelAfrica</span>
-      </td></tr>
-
-      <!-- CARD -->
-      <tr><td style="background:#111820;border:1px solid #1e2a38;border-radius:16px;overflow:hidden;">
-
-        <!-- HEADER -->
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="background:linear-gradient(135deg,#0d2a1a,#0a1f2e);padding:36px 32px;text-align:center;border-bottom:1px solid #1e2a38;">
-            <div style="font-size:2.5rem;margin-bottom:12px;">🚀</div>
-            <h1 style="margin:0 0 8px;font-size:1.4rem;font-weight:800;color:#00c896;">Bienvenue sur FunnelAfrica !</h1>
-            <p style="margin:0;font-size:.9rem;color:#8fa5bc;">Bonjour <strong style="color:#e8f0f8;">${to_name}</strong>, votre compte est prêt.</p>
-          </td></tr>
-
-          <!-- BODY -->
-          <tr><td style="padding:28px 32px;">
-
-            <p style="color:#8fa5bc;font-size:.88rem;line-height:1.7;margin-bottom:24px;">
-              Vous avez rejoint la plateforme de vente en ligne conçue pour les entrepreneurs africains.
-              Voici comment démarrer en 3 étapes :
-            </p>
-
-            <!-- ÉTAPES -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
-              <tr><td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
-                <table width="100%"><tr>
-                  <td style="width:36px;"><div style="width:30px;height:30px;background:#00c896;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#0a0f14;text-align:center;line-height:30px;">1</div></td>
-                  <td style="padding-left:12px;">
-                    <div style="font-weight:700;font-size:.88rem;color:#e8f0f8;margin-bottom:3px;">Créez votre premier tunnel</div>
-                    <div style="font-size:.78rem;color:#6b7e93;">Choisissez un template et personnalisez en 15 minutes</div>
-                  </td>
-                </tr></table>
-              </td></tr>
-              <tr><td style="height:8px;"></td></tr>
-              <tr><td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px 16px;">
-                <table width="100%"><tr>
-                  <td style="width:36px;"><div style="width:30px;height:30px;background:#00c896;border-radius:50%;font-weight:800;font-size:.8rem;color:#0a0f14;text-align:center;line-height:30px;">2</div></td>
-                  <td style="padding-left:12px;">
-                    <div style="font-weight:700;font-size:.88rem;color:#e8f0f8;margin-bottom:3px;">Publiez et partagez votre lien</div>
-                    <div style="font-size:.78rem;color:#6b7e93;">Partagez sur Facebook, WhatsApp, Instagram</div>
-                  </td>
-                </tr></table>
-              </td></tr>
-              <tr><td style="height:8px;"></td></tr>
-              <tr><td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px 16px;">
-                <table width="100%"><tr>
-                  <td style="width:36px;"><div style="width:30px;height:30px;background:#00c896;border-radius:50%;font-weight:800;font-size:.8rem;color:#0a0f14;text-align:center;line-height:30px;">3</div></td>
-                  <td style="padding-left:12px;">
-                    <div style="font-weight:700;font-size:.88rem;color:#e8f0f8;margin-bottom:3px;">Encaissez avec Mobile Money</div>
-                    <div style="font-size:.78rem;color:#6b7e93;">MTN MoMo, Moov Money, Wave, Orange Money</div>
-                  </td>
-                </tr></table>
-              </td></tr>
-            </table>
-
-            <!-- CTA -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-              <tr><td align="center">
-                <a href="${APP_URL}/funnelafrica-dashboard.html"
-                   style="display:inline-block;background:#00c896;color:#0a0f14;font-weight:800;font-size:.95rem;padding:16px 36px;border-radius:12px;text-decoration:none;">
-                  🚀 Accéder à mon dashboard
-                </a>
-              </td></tr>
-            </table>
-
-            <p style="font-size:.78rem;color:#6b7e93;text-align:center;line-height:1.6;">
-              Des questions ? Répondez à cet email ou contactez-nous sur WhatsApp.<br>
-              Nous répondons sous 24h.
-            </p>
-
-          </td></tr>
-        </table>
-      </td></tr>
-
-      <!-- FOOTER -->
-      <tr><td style="padding:20px;text-align:center;">
-        <p style="font-size:.72rem;color:#3a4f65;margin:0;">
-          © 2026 FunnelAfrica · <a href="${APP_URL}" style="color:#3a4f65;">funnelafrica.vercel.app</a>
-        </p>
-      </td></tr>
-
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
+      if (!to_email || !to_name) return res.status(400).json({ error: 'to_email et to_name requis' });
+      const ai_tip = await generateAITip({ type: 'welcome', context: 'nouvel entrepreneur africain sur FunnelAfrica' });
+      email_data = tplWelcome({ to_name, ai_tip });
+      await sendBrevo(to_email, to_name, email_data.subject, email_data.html, FROM_EMAIL, FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: to_email });
     }
 
-    // ══════════════════════════════════════════
-    //  EMAIL 2 — RELANCE (J+3)
-    //  Si tunnel créé mais pas encore publié
-    // ══════════════════════════════════════════
-    else if (type === 'relance') {
-      subject = `${to_name.split(' ')[0]}, votre tunnel attend d'être publié 👀`;
-      htmlContent = `
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#0a0f14;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f14;padding:32px 16px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-
-      <tr><td align="center" style="padding-bottom:24px;">
-        <span style="font-size:1.4rem;font-weight:800;color:#00c896;">⚡ FunnelAfrica</span>
-      </td></tr>
-
-      <tr><td style="background:#111820;border:1px solid #1e2a38;border-radius:16px;overflow:hidden;">
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="background:linear-gradient(135deg,#1a0d2a,#0f0a20);padding:36px 32px;text-align:center;border-bottom:1px solid #1e2a38;">
-            <div style="font-size:2.5rem;margin-bottom:12px;">👀</div>
-            <h1 style="margin:0 0 8px;font-size:1.3rem;font-weight:800;color:#e8f0f8;">Votre tunnel attend d'être publié</h1>
-            <p style="margin:0;font-size:.9rem;color:#8fa5bc;">Il suffit d'un clic pour commencer à vendre.</p>
-          </td></tr>
-
-          <tr><td style="padding:28px 32px;">
-            <p style="color:#8fa5bc;font-size:.88rem;line-height:1.7;margin-bottom:20px;">
-              Bonjour <strong style="color:#e8f0f8;">${to_name.split(' ')[0]}</strong>,<br><br>
-              ${tunnel_name ? `Votre tunnel "<strong style="color:#e8f0f8;">${tunnel_name}</strong>" est prêt` : 'Votre tunnel est prêt'} mais n'est pas encore publié.
-              Pendant ce temps, des clients potentiels ne peuvent pas vous trouver.
-            </p>
-
-            <!-- STATS MOTIVANTES -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-              <tr>
-                <td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;width:33%;">
-                  <div style="font-size:1.3rem;font-weight:800;color:#00c896;">15 min</div>
-                  <div style="font-size:.7rem;color:#6b7e93;margin-top:4px;">pour publier</div>
-                </td>
-                <td style="width:10px;"></td>
-                <td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;width:33%;">
-                  <div style="font-size:1.3rem;font-weight:800;color:#f5a623;">1ère vente</div>
-                  <div style="font-size:.7rem;color:#6b7e93;margin-top:4px;">possible aujourd'hui</div>
-                </td>
-                <td style="width:10px;"></td>
-                <td style="background:#182030;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;width:33%;">
-                  <div style="font-size:1.3rem;font-weight:800;color:#4da6ff;">0 FCFA</div>
-                  <div style="font-size:.7rem;color:#6b7e93;margin-top:4px;">pour commencer</div>
-                </td>
-              </tr>
-            </table>
-
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-              <tr><td align="center">
-                <a href="${APP_URL}/funnelafrica-dashboard.html"
-                   style="display:inline-block;background:#00c896;color:#0a0f14;font-weight:800;font-size:.95rem;padding:16px 36px;border-radius:12px;text-decoration:none;">
-                  ✅ Publier mon tunnel maintenant →
-                </a>
-              </td></tr>
-            </table>
-
-            <p style="font-size:.78rem;color:#6b7e93;text-align:center;">
-              Besoin d'aide ? Répondez à cet email, on vous aide gratuitement.
-            </p>
-          </td></tr>
-        </table>
-      </td></tr>
-
-      <tr><td style="padding:20px;text-align:center;">
-        <p style="font-size:.72rem;color:#3a4f65;margin:0;">© 2026 FunnelAfrica · <a href="#" style="color:#3a4f65;">Se désabonner</a></p>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
+    // 2. Relance J+3
+    if (type === 'relance') {
+      if (!to_email || !to_name) return res.status(400).json({ error: 'to_email et to_name requis' });
+      const ai_tip = await generateAITip({ type: 'relance', context: 'entrepreneur inscrit depuis 3 jours sans tunnel publié' });
+      email_data = tplRelance({ to_name, tunnel_name, tunnel_url, ai_tip });
+      await sendBrevo(to_email, to_name, email_data.subject, email_data.html, FROM_EMAIL, FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: to_email });
     }
 
-    // ══════════════════════════════════════════
-    //  EMAIL 3 — UPGRADE PLAN (J+7)
-    //  Pour vendeurs actifs sur plan Starter
-    // ══════════════════════════════════════════
-    else if (type === 'upgrade') {
-      subject = `${to_name.split(' ')[0]}, débloquez tout le potentiel de FunnelAfrica ⚡`;
-      htmlContent = `
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#0a0f14;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f14;padding:32px 16px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-
-      <tr><td align="center" style="padding-bottom:24px;">
-        <span style="font-size:1.4rem;font-weight:800;color:#00c896;">⚡ FunnelAfrica</span>
-      </td></tr>
-
-      <tr><td style="background:#111820;border:1px solid #1e2a38;border-radius:16px;overflow:hidden;">
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="background:linear-gradient(135deg,#1a1000,#201500);padding:36px 32px;text-align:center;border-bottom:1px solid #1e2a38;">
-            <div style="font-size:2.5rem;margin-bottom:12px;">⚡</div>
-            <h1 style="margin:0 0 8px;font-size:1.3rem;font-weight:800;color:#f5a623;">Passez au niveau supérieur</h1>
-            <p style="margin:0;font-size:.9rem;color:#d4a843;">Débloquez tout ce que FunnelAfrica peut faire pour vous.</p>
-          </td></tr>
-
-          <tr><td style="padding:28px 32px;">
-            <p style="color:#8fa5bc;font-size:.88rem;line-height:1.7;margin-bottom:24px;">
-              Bonjour <strong style="color:#e8f0f8;">${to_name.split(' ')[0]}</strong>,<br><br>
-              Vous êtes sur le plan Starter depuis 7 jours. Voici ce que vous manquez avec le plan Pro :
-            </p>
-
-            <!-- COMPARAISON -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;border-collapse:collapse;">
-              <tr style="background:#182030;">
-                <td style="padding:10px 14px;font-size:.78rem;color:#6b7e93;border-bottom:1px solid #1e2a38;">Fonctionnalité</td>
-                <td style="padding:10px 14px;font-size:.78rem;color:#6b7e93;text-align:center;border-bottom:1px solid #1e2a38;">Starter</td>
-                <td style="padding:10px 14px;font-size:.78rem;color:#00c896;text-align:center;border-bottom:1px solid #1e2a38;font-weight:700;">Pro</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;font-size:.82rem;color:#8fa5bc;border-bottom:1px solid #1e2a38;">Tunnels de vente</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#6b7e93;text-align:center;border-bottom:1px solid #1e2a38;">1</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#00c896;text-align:center;font-weight:700;border-bottom:1px solid #1e2a38;">Illimité</td>
-              </tr>
-              <tr style="background:#182030;">
-                <td style="padding:10px 14px;font-size:.82rem;color:#8fa5bc;border-bottom:1px solid #1e2a38;">Email marketing</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#ff4d6d;text-align:center;border-bottom:1px solid #1e2a38;">✕</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#00c896;text-align:center;font-weight:700;border-bottom:1px solid #1e2a38;">✓</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;font-size:.82rem;color:#8fa5bc;border-bottom:1px solid #1e2a38;">Contacts</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#6b7e93;text-align:center;border-bottom:1px solid #1e2a38;">500</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#00c896;text-align:center;font-weight:700;border-bottom:1px solid #1e2a38;">5 000</td>
-              </tr>
-              <tr style="background:#182030;">
-                <td style="padding:10px 14px;font-size:.82rem;color:#8fa5bc;">Support WhatsApp</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#6b7e93;text-align:center;">Standard</td>
-                <td style="padding:10px 14px;font-size:.82rem;color:#00c896;text-align:center;font-weight:700;">Prioritaire</td>
-              </tr>
-            </table>
-
-            <!-- PRIX -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-              <tr><td style="background:#182030;border:2px solid #00c896;border-radius:12px;padding:20px;text-align:center;">
-                <div style="font-size:.78rem;color:#6b7e93;margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em;">PLAN PRO</div>
-                <div style="font-size:2rem;font-weight:800;color:#00c896;line-height:1;">9 900</div>
-                <div style="font-size:.8rem;color:#6b7e93;margin-bottom:14px;">FCFA / mois · Sans engagement</div>
-                <a href="${APP_URL}/abonnement.html"
-                   style="display:inline-block;background:#00c896;color:#0a0f14;font-weight:800;font-size:.9rem;padding:14px 28px;border-radius:10px;text-decoration:none;">
-                  ⚡ Passer au plan Pro →
-                </a>
-              </td></tr>
-            </table>
-
-            <p style="font-size:.78rem;color:#6b7e93;text-align:center;line-height:1.6;">
-              Paiement sécurisé via MTN MoMo, Moov Money, Wave<br>
-              Annulable à tout moment · Support WhatsApp inclus
-            </p>
-
-          </td></tr>
-        </table>
-      </td></tr>
-
-      <tr><td style="padding:20px;text-align:center;">
-        <p style="font-size:.72rem;color:#3a4f65;margin:0;">© 2026 FunnelAfrica · <a href="#" style="color:#3a4f65;">Se désabonner</a></p>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
+    // 3. Upgrade J+7
+    if (type === 'upgrade') {
+      if (!to_email || !to_name) return res.status(400).json({ error: 'to_email et to_name requis' });
+      const ai_tip = await generateAITip({ type: 'upgrade', context: `vendeur actif depuis 7 jours avec ${tunnel_count||0} tunnel(s) et ${revenue||0} FCFA de revenus` });
+      email_data = tplUpgrade({ to_name, tunnel_count, revenue, ai_tip });
+      await sendBrevo(to_email, to_name, email_data.subject, email_data.html, FROM_EMAIL, FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: to_email });
     }
 
-    else {
-      return res.status(400).json({ error: 'Type invalide. Valeurs: welcome | relance | upgrade' });
+    // ══ SÉQUENCES VENDEUR → ACHETEURS (P3) ══
+
+    // 4. Suivi acheteur J+1, J+3, J+7
+    if (type === 'buyer_followup') {
+      if (!buyer_email || !buyer_name) return res.status(400).json({ error: 'buyer_email et buyer_name requis' });
+      email_data = tplBuyerFollowup({
+        buyer_name, product_name, access_url,
+        vendor_name, vendor_message, primary_color,
+        day: day || '1'
+      });
+      // Email envoyé au nom du vendeur (même compte Brevo CEO)
+      const sender_name  = vendor_name  || FROM_NAME;
+      const sender_email = FROM_EMAIL;
+      await sendBrevo(buyer_email, buyer_name, email_data.subject, email_data.html, sender_email, sender_name);
+      return res.status(200).json({ success: true, type, sent_to: buyer_email });
     }
 
-    // ── Envoyer via Brevo ──
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.BREVO_API_KEY
-      },
-      body: JSON.stringify({
-        sender:      { name: FROM_NAME, email: FROM_EMAIL },
-        to:          [{ email: to_email, name: to_name }],
-        subject:     subject,
-        htmlContent: htmlContent
-      })
-    });
+    // 5. Broadcast vendeur → tous ses acheteurs (P3)
+    if (type === 'vendor_broadcast') {
+      const { vendor_id, message_subject, message_body } = req.body;
+      if (!vendor_id) return res.status(400).json({ error: 'vendor_id requis' });
 
-    if (!response.ok) {
-      const err = await response.json();
-      console.error('Brevo error:', err);
-      return res.status(500).json({ error: 'Erreur envoi email', details: err });
+      // Récupérer tous les contacts du vendeur
+      const { data: contacts } = await sb.from('contacts')
+        .select('email, name')
+        .eq('user_id', vendor_id)
+        .limit(100); // Max 100 pour rester dans les 300 Brevo/jour
+
+      if (!contacts || !contacts.length) {
+        return res.status(200).json({ success: true, sent: 0, message: 'Aucun contact' });
+      }
+
+      // Récupérer profil vendeur
+      const { data: vProfile } = await sb.from('profiles')
+        .select('full_name').eq('id', vendor_id).single();
+      const vName = vProfile?.full_name || 'Votre formateur';
+
+      let sent = 0;
+      for (const contact of contacts) {
+        const { wrap, p, btn, divider } = require('./templates');
+        const body_html = message_body
+          .replace(/{prenom}/g, (contact.name||contact.email).split(' ')[0])
+          .replace(/{email}/g, contact.email);
+
+        const html = wrap(`
+          <h2 style="color:#e8f0f8;font-family:Arial,sans-serif;font-size:22px;font-weight:900;margin:0 0 16px;">${message_subject}</h2>
+          <p style="color:#6b7e93;font-family:Arial,sans-serif;font-size:15px;line-height:1.7;margin:0 0 20px;">${body_html}</p>
+          <p style="color:#6b7e93;font-family:Arial,sans-serif;font-size:12px;margin:24px 0 0;">Message de <strong style="color:#e8f0f8;">${vName}</strong> via FunnelAfrica</p>
+        `, { accentColor: primary_color || '#00c896' });
+
+        await sendBrevo(contact.email, contact.name || contact.email, message_subject, html, FROM_EMAIL, vName)
+          .catch(() => {});
+        sent++;
+        // Délai pour éviter spam Brevo
+        await new Promise(r => setTimeout(r, 100));
+      }
+
+      return res.status(200).json({ success: true, type, sent, total: contacts.length });
     }
 
-    console.log(`📧 Email [${type}] envoyé à ${to_email}`);
-    return res.status(200).json({ success: true, type, to: to_email });
+    // ══ NOUVELLES SÉQUENCES ══
+
+    // 6. Panier abandonné H+2
+    if (type === 'abandon_cart') {
+      if (!buyer_email || !buyer_name) return res.status(400).json({ error: 'buyer_email et buyer_name requis' });
+      const { tplAbandonCart } = require('./templates');
+      const tpl = tplAbandonCart({
+        buyer_name, product_name: req.body.product_name,
+        price: req.body.price, currency: req.body.currency || 'FCFA',
+        checkout_url: req.body.checkout_url,
+        primary_color, vendor_name
+      });
+      await sendBrevo(buyer_email, buyer_name, tpl.subject, tpl.html, FROM_EMAIL, vendor_name||FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: buyer_email });
+    }
+
+    // 7. Remboursement
+    if (type === 'refund') {
+      if (!buyer_email || !buyer_name) return res.status(400).json({ error: 'buyer_email et buyer_name requis' });
+      const { tplRefund } = require('./templates');
+      const tpl = tplRefund({
+        buyer_name, product_name: req.body.product_name,
+        amount: req.body.amount, currency: req.body.currency || 'FCFA',
+        order_ref: req.body.order_ref, reason: req.body.reason, vendor_name
+      });
+      await sendBrevo(buyer_email, buyer_name, tpl.subject, tpl.html, FROM_EMAIL, vendor_name||FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: buyer_email });
+    }
+
+    // 8. Offre Upsell
+    if (type === 'upsell_offer') {
+      if (!buyer_email || !buyer_name) return res.status(400).json({ error: 'buyer_email et buyer_name requis' });
+      const { tplUpsellOffer, generateAITip } = require('./templates');
+      const ai_pitch = await generateAITip({ type:'upgrade', context:'offre upsell pour acheteur récent de '+req.body.main_product });
+      const tpl = tplUpsellOffer({ buyer_name, ...req.body, vendor_name, primary_color, ai_pitch });
+      await sendBrevo(buyer_email, buyer_name, tpl.subject, tpl.html, FROM_EMAIL, vendor_name||FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: buyer_email });
+    }
+
+    // 9. Bienvenue affilié
+    if (type === 'affiliate_welcome') {
+      const { affiliate_email, affiliate_name, affiliate_code, commission } = req.body;
+      if (!affiliate_email) return res.status(400).json({ error: 'affiliate_email requis' });
+      const { tplAffiliateWelcome } = require('./templates');
+      const tpl = tplAffiliateWelcome({
+        affiliate_name, affiliate_code, vendor_name,
+        product_name: req.body.product_name,
+        commission: commission || 20,
+        affiliate_url: `${APP_URL}/t/${req.body.tunnel_slug||''}?ref=${affiliate_code}`
+      });
+      await sendBrevo(affiliate_email, affiliate_name||affiliate_email, tpl.subject, tpl.html, FROM_EMAIL, vendor_name||FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: affiliate_email });
+    }
+
+    // 10. Résumé hebdo
+    if (type === 'weekly_digest') {
+      if (!req.body.to_email) return res.status(400).json({ error: 'to_email requis' });
+      const { tplWeeklyDigest, generateAITip } = require('./templates');
+      const tip_ia = await generateAITip({ type:'welcome', context:'vendeur actif avec '+req.body.week_revenue+' FCFA cette semaine' });
+      const tpl = tplWeeklyDigest({ ...req.body, vendor_name:req.body.to_name, tip_ia });
+      await sendBrevo(req.body.to_email, req.body.to_name, tpl.subject, tpl.html, FROM_EMAIL, FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: req.body.to_email });
+    }
+
+    // 11. Demande d'avis J+14
+    if (type === 'review_request') {
+      if (!buyer_email || !buyer_name) return res.status(400).json({ error: 'buyer_email et buyer_name requis' });
+      const prenom = (buyer_name||'').split(' ')[0];
+      const { wrap, h1, p, btn, divider } = require('./templates');
+      const html = wrap(`
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:48px;margin-bottom:12px;">⭐</div>
+          <h1 style="color:#e8f0f8;font-family:Arial,sans-serif;font-size:24px;font-weight:900;margin:0 0 12px;">${prenom}, votre avis compte !</h1>
+          <p style="color:#6b7e93;font-family:Arial,sans-serif;font-size:15px;line-height:1.7;margin:0 0 14px;">Cela fait 2 semaines que vous avez accès à <strong style="color:#e8f0f8;">${product_name||'votre produit'}</strong>. Votre avis aide d'autres entrepreneurs africains à prendre leur décision.</p>
+        </div>
+        <div style="background:#0d1318;border:1px solid #1e2a38;border-radius:10px;padding:20px;margin-bottom:20px;text-align:center;">
+          <p style="color:#6b7e93;font-family:Arial,sans-serif;font-size:14px;margin:0 0 12px;">Comment évaluez-vous votre expérience ?</p>
+          <div style="display:flex;justify-content:center;gap:8px;">
+            ${[1,2,3,4,5].map(n=>`<a href="${req.body.review_url||APP_URL}?rating=${n}" style="display:inline-block;width:40px;height:40px;line-height:40px;border-radius:50%;background:#182030;color:#e8f0f8;font-family:Arial,sans-serif;font-weight:900;text-decoration:none;font-size:16px;">${n}</a>`).join('')}
+          </div>
+        </div>
+        ${btn('✍️ Laisser mon avis complet', req.body.review_url||APP_URL, '#00c896')}
+      `, { accentColor: primary_color||'#00c896' });
+      await sendBrevo(buyer_email, buyer_name, `⭐ ${prenom}, votre avis sur ${product_name||'votre achat'} ?`, html, FROM_EMAIL, vendor_name||FROM_NAME);
+      return res.status(200).json({ success: true, type, sent_to: buyer_email });
+    }
+
+    return res.status(400).json({ error: `Type inconnu : ${type}. Types : welcome | relance | upgrade | buyer_followup | vendor_broadcast | abandon_cart | refund | upsell_offer | affiliate_welcome | weekly_digest | review_request` });
 
   } catch (err) {
-    console.error('Sequence email error:', err);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error('Sequence error:', err);
+    return res.status(500).json({ error: err.message });
   }
-}
+};         
