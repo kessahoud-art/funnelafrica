@@ -6,6 +6,7 @@
 <title>Bienvenue sur FunnelAfrica</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
 <style>
 :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--green2:#00c896;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--radius:14px;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -209,8 +210,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <script>
-  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   var currentStep   = 1;
