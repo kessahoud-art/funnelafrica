@@ -214,9 +214,12 @@
 
     <!-- TABS -->
     <div class="main-tabs">
-      <button class="main-tab active" onclick="showTab('sequences',this)">⚡ Séquences auto</button>
+      <button class="main-tab active" onclick="showTab('sequences',this)">⚡ Séquences</button>
       <button class="main-tab" onclick="showTab('campaigns',this)">📢 Campagnes</button>
       <button class="main-tab" onclick="showTab('compose',this)">✍️ Composer</button>
+      <button class="main-tab" onclick="showTab('contacts',this)">👥 Contacts</button>
+      <button class="main-tab" onclick="showTab('stats',this)">📊 Stats</button>
+      <button class="main-tab" onclick="showTab('config',this)">⚙️ Config</button>
     </div>
 
     <!-- TAB SÉQUENCES -->
@@ -301,6 +304,121 @@ Cordialement,
               <span class="var-tag" onclick="insertVar('{produit}')">+ {produit}</span>
               <span class="var-tag" onclick="insertVar('{lien_acces}')">+ {lien_acces}</span>
               <span class="var-tag" onclick="insertVar('{vendeur}')">+ {vendeur}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB CONTACTS -->
+    <div id="tab-contacts" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 Mes contacts</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" style="font-size:.75rem;" onclick="document.getElementById('csvImport').click()">⬆️ Import CSV</button>
+            <button class="btn btn-ghost" style="font-size:.75rem;" onclick="exportContactsCSV()">⬇️ Export CSV</button>
+          </div>
+        </div>
+        <input type="file" id="csvImport" accept=".csv" style="display:none;" onchange="importCSV(this)">
+        <!-- Stats contacts -->
+        <div style="display:flex;border-bottom:1px solid var(--border);">
+          <div style="flex:1;padding:12px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text);" id="ctTotal">0</div><div style="font-size:.65rem;color:var(--muted);">Total</div></div>
+          <div style="flex:1;padding:12px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--green);" id="ctActive">0</div><div style="font-size:.65rem;color:var(--muted);">Actifs</div></div>
+          <div style="flex:1;padding:12px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--gold);" id="ctBuyers">0</div><div style="font-size:.65rem;color:var(--muted);">Acheteurs</div></div>
+          <div style="flex:1;padding:12px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--danger);" id="ctUnsub">0</div><div style="font-size:.65rem;color:var(--muted);">Désabonnés</div></div>
+        </div>
+        <!-- Filtre + recherche -->
+        <div style="padding:12px;display:flex;gap:8px;border-bottom:1px solid var(--border);">
+          <input id="ctSearch" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:.82rem;outline:none;" placeholder="🔍 Chercher email/nom..." oninput="filterContacts(this.value)">
+          <select id="ctFilter" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.78rem;outline:none;" onchange="filterContacts()">
+            <option value="">Tous</option>
+            <option value="acheteur">Acheteurs</option>
+            <option value="lead">Leads</option>
+            <option value="unsub">Désabonnés</option>
+          </select>
+        </div>
+        <div id="contactsList" style="padding:0;"></div>
+        <!-- Import guide -->
+        <div id="csvGuide" style="padding:14px;background:#00c89610;border-top:1px solid #00c89630;display:none;">
+          <div style="font-size:.78rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px;">Format CSV requis :</div>
+          <div style="font-size:.72rem;color:var(--muted);font-family:monospace;">nom,email,telephone,source<br>Amadou Koné,amadou@email.com,+2250700000000,manuel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB STATS -->
+    <div id="tab-stats" style="display:none;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 Statistiques email</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);">
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--blue);" id="statSent">0</div><div style="font-size:.65rem;color:var(--muted);">Envoyés</div></div>
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--green);" id="statOpen">0%</div><div style="font-size:.65rem;color:var(--muted);">Taux ouverture</div></div>
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--border);"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--gold);" id="statClick">0%</div><div style="font-size:.65rem;color:var(--muted);">Taux de clic</div></div>
+          <div style="padding:16px;text-align:center;"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--danger);" id="statUnsub">0%</div><div style="font-size:.65rem;color:var(--muted);">Désabonnements</div></div>
+        </div>
+        <div style="padding:16px;" id="statsCampaignList">
+          <div style="text-align:center;padding:30px;color:var(--muted);font-size:.82rem;">Envoyez votre première campagne pour voir les statistiques</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB CONFIG -->
+    <div id="tab-config" style="display:none;">
+      <!-- Activation email marketing -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-header">
+          <span class="card-title">⚙️ Activation Email Marketing</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;">Email marketing activé</div>
+              <div style="font-size:.75rem;color:var(--muted);">Permet d'envoyer des emails à vos contacts</div>
+            </div>
+            <div class="toggle-sw on" id="toggleEmailEnabled" onclick="toggleConfig('email_enabled',this)" style="cursor:pointer;"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;">Séquences automatiques</div>
+              <div style="font-size:.75rem;color:var(--muted);">J+1 · J+3 · J+7 après chaque achat</div>
+            </div>
+            <div class="toggle-sw on" id="toggleSequencesOn" onclick="toggleConfig('email_sequences_on',this)" style="cursor:pointer;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expéditeur -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-header"><span class="card-title">✉️ Infos expéditeur</span></div>
+        <div class="card-body">
+          <div style="margin-bottom:12px;">
+            <label style="font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Nom affiché</label>
+            <input id="cfgFromName" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.88rem;outline:none;" placeholder="Ex: Samuel — FunnelAfrica">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Email expéditeur</label>
+            <input id="cfgFromEmail" type="email" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.88rem;outline:none;" placeholder="mon@email.com">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Message suivi J+1 (optionnel)</label>
+            <textarea id="cfgFollowup1" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.82rem;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;" placeholder="Message personnalisé envoyé J+1 après achat..."></textarea>
+          </div>
+          <button onclick="saveEmailConfig()" style="background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:10px 20px;border-radius:9px;border:none;cursor:pointer;">💾 Sauvegarder</button>
+        </div>
+      </div>
+
+      <!-- Désabonnements -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">🚫 Désabonnements</span></div>
+        <div class="card-body">
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">Liste des contacts qui se sont désabonnés de vos emails. Ils ne recevront plus aucun email automatique.</div>
+          <div id="unsubList" style="font-size:.82rem;color:var(--muted);text-align:center;padding:16px;">Chargement...</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+            <label style="font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Désabonner manuellement</label>
+            <div style="display:flex;gap:8px;">
+              <input id="manualUnsub" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:.82rem;outline:none;" placeholder="email@exemple.com">
+              <button onclick="manualUnsubscribe()" style="background:#ff4d6d20;border:1px solid #ff4d6d40;color:var(--danger);font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:8px 14px;border-radius:8px;cursor:pointer;">Désabonner</button>
             </div>
           </div>
         </div>
@@ -560,12 +678,231 @@ Cordialement,
 
   // ── TABS ──
   function showTab(id, btn) {
-    ['sequences','campaigns','compose'].forEach(function(t){
-      document.getElementById('tab-'+t).style.display = 'none';
+    ['sequences','campaigns','compose','contacts','stats','config'].forEach(function(t){
+      var el = document.getElementById('tab-'+t);
+      if (el) el.style.display = 'none';
     });
-    document.getElementById('tab-'+id).style.display = 'block';
+    var target = document.getElementById('tab-'+id);
+    if (target) target.style.display = 'block';
     document.querySelectorAll('.main-tab').forEach(function(t){t.classList.remove('active');});
     if (btn) btn.classList.add('active');
+    // Charger les données à l'ouverture
+    if (id === 'contacts') loadContactsTab();
+    if (id === 'stats')    loadStats();
+    if (id === 'config')   loadConfig();
+  }
+
+  // ══ TAB CONTACTS ══
+  var allContacts = [];
+
+  function loadContactsTab() {
+    sb.from('contacts').select('*').eq('user_id', currentUser.id)
+      .order('created_at', {ascending:false}).then(function(r) {
+      allContacts = r.data || [];
+      renderContacts(allContacts);
+      // Stats
+      var total   = allContacts.length;
+      var active  = allContacts.filter(function(c){return !c.unsubscribed;}).length;
+      var buyers  = allContacts.filter(function(c){return (c.tags||[]).includes('acheteur');}).length;
+      var unsub   = allContacts.filter(function(c){return c.unsubscribed;}).length;
+      document.getElementById('ctTotal').textContent  = total;
+      document.getElementById('ctActive').textContent = active;
+      document.getElementById('ctBuyers').textContent = buyers;
+      document.getElementById('ctUnsub').textContent  = unsub;
+    });
+  }
+
+  function renderContacts(list) {
+    if (!list.length) {
+      document.getElementById('contactsList').innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);font-size:.82rem;">Aucun contact. Vos acheteurs apparaîtront ici automatiquement.</div>';
+      return;
+    }
+    document.getElementById('contactsList').innerHTML = list.map(function(c) {
+      var name    = c.name || c.email.split('@')[0];
+      var initial = name[0].toUpperCase();
+      var tags    = (c.tags || []).map(function(t){
+        return '<span style="font-size:.6rem;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:1px 6px;border-radius:20px;margin-left:3px;">'+t+'</span>';
+      }).join('');
+      var date    = new Date(c.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:Syne,sans-serif;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(c.unsubscribed?'🚫':initial)+'</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(c.unsubscribed?'<span style="text-decoration:line-through;color:var(--muted);">':'')+name+(c.unsubscribed?'</span>':'')+tags+'</div>' +
+          '<div style="font-size:.7rem;color:var(--muted);">'+c.email+'</div>' +
+        '</div>' +
+        '<div style="font-size:.7rem;color:var(--muted);">'+date+'</div>' +
+        '<button onclick="deleteContact(\''+c.id+'\')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:3px 6px;">🗑</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function filterContacts(q) {
+    var query  = (q || document.getElementById('ctSearch').value || '').toLowerCase();
+    var filter = document.getElementById('ctFilter').value;
+    var list   = allContacts.filter(function(c) {
+      var matchQ = !query || (c.email||'').toLowerCase().includes(query) || (c.name||'').toLowerCase().includes(query);
+      var matchF = !filter ||
+        (filter==='acheteur' && (c.tags||[]).includes('acheteur')) ||
+        (filter==='lead'     && (c.tags||[]).includes('lead')) ||
+        (filter==='unsub'    && c.unsubscribed);
+      return matchQ && matchF;
+    });
+    renderContacts(list);
+  }
+
+  function deleteContact(id) {
+    if (!confirm('Supprimer ce contact ?')) return;
+    sb.from('contacts').delete().eq('id', id).then(function(){
+      showToast('Contact supprimé', 'success');
+      loadContactsTab();
+    });
+  }
+
+  // Import CSV
+  function importCSV(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var lines  = e.target.result.split('\n').filter(Boolean);
+      var header = lines[0].toLowerCase().split(',').map(function(h){return h.trim().replace(/"/g,'');});
+      var rows   = lines.slice(1);
+      var imported = 0; var errors = 0;
+      var nameIdx  = header.indexOf('nom');
+      var emailIdx = header.indexOf('email');
+      var phoneIdx = header.indexOf('telephone');
+      if (emailIdx < 0) { showToast('Colonne "email" manquante dans le CSV','error'); return; }
+
+      var promises = rows.map(function(row) {
+        var cols  = row.split(',').map(function(c){return c.trim().replace(/"/g,'');});
+        var email = cols[emailIdx];
+        var name  = nameIdx >= 0 ? cols[nameIdx] : email.split('@')[0];
+        var phone = phoneIdx >= 0 ? cols[phoneIdx] : null;
+        if (!email || !email.includes('@')) { errors++; return Promise.resolve(); }
+        imported++;
+        return sb.from('contacts').upsert({
+          user_id: currentUser.id, email, name,
+          phone: phone || null,
+          source: 'csv_import', tags: ['import'],
+          unsubscribed: false
+        }, { onConflict: 'user_id,email' });
+      });
+
+      Promise.all(promises).then(function() {
+        showToast('✓ '+imported+' contacts importés'+(errors?' ('+errors+' erreurs)':''), 'success');
+        loadContactsTab();
+        input.value = '';
+      });
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function exportContactsCSV() {
+    var list = allContacts;
+    if (!list.length) { showToast('Aucun contact à exporter','error'); return; }
+    var rows = [['Nom','Email','Téléphone','Source','Tags','Désabonné','Date']];
+    list.forEach(function(c){
+      rows.push([c.name||'',c.email||'',c.phone||'',(c.source||''),(c.tags||[]).join('|'),c.unsubscribed?'oui':'non',new Date(c.created_at).toLocaleDateString('fr-FR')]);
+    });
+    var csv = rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url; a.download='contacts-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ '+list.length+' contacts exportés','success');
+  }
+
+  // ══ TAB STATS ══
+  function loadStats() {
+    sb.from('campaigns').select('*').eq('user_id', currentUser.id)
+      .order('sent_at', {ascending:false}).then(function(r) {
+      var camps = r.data || [];
+      var totalSent   = camps.reduce(function(s,c){return s+(c.sent_count||0);},0);
+      var totalOpen   = camps.reduce(function(s,c){return s+(c.open_count||0);},0);
+      var totalClick  = camps.reduce(function(s,c){return s+(c.click_count||0);},0);
+      var totalUnsub  = camps.reduce(function(s,c){return s+(c.unsub_count||0);},0);
+      var openRate    = totalSent ? Math.round(totalOpen/totalSent*100)  : 0;
+      var clickRate   = totalSent ? Math.round(totalClick/totalSent*100) : 0;
+      var unsubRate   = totalSent ? Math.round(totalUnsub/totalSent*100) : 0;
+      document.getElementById('statSent').textContent  = totalSent.toLocaleString('fr');
+      document.getElementById('statOpen').textContent  = openRate+'%';
+      document.getElementById('statClick').textContent = clickRate+'%';
+      document.getElementById('statUnsub').textContent = unsubRate+'%';
+
+      if (!camps.length) return;
+      document.getElementById('statsCampaignList').innerHTML = camps.map(function(c) {
+        var oRate = c.sent_count ? Math.round((c.open_count||0)/c.sent_count*100) : 0;
+        var cRate = c.sent_count ? Math.round((c.click_count||0)/c.sent_count*100) : 0;
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);">' +
+          '<div style="flex:1;min-width:0;"><div style="font-size:.82rem;font-weight:500;">'+c.name+'</div><div style="font-size:.7rem;color:var(--muted);">'+c.subject+'</div></div>' +
+          '<div style="text-align:center;min-width:50px;"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--blue);">'+( c.sent_count||0)+'</div><div style="font-size:.6rem;color:var(--muted);">Envois</div></div>' +
+          '<div style="text-align:center;min-width:50px;"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--green);">'+oRate+'%</div><div style="font-size:.6rem;color:var(--muted);">Ouverture</div></div>' +
+          '<div style="text-align:center;min-width:50px;"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--gold);">'+cRate+'%</div><div style="font-size:.6rem;color:var(--muted);">Clic</div></div>' +
+        '</div>';
+      }).join('');
+    });
+  }
+
+  // ══ TAB CONFIG ══
+  var emailConfig = {};
+
+  function loadConfig() {
+    sb.from('profiles').select('email_enabled,email_sequences_on,from_name,from_email').eq('id',currentUser.id).single().then(function(r){
+      if (!r.data) return;
+      emailConfig = r.data;
+      var enToggle = document.getElementById('toggleEmailEnabled');
+      var seqToggle = document.getElementById('toggleSequencesOn');
+      if (enToggle)  enToggle.className = 'toggle-sw ' + (r.data.email_enabled !== false ? 'on' : 'off');
+      if (seqToggle) seqToggle.className = 'toggle-sw ' + (r.data.email_sequences_on !== false ? 'on' : 'off');
+      if (r.data.from_name)  document.getElementById('cfgFromName').value  = r.data.from_name;
+      if (r.data.from_email) document.getElementById('cfgFromEmail').value = r.data.from_email;
+    });
+    // Charger désabonnements
+    sb.from('unsubscribes').select('email,created_at').eq('vendor_id',currentUser.id)
+      .order('created_at',{ascending:false}).limit(20).then(function(r){
+      var list = r.data || [];
+      if (!list.length) { document.getElementById('unsubList').textContent = 'Aucun désabonnement'; return; }
+      document.getElementById('unsubList').innerHTML = list.map(function(u){
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem;"><span>'+u.email+'</span><span style="color:var(--muted);">'+new Date(u.created_at).toLocaleDateString('fr-FR')+'</span></div>';
+      }).join('');
+    });
+  }
+
+  function toggleConfig(field, el) {
+    var isOn = el.classList.contains('on');
+    el.className = 'toggle-sw ' + (isOn ? 'off' : 'on');
+    var update = {};
+    update[field] = !isOn;
+    sb.from('profiles').update(update).eq('id', currentUser.id).then(function(){
+      showToast(isOn ? '✓ Désactivé' : '✓ Activé', 'success');
+    });
+  }
+
+  function saveEmailConfig() {
+    var from_name  = document.getElementById('cfgFromName').value.trim();
+    var from_email = document.getElementById('cfgFromEmail').value.trim();
+    var followup1  = document.getElementById('cfgFollowup1').value.trim();
+    if (!from_name || !from_email) { showToast('Remplissez nom et email','error'); return; }
+    // Sauvegarder dans profiles
+    sb.from('profiles').update({ from_name, from_email }).eq('id', currentUser.id).then(function(r){
+      if (r.error) { showToast('Erreur : '+r.error.message,'error'); return; }
+      // Sauvegarder le message followup dans le tunnel par défaut si besoin
+      showToast('✓ Configuration sauvegardée', 'success');
+    });
+  }
+
+  function manualUnsubscribe() {
+    var email = document.getElementById('manualUnsub').value.trim();
+    if (!email) { showToast('Entrez un email','error'); return; }
+    sb.from('unsubscribes').upsert({ vendor_id:currentUser.id, email, reason:'Manuel CEO' },
+      { onConflict:'vendor_id,email' }).then(function(){
+      sb.from('contacts').update({unsubscribed:true}).eq('user_id',currentUser.id).eq('email',email).then(function(){
+        showToast('✓ '+email+' désabonné','success');
+        document.getElementById('manualUnsub').value='';
+        loadConfig();
+      });
+    });
   }
 
   function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}

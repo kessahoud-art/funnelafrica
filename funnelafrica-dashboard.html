@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — FunnelAfrica</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00e5a0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FunnelAfrica">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
@@ -223,6 +230,14 @@ fbq("track","PageView");
       Contacts
     </div>
     <div class="nav-section-label">Avancé</div>
+    <div class="nav-item" onclick="window.location.href='/ai-generator.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      🤖 IA Générateur
+    </div>
+    <div class="nav-item" onclick="window.location.href='/expansion.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      🌍 Expansion
+    </div>
     <div class="nav-item" id="navAbTest" onclick="goPhase4('ab-testing.html','pro')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
       A/B Testing
@@ -746,5 +761,25 @@ fbq("track","PageView");
     if (e.target === this) this.classList.remove('open');
   });
 </script>
+  <!-- Bannière installation PWA -->
+  <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#00e5a0,#00a87a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#070b0f;font-family:Syne,sans-serif;flex-shrink:0;">FA</div>
+    <div style="flex:1;">
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:#f0f6ff;">Installer FunnelAfrica</div>
+      <div style="font-size:.7rem;color:#5a7080;">Accès rapide depuis ton écran d'accueil</div>
+    </div>
+    <button onclick="installPWA()" style="background:#00e5a0;color:#070b0f;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;flex-shrink:0;">Installer</button>
+    <button onclick="dismissPWA()" style="background:none;border:none;color:#5a7080;cursor:pointer;font-size:1.1rem;padding:2px;flex-shrink:0;">✕</button>
+  </div>
+  <!-- Service Worker PWA -->
+  <script>
+    if('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(reg) { console.log('SW registered'); })
+          .catch(function(err) { console.log('SW error:', err); });
+      });
+    }
+  </script>
 </body>
 </html>

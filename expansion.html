@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Expansion — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
+<style>
+:root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--danger:#ff4d6d;--blue:#4da6ff;--radius:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+.sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+.logo{padding:20px 16px;border-bottom:1px solid var(--border);}
+.logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+.logo-mark span{width:28px;height:28px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#070b0f;font-weight:800;}
+.nav{padding:10px;flex:1;}
+.nav-section{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 4px;font-family:'Syne',sans-serif;}
+.nav-item{padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;}
+.nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:var(--green);}
+.main{margin-left:220px;flex:1;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;}
+.hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1.2rem;padding:7px 11px;border-radius:8px;}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.content{padding:24px;max-width:900px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:14px;}
+.countries-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.country-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;transition:all .2s;}
+.country-card.active{border-color:var(--green);}
+.country-flag{font-size:1.8rem;}
+.country-info{flex:1;}
+.country-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;}
+.country-methods{font-size:.7rem;color:var(--muted);}
+.country-toggle{width:36px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.country-toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:3px;left:3px;transition:left .2s;}
+.country-toggle.on{background:var(--green);}
+.country-toggle.on::after{left:19px;}
+.method-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.method-tag{font-size:.6rem;font-family:'Syne',sans-serif;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+.method-tag.active{background:#00e5a015;border-color:#00e5a040;color:var(--green);}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:3px;}
+.stat-label{font-size:.65rem;color:var(--muted);}
+.overlay-sb{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+#__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.overlay-sb.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}.countries-grid{grid-template-columns:1fr;}.stat-grid{grid-template-columns:1fr 1fr;}.content{padding:14px;}}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<div class="overlay-sb" id="overlaySb" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo"><div class="logo-mark"><span>FA</span>FunnelAfrica</div></div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'">📊 Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-templates.html?new=1'">🚀 Mes Tunnels</div>
+    <div class="nav-section">Avancé</div>
+    <div class="nav-item" onclick="window.location.href='/ai-generator.html'">🤖 IA Générateur</div>
+    <div class="nav-item" onclick="window.location.href='/ab-testing.html'">🧪 A/B Testing</div>
+    <div class="nav-item" onclick="window.location.href='/api-docs.html'">🔌 API</div>
+    <div class="nav-item" onclick="window.location.href='/payout.html'">💸 Retrait</div>
+    <div class="nav-item active">🌍 Expansion</div>
+    <div class="nav-section">Paramètres</div>
+    <div class="nav-item" onclick="window.location.href='/profil.html'">👤 Mon profil</div>
+    <div class="nav-item" onclick="logout()">🚪 Déconnexion</div>
+  </nav>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <span class="page-title">🌍 Expansion Multi-pays</span>
+  </div>
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--green);" id="activeCountries">1</div>
+        <div class="stat-label">Pays actifs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--blue);" id="totalMethods">4</div>
+        <div class="stat-label">Méthodes paiement</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--gold);">9</div>
+        <div class="stat-label">Pays couverts</div>
+      </div>
+    </div>
+
+    <!-- PAYS ACTIFS -->
+    <div class="card">
+      <div class="card-title">🗺️ Pays & méthodes de paiement</div>
+      <div class="countries-grid" id="countriesGrid"></div>
+    </div>
+
+    <!-- EXPANSION ROADMAP -->
+    <div class="card">
+      <div class="card-title">🔮 Expansion planifiée (V2)</div>
+      <div style="font-size:.82rem;color:var(--muted);line-height:2;">
+        🇳🇬 <strong style="color:var(--text);">Nigeria</strong> — Paystack · Flutterwave · NGN (Naira) · <span style="color:var(--gold);">En cours de validation</span><br>
+        🇰🇪 <strong style="color:var(--text);">Kenya · Tanzanie</strong> — M-Pesa · KES / TZS · <span style="color:var(--muted);">Roadmap V2</span><br>
+        🇲🇦 <strong style="color:var(--text);">Maroc</strong> — CMI · MAD · <span style="color:var(--muted);">Roadmap V3</span><br>
+        🇪🇬 <strong style="color:var(--text);">Égypte</strong> — Fawry · EGP · <span style="color:var(--muted);">Roadmap V3</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+
+  var COUNTRIES = [
+    {code:'BJ',flag:'🇧🇯',name:'Bénin',methods:['MTN MoMo','Moov Money'],active:true},
+    {code:'CI',flag:'🇨🇮',name:'Côte d\'Ivoire',methods:['Wave','MTN MoMo','Orange Money','Moov'],active:true},
+    {code:'SN',flag:'🇸🇳',name:'Sénégal',methods:['Wave','Orange Money'],active:true},
+    {code:'ML',flag:'🇲🇱',name:'Mali',methods:['Wave','Orange Money'],active:true},
+    {code:'BF',flag:'🇧🇫',name:'Burkina Faso',methods:['Orange Money','Moov'],active:true},
+    {code:'TG',flag:'🇹🇬',name:'Togo',methods:['Moov Money','T-Money'],active:true},
+    {code:'GN',flag:'🇬🇳',name:'Guinée',methods:['Orange Money','MTN'],active:true},
+    {code:'CM',flag:'🇨🇲',name:'Cameroun',methods:['MTN MoMo','Orange Money'],active:true},
+    {code:'NE',flag:'🇳🇪',name:'Niger',methods:['Airtel Money','Moov'],active:true},
+  ];
+
+  sb.auth.getUser().then(function(r){
+    if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
+    currentUser=r.data.user;
+    renderCountries();
+  });
+
+  function renderCountries(){
+    var html='';
+    COUNTRIES.forEach(function(c){
+      html += '<div class="country-card'+(c.active?' active':'')+'"><div class="country-flag">'+c.flag+'</div><div class="country-info"><div class="country-name">'+c.name+'</div><div class="method-tags">'+c.methods.map(function(m){return '<span class="method-tag'+(c.active?' active':'')+'">'+m+'</span>';}).join('')+'</div></div><div class="country-toggle'+(c.active?' on':'')+'" onclick="toggleCountry(\''+c.code+'\',this)"></div></div>';
+    });
+    document.getElementById('countriesGrid').innerHTML = html;
+    var active = COUNTRIES.filter(function(c){return c.active;}).length;
+    document.getElementById('activeCountries').textContent = active;
+  }
+
+  function toggleCountry(code, el){
+    var country = COUNTRIES.find(function(c){return c.code===code;});
+    if(!country) return;
+    country.active = !country.active;
+    showToast(country.active ? '✓ '+country.name+' activé' : country.name+' désactivé', country.active?'success':'error');
+    renderCountries();
+  }
+
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}
+  function logout(){sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';});}
+  function showToast(msg,type){var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};var t=document.getElementById('__toast');t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';t.textContent=msg;setTimeout(function(){t.style.opacity='1';},10);setTimeout(function(){t.style.opacity='0';},3500);}
+</script>
+</body>
+</html>
