@@ -10,6 +10,9 @@
   :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:10px;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  @media(max-width:800px){
+    body,html{height:auto !important;overflow:auto !important;min-height:100vh;}
+  }
   .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
   .topbar-left{display:flex;align-items:center;gap:10px;}
   .back-btn{color:var(--muted);font-size:.78rem;cursor:pointer;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;transition:all .2s;}
@@ -20,10 +23,12 @@
   .status-pill.draft{background:#6b7e9318;border:1px solid #6b7e9340;color:var(--muted);}
   .status-pill.live{background:#00c89618;border:1px solid #00c89640;color:var(--green);}
   .topbar-right{display:flex;align-items:center;gap:8px;}
-  @media(max-width:760px){
-    .topbar-right .btn-ghost{display:none;}
+  @media(max-width:800px){
+    .topbar-right .btn-ghost{display:none !important;}
     .topbar-right .save-status span{display:none;}
-    .topbar-right{gap:5px;}
+    .topbar-right{gap:4px !important;}
+    body,html{height:auto !important;overflow:auto !important;}
+    .editor-wrap{height:auto !important;overflow:visible !important;}
   }
   .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
   .btn-primary{background:var(--green);color:#0a0f14;}
@@ -39,17 +44,18 @@
   .save-dot.saving{background:var(--gold);animation:pulse .8s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
   .editor-layout{display:flex;flex:1;overflow:hidden;}
-  @media(max-width:760px){
-    .editor-layout{flex-direction:column;overflow-y:auto;}
-    .left-panel{width:100%;min-height:auto;border-right:none;border-bottom:1px solid var(--border);display:flex;flex-direction:row;overflow-x:auto;flex-shrink:0;padding:6px 8px;gap:4px;}
-    .left-panel .nav-section{display:none;}
-    .section-item{flex-direction:column;padding:8px 10px;min-width:70px;text-align:center;border-radius:8px;font-size:.62rem;gap:3px;flex-shrink:0;}
-    .section-item .section-icon{font-size:1.1rem;}
-    .section-item .section-label{font-size:.6rem;}
-    .preview-wrap{display:none;}
-    .right-panel{width:100%;border-left:none;flex:1;overflow-y:auto;}
-    .prop-body{padding:12px;}
-    .device-btns{display:none;}
+  @media(max-width:800px){
+    .editor-layout{flex-direction:column !important;overflow-y:auto !important;height:auto !important;}
+    .left-panel{width:100% !important;min-height:auto !important;height:auto !important;border-right:none !important;border-bottom:1px solid var(--border) !important;display:flex !important;flex-direction:row !important;overflow-x:auto !important;overflow-y:hidden !important;flex-shrink:0 !important;padding:6px 8px !important;gap:4px !important;}
+    .left-panel .nav-section{display:none !important;}
+    .section-item{flex-direction:column !important;padding:8px 10px !important;min-width:65px !important;text-align:center !important;border-radius:8px !important;font-size:.6rem !important;gap:2px !important;flex-shrink:0 !important;}
+    .section-item .section-icon{font-size:1.1rem !important;}
+    .preview-wrap{display:none !important;}
+    .right-panel{width:100% !important;max-width:100% !important;border-left:none !important;flex:1 !important;overflow-y:auto !important;min-height:60vh !important;}
+    .prop-body{padding:10px 12px !important;}
+    .device-btns{display:none !important;}
+    .topbar{padding:8px 12px !important;}
+    .topbar .btn-ghost{display:none !important;}
   }
   .left-panel{width:190px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
   .panel-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:12px 14px 8px;}
@@ -321,7 +327,7 @@
 
 <script>
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var tunnelId = new URLSearchParams(window.location.search).get('tunnel');
   var tunnelData = null;
