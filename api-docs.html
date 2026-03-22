@@ -115,7 +115,7 @@
 Authorization: Bearer fa_xxxxxxxxxxxxxxxxxxxx
 
 # Ou via paramètre URL (moins sécurisé)
-GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
+GET /api/public?resource=tunnels?api_key=fa_xxxxxxxxxxxx</div>
         <div style="margin-top:14px;font-size:.82rem;color:var(--muted);">Base URL : <span style="color:var(--blue);font-family:'JetBrains Mono',monospace;">https://funnelafrica.vercel.app</span></div>
       </div>
       <div class="card">
@@ -135,7 +135,7 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
         <div class="endpoint">
           <div class="endpoint-header" onclick="toggleEndpoint(this)">
             <span class="method-badge get">GET</span>
-            <span class="endpoint-path">/api/public/tunnels</span>
+            <span class="endpoint-path">/api/public?resource=tunnels</span>
             <span class="endpoint-desc">Liste tes tunnels</span>
           </div>
           <div class="endpoint-body">
@@ -146,7 +146,7 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
               <tr><td>offset</td><td>integer</td><td><span class="badge-opt">optionnel</span></td><td>Pagination (défaut: 0)</td></tr>
             </table>
             <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
-  "https://funnelafrica.vercel.app/api/public/tunnels?status=live" \
+  "https://funnelafrica.vercel.app/api/public?resource=tunnels?status=live" \
   -H "Authorization: Bearer fa_VOTRE_CLE"
 
 // Réponse
@@ -178,7 +178,7 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
         <div class="endpoint">
           <div class="endpoint-header" onclick="toggleEndpoint(this)">
             <span class="method-badge get">GET</span>
-            <span class="endpoint-path">/api/public/orders</span>
+            <span class="endpoint-path">/api/public?resource=orders</span>
             <span class="endpoint-desc">Liste tes commandes</span>
           </div>
           <div class="endpoint-body">
@@ -189,7 +189,7 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
               <tr><td>limit</td><td>integer</td><td><span class="badge-opt">optionnel</span></td><td>Max 100 (défaut: 20)</td></tr>
             </table>
             <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
-  "https://funnelafrica.vercel.app/api/public/orders?status=paid" \
+  "https://funnelafrica.vercel.app/api/public?resource=orders?status=paid" \
   -H "Authorization: Bearer fa_VOTRE_CLE"</div>
           </div>
         </div>
@@ -203,12 +203,12 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
         <div class="endpoint">
           <div class="endpoint-header" onclick="toggleEndpoint(this)">
             <span class="method-badge get">GET</span>
-            <span class="endpoint-path">/api/public/stats</span>
+            <span class="endpoint-path">/api/public?resource=stats</span>
             <span class="endpoint-desc">Vue globale de tes performances</span>
           </div>
           <div class="endpoint-body">
             <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
-  "https://funnelafrica.vercel.app/api/public/stats" \
+  "https://funnelafrica.vercel.app/api/public?resource=stats" \
   -H "Authorization: Bearer fa_VOTRE_CLE"
 
 // Réponse
