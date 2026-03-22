@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienvenue sur FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--green2:#00c896;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--radius:14px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;overflow:hidden;}
+.progress-bar{height:4px;background:var(--border);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));transition:width .4s ease;border-radius:2px;}
+.step-content{padding:36px;}
+.step-header{margin-bottom:28px;}
+.step-num{font-size:.72rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.step-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:8px;}
+.step-sub{font-size:.88rem;color:var(--muted);line-height:1.6;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:.72rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;}
+.form-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--green);}
+.form-input::placeholder{color:#3a4f65;}
+.form-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.9rem;outline:none;cursor:pointer;}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px;}
+.product-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;}
+.product-opt:hover{border-color:#00e5a040;}
+.product-opt.selected{border-color:var(--green);background:#00e5a010;}
+.product-opt-icon{font-size:1.4rem;margin-bottom:6px;}
+.product-opt-name{font-size:.72rem;font-family:'Syne',sans-serif;font-weight:600;}
+.goal-grid{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.goal-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;}
+.goal-opt:hover{border-color:#00e5a040;}
+.goal-opt.selected{border-color:var(--green);background:#00e5a010;}
+.goal-icon{font-size:1.2rem;flex-shrink:0;}
+.goal-text{font-size:.85rem;font-weight:500;}
+.goal-sub{font-size:.72rem;color:var(--muted);}
+.step-footer{padding:20px 36px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 24px;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#070b0f;box-shadow:0 4px 16px #00e5a030;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px #00e5a040;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{color:var(--text);}
+.skip-link{font-size:.78rem;color:var(--muted);cursor:pointer;transition:color .2s;}
+.skip-link:hover{color:var(--text);}
+.success-view{padding:48px 36px;text-align:center;}
+.success-icon{font-size:3.5rem;margin-bottom:16px;animation:bounce .6s ease;}
+@keyframes bounce{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+.success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:10px;}
+.success-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px;line-height:1.7;}
+.checklist{text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;}
+.check-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.85rem;border-bottom:1px solid var(--border);}
+.check-item:last-child{border-bottom:none;}
+.check-circle{width:20px;height:20px;border-radius:50%;background:#00e5a020;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--green);font-weight:700;flex-shrink:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.step-content{animation:fadeUp .3s ease;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+  <!-- STEP 1 : Bienvenue + Nom -->
+  <div id="step1">
+    <div class="step-content">
+      <div class="step-header">
+        <div class="step-num">Étape 1 sur 4</div>
+        <div class="step-title">🎉 Bienvenue sur FunnelAfrica !</div>
+        <div class="step-sub">Vous êtes à 4 étapes de votre première vente en ligne. Commençons par vous connaître.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Votre prénom</label>
+        <input class="form-input" type="text" id="onbFirst" placeholder="Moussa">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Votre nom</label>
+        <input class="form-input" type="text" id="onbLast" placeholder="Koné">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Votre pays</label>
+        <select class="form-select" id="onbCountry">
+          <option value="BJ">🇧🇯 Bénin</option>
+          <option value="CI">🇨🇮 Côte d'Ivoire</option>
+          <option value="SN">🇸🇳 Sénégal</option>
+          <option value="ML">🇲🇱 Mali</option>
+          <option value="BF">🇧🇫 Burkina Faso</option>
+          <option value="TG">🇹🇬 Togo</option>
+          <option value="CM">🇨🇲 Cameroun</option>
+          <option value="GN">🇬🇳 Guinée</option>
+          <option value="NE">🇳🇪 Niger</option>
+        </select>
+      </div>
+    </div>
+    <div class="step-footer">
+      <span class="skip-link" onclick="skipOnboarding()">Passer →</span>
+      <button class="btn btn-primary" onclick="goStep(2)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 : Type de produit -->
+  <div id="step2" style="display:none;">
+    <div class="step-content">
+      <div class="step-header">
+        <div class="step-num">Étape 2 sur 4</div>
+        <div class="step-title">📦 Que vendez-vous ?</div>
+        <div class="step-sub">Cela nous aide à personnaliser votre expérience et vous proposer les bons templates.</div>
+      </div>
+      <div class="product-grid">
+        <div class="product-opt" onclick="selectProduct('formation',this)"><div class="product-opt-icon">📘</div><div class="product-opt-name">Formation</div></div>
+        <div class="product-opt" onclick="selectProduct('coaching',this)"><div class="product-opt-icon">🎯</div><div class="product-opt-name">Coaching</div></div>
+        <div class="product-opt" onclick="selectProduct('ebook',this)"><div class="product-opt-icon">📄</div><div class="product-opt-name">Ebook / PDF</div></div>
+        <div class="product-opt" onclick="selectProduct('service',this)"><div class="product-opt-icon">🛠</div><div class="product-opt-name">Service</div></div>
+        <div class="product-opt" onclick="selectProduct('physique',this)"><div class="product-opt-icon">📦</div><div class="product-opt-name">Produit physique</div></div>
+        <div class="product-opt" onclick="selectProduct('autre',this)"><div class="product-opt-icon">✨</div><div class="product-opt-name">Autre</div></div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Retour</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 : Objectif -->
+  <div id="step3" style="display:none;">
+    <div class="step-content">
+      <div class="step-header">
+        <div class="step-num">Étape 3 sur 4</div>
+        <div class="step-title">🎯 Quel est votre objectif ?</div>
+        <div class="step-sub">Nous personnalisons votre tableau de bord selon votre priorité.</div>
+      </div>
+      <div class="goal-grid">
+        <div class="goal-opt" onclick="selectGoal('first_sale',this)">
+          <div class="goal-icon">💰</div>
+          <div><div class="goal-text">Faire mes premières ventes</div><div class="goal-sub">Je démarre et je veux valider mon offre</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectGoal('scale',this)">
+          <div class="goal-icon">🚀</div>
+          <div><div class="goal-text">Scaler mon business existant</div><div class="goal-sub">J'ai déjà des clients et je veux automatiser</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectGoal('audience',this)">
+          <div class="goal-icon">👥</div>
+          <div><div class="goal-text">Construire mon audience</div><div class="goal-sub">Je veux collecter des contacts et leads</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectGoal('passive',this)">
+          <div class="goal-icon">😴</div>
+          <div><div class="goal-text">Créer un revenu passif</div><div class="goal-sub">Je veux vendre en automatique 24h/24</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Retour</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 : Mobile Money -->
+  <div id="step4" style="display:none;">
+    <div class="step-content">
+      <div class="step-header">
+        <div class="step-num">Étape 4 sur 4</div>
+        <div class="step-title">📱 Activez les paiements</div>
+        <div class="step-sub">Quelle méthode de paiement vos clients utilisent-ils principalement ?</div>
+      </div>
+      <div class="goal-grid">
+        <div class="goal-opt" onclick="selectPayment('wave',this)">
+          <div class="goal-icon">🌊</div>
+          <div><div class="goal-text">Wave</div><div class="goal-sub">Sénégal · Côte d'Ivoire · Mali</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectPayment('mtn',this)">
+          <div class="goal-icon">💛</div>
+          <div><div class="goal-text">MTN MoMo</div><div class="goal-sub">Bénin · Côte d'Ivoire · Cameroun</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectPayment('orange',this)">
+          <div class="goal-icon">🟠</div>
+          <div><div class="goal-text">Orange Money</div><div class="goal-sub">Sénégal · Mali · Burkina · Guinée</div></div>
+        </div>
+        <div class="goal-opt" onclick="selectPayment('tous',this)">
+          <div class="goal-icon">💳</div>
+          <div><div class="goal-text">Tous les moyens</div><div class="goal-sub">J'accepte tout</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="btn btn-ghost" onclick="goStep(3)">← Retour</button>
+      <button class="btn btn-primary" onclick="finishOnboarding()">🚀 Commencer à vendre !</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="stepSuccess" style="display:none;">
+    <div class="success-view">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Vous êtes prêt !</div>
+      <div class="success-sub">Votre compte FunnelAfrica est configuré. Créez votre premier tunnel en 15 minutes.</div>
+      <div class="checklist">
+        <div class="check-item"><div class="check-circle">✓</div>Compte créé et configuré</div>
+        <div class="check-item"><div class="check-circle">✓</div>Type de produit défini</div>
+        <div class="check-item"><div class="check-circle">✓</div>Objectif enregistré</div>
+        <div class="check-item"><div class="check-circle">✓</div>Méthode de paiement choisie</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="goToDashboard()">
+        Aller sur mon Dashboard →
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var currentStep   = 1;
+  var selectedProduct = '';
+  var selectedGoal    = '';
+  var selectedPayment = '';
+
+  var PROGRESS = {1:25, 2:50, 3:75, 4:95};
+
+  function goStep(n) {
+    document.getElementById('step'+currentStep).style.display = 'none';
+    currentStep = n;
+    document.getElementById('step'+n).style.display = 'block';
+    document.getElementById('progressFill').style.width = PROGRESS[n] + '%';
+  }
+
+  function selectProduct(type, el) {
+    selectedProduct = type;
+    document.querySelectorAll('.product-opt').forEach(function(o){o.classList.remove('selected');});
+    el.classList.add('selected');
+  }
+
+  function selectGoal(goal, el) {
+    selectedGoal = goal;
+    document.querySelectorAll('.goal-opt').forEach(function(o){o.classList.remove('selected');});
+    el.classList.add('selected');
+  }
+
+  function selectPayment(method, el) {
+    selectedPayment = method;
+    document.querySelectorAll('.goal-opt').forEach(function(o){o.classList.remove('selected');});
+    el.classList.add('selected');
+  }
+
+  function finishOnboarding() {
+    var first   = document.getElementById('onbFirst').value.trim();
+    var last    = document.getElementById('onbLast').value.trim();
+    var country = document.getElementById('onbCountry').value;
+    var full    = first + (last ? ' '+last : '');
+
+    sb.auth.getUser().then(function(r) {
+      if (!r.data.user) return;
+      sb.from('profiles').update({
+        full_name:        full || null,
+        country:          country,
+        product_type:     selectedProduct,
+        goal:             selectedGoal,
+        preferred_payment: selectedPayment,
+        onboarded:        true
+      }).eq('id', r.data.user.id).then(function() {
+        document.getElementById('step4').style.display = 'none';
+        document.getElementById('stepSuccess').style.display = 'block';
+        document.getElementById('progressFill').style.width = '100%';
+      });
+    });
+  }
+
+  function skipOnboarding() {
+    sb.auth.getUser().then(function(r) {
+      if (r.data.user) {
+        sb.from('profiles').update({ onboarded:true }).eq('id', r.data.user.id);
+      }
+      goToDashboard();
+    });
+  }
+
+  function goToDashboard() {
+    window.location.href = '/funnelafrica-dashboard.html';
+  }
+
+  // Vérifier si déjà onboardé
+  sb.auth.getUser().then(function(r) {
+    if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
+    sb.from('profiles').select('onboarded,full_name').eq('id',r.data.user.id).single().then(function(pr) {
+      if (pr.data && pr.data.onboarded) {
+        window.location.href = '/funnelafrica-dashboard.html';
+      }
+    });
+  });
+</script>
+</body>
+</html>

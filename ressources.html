@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ressources — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--green2:#00c896;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--danger:#ff4d6d;--blue:#4da6ff;--purple:#a78bfa;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+  /* SIDEBAR */
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+  .logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-mark span{width:30px;height:30px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#070b0f;font-weight:800;flex-shrink:0;}
+  .plan-badge{margin-top:8px;font-size:.68rem;color:var(--gold);background:#f5a62318;border:1px solid #f5a62340;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Syne',sans-serif;font-weight:600;}
+  .nav{padding:12px 10px;flex:1;}
+  .nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 5px;font-family:'Syne',sans-serif;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:#00c89615;color:var(--green);}
+  .nav-icon{font-size:.85rem;flex-shrink:0;}
+  .sidebar-footer{padding:14px 12px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:9px;padding:9px;border-radius:9px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:#070b0f;flex-shrink:0;}
+
+  /* MAIN */
+  .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .content{padding:24px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+  /* HERO SECTION */
+  .res-hero{background:linear-gradient(135deg,#030807,#071a0f,#050b12);border:1px solid #00e5a020;border-radius:var(--radius);padding:28px;margin-bottom:28px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+  .res-hero::before{content:'';position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,#00e5a010,transparent 70%);}
+  .res-hero-tag{display:inline-flex;align-items:center;gap:6px;background:#00e5a012;border:1px solid #00e5a030;color:var(--green);padding:4px 12px;border-radius:20px;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;margin-bottom:12px;}
+  .res-hero h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px;position:relative;}
+  .res-hero p{font-size:.85rem;color:var(--muted);line-height:1.7;max-width:560px;position:relative;}
+
+  /* FILTER TABS */
+  .filter-tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:24px;overflow-x:auto;width:fit-content;}
+  .filter-tab{padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .2s;white-space:nowrap;}
+  .filter-tab.active{background:var(--surface);color:var(--text);}
+
+  /* RESOURCE GRID */
+  .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px;}
+
+  /* RESOURCE CARD */
+  .res-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;animation:fadeUp .5s ease both;display:flex;flex-direction:column;}
+  .res-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px #00000050;border-color:#00e5a030;}
+  .res-card-top{padding:20px;flex:1;}
+  .res-card-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:14px;}
+  .res-card-cat{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+  .res-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:6px;}
+  .res-card-desc{font-size:.78rem;color:var(--muted);line-height:1.6;}
+  .res-card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;}
+  .res-tag{font-size:.62rem;padding:2px 8px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .res-card-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .res-plan-pill{font-size:.62rem;font-family:'Syne',sans-serif;font-weight:700;padding:2px 9px;border-radius:20px;}
+  .plan-all{background:#00e5a012;border:1px solid #00e5a030;color:var(--green);}
+  .plan-pro{background:#4da6ff12;border:1px solid #4da6ff30;color:var(--blue);}
+  .plan-scale{background:#a78bfa12;border:1px solid #a78bfa30;color:var(--purple);}
+  .res-btn{background:var(--green);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+  .res-btn:hover{background:#00f5b0;transform:translateY(-1px);}
+  .res-btn.ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .res-btn.ghost:hover{border-color:var(--green);color:var(--green);}
+  .res-btn.locked{background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:not-allowed;}
+
+  /* SECTION TITLE */
+  .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* QUICK LINKS */
+  .quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px;}
+  .quick-link{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;text-decoration:none;}
+  .quick-link:hover{border-color:var(--green);transform:translateY(-2px);}
+  .quick-link-icon{font-size:1.4rem;margin-bottom:6px;}
+  .quick-link-label{font-size:.72rem;font-family:'Syne',sans-serif;font-weight:600;color:var(--muted);}
+
+  /* PROGRESS */
+  .progress-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:28px;animation:fadeUp .5s ease .2s both;}
+  .progress-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+  .progress-steps{display:flex;flex-direction:column;gap:8px;}
+  .prog-step{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;cursor:pointer;transition:background .2s;}
+  .prog-step:hover{background:var(--surface2);}
+  .prog-step-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;transition:all .2s;}
+  .prog-step-icon.todo{background:var(--surface2);border:2px solid var(--border);color:var(--muted);}
+  .prog-step-icon.done{background:var(--green);border:2px solid var(--green);color:#070b0f;}
+  .prog-step-icon.active{background:#00e5a020;border:2px solid var(--green);color:var(--green);}
+  .prog-step-text{flex:1;font-size:.83rem;}
+  .prog-step-text.done{color:var(--muted);text-decoration:line-through;}
+  .prog-step-link{font-size:.7rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:600;}
+  .progress-bar-wrap{height:6px;background:var(--border);border-radius:3px;margin-top:14px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:3px;transition:width .8s ease;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+  .hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.3rem;}
+  .overlay-sb{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+  @media(max-width:760px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.overlay-sb.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}.content{padding:16px;}.topbar{padding:12px 16px;}.res-grid{grid-template-columns:1fr;}.quick-links{grid-template-columns:repeat(2,1fr);}  }
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<div class="overlay-sb" id="overlaySb" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark"><span>FA</span>FunnelAfrica</div>
+    <div class="plan-badge" id="planBadge">⚡ Plan Starter</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-templates.html?new=1'"><span class="nav-icon">🚀</span>Mes Tunnels</div>
+    <div class="nav-item" onclick="window.location.href='/produits.html'"><span class="nav-icon">📦</span>Produits</div>
+    <div class="nav-item" onclick="window.location.href='/commandes.html'"><span class="nav-icon">📋</span>Commandes</div>
+    <div class="nav-section">Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/statistiques.html'"><span class="nav-icon">📈</span>Statistiques</div>
+    <div class="nav-item" onclick="window.location.href='/email-marketing.html'"><span class="nav-icon">📧</span>Email Marketing</div>
+    <div class="nav-item" onclick="window.location.href='/contacts.html'"><span class="nav-icon">👥</span>Contacts</div>
+    <div class="nav-item" onclick="window.location.href='/whatsapp.html'"><span class="nav-icon">📱</span>WhatsApp</div>
+    <div class="nav-item" onclick="window.location.href='/affiliation.html'"><span class="nav-icon">🤝</span>Affiliation</div>
+    <div class="nav-item" onclick="window.location.href='/facebook-ads.html'"><span class="nav-icon">📢</span>Facebook Ads</div>
+    <div class="nav-section">Ressources</div>
+    <div class="nav-item active"><span class="nav-icon">📚</span>Ressources</div>
+    <div class="nav-section">Paramètres</div>
+    <div class="nav-item" onclick="window.location.href='/notifications.html'"><span class="nav-icon">🔔</span>Notifications</div>
+    <div class="nav-item" onclick="window.location.href='/profil.html'"><span class="nav-icon">👤</span>Mon profil</div>
+    <div class="nav-item" onclick="window.location.href='/abonnement.html'"><span class="nav-icon">💳</span>Plans & Paiements</div>
+    <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span>Déconnexion</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="userAvatar">?</div>
+      <div><div style="font-size:.8rem;font-weight:500;" id="userName">—</div><div style="font-size:.68rem;color:var(--muted);" id="userPlan">—</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">📚 Ressources</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span style="font-size:.75rem;color:var(--muted);" id="progressText">0 / 6 complétés</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="res-hero">
+      <div class="res-hero-tag">📚 Centre de ressources</div>
+      <h2>Tout ce dont tu as besoin pour vendre</h2>
+      <p>Guides pas à pas, visuels prêts à l'emploi, copies publicitaires, tutoriels Facebook Ads. Tout est ici pour aller de la création de ton tunnel à ta première vente.</p>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="section-title">⚡ Accès rapide</div>
+    <div class="quick-links">
+      <a class="quick-link" href="/guide-lancement-tunnel.html">
+        <div class="quick-link-icon">🚀</div>
+        <div class="quick-link-label">Guide lancement</div>
+      </a>
+      <a class="quick-link" href="/guide-campagnes.html">
+        <div class="quick-link-icon">📢</div>
+        <div class="quick-link-label">Campagnes Ads</div>
+      </a>
+      <a class="quick-link" href="/ads-visuels.html">
+        <div class="quick-link-icon">🎨</div>
+        <div class="quick-link-label">Visuels Ads</div>
+      </a>
+      <a class="quick-link" href="/guide-pixel.html">
+        <div class="quick-link-icon">📡</div>
+        <div class="quick-link-label">Pixel Facebook</div>
+      </a>
+    </div>
+
+    <!-- PROGRESSION -->
+    <div class="progress-section">
+      <div class="progress-title">
+        <span>🎯 Ta progression de lancement</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--green);" id="progressPct">0%</span>
+      </div>
+      <div class="progress-steps" id="progressSteps">
+        <div class="prog-step" onclick="toggleProgress(0,this)">
+          <div class="prog-step-icon todo" id="ps-0">○</div>
+          <div class="prog-step-text" id="pt-0">Créer mon compte FunnelAfrica</div>
+          <a href="/funnelafrica-auth.html" class="prog-step-link" onclick="event.stopPropagation()">Aller →</a>
+        </div>
+        <div class="prog-step" onclick="toggleProgress(1,this)">
+          <div class="prog-step-icon todo" id="ps-1">○</div>
+          <div class="prog-step-text" id="pt-1">Créer mon premier tunnel</div>
+          <a href="/funnelafrica-templates.html?new=1" class="prog-step-link" onclick="event.stopPropagation()">Aller →</a>
+        </div>
+        <div class="prog-step" onclick="toggleProgress(2,this)">
+          <div class="prog-step-icon todo" id="ps-2">○</div>
+          <div class="prog-step-text" id="pt-2">Personnaliser ma page de vente</div>
+          <a href="/guide-lancement-tunnel.html" class="prog-step-link" onclick="event.stopPropagation()">Guide →</a>
+        </div>
+        <div class="prog-step" onclick="toggleProgress(3,this)">
+          <div class="prog-step-icon todo" id="ps-3">○</div>
+          <div class="prog-step-text" id="pt-3">Configurer les paiements Mobile Money</div>
+          <a href="/guide-lancement-tunnel.html#paiement" class="prog-step-link" onclick="event.stopPropagation()">Guide →</a>
+        </div>
+        <div class="prog-step" onclick="toggleProgress(4,this)">
+          <div class="prog-step-icon todo" id="ps-4">○</div>
+          <div class="prog-step-text" id="pt-4">Publier mon tunnel et faire ma première vente</div>
+          <a href="/guide-lancement-tunnel.html" class="prog-step-link" onclick="event.stopPropagation()">Guide →</a>
+        </div>
+        <div class="prog-step" onclick="toggleProgress(5,this)">
+          <div class="prog-step-icon todo" id="ps-5">○</div>
+          <div class="prog-step-text" id="pt-5">Lancer ma première campagne Facebook Ads</div>
+          <a href="/guide-campagnes.html" class="prog-step-link" onclick="event.stopPropagation()">Guide →</a>
+        </div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="section-title">📂 Toutes les ressources</div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterRes('all',this)">Tout</button>
+      <button class="filter-tab" onclick="filterRes('lancement',this)">🚀 Lancement</button>
+      <button class="filter-tab" onclick="filterRes('ads',this)">📢 Facebook Ads</button>
+      <button class="filter-tab" onclick="filterRes('visuels',this)">🎨 Visuels</button>
+      <button class="filter-tab" onclick="filterRes('templates',this)">✍️ Copies</button>
+      <button class="filter-tab" onclick="filterRes('avance',this)">⚡ Avancé</button>
+    </div>
+
+    <!-- GRID RESSOURCES -->
+    <div class="res-grid" id="resGrid">
+
+      <!-- GUIDE LANCEMENT -->
+      <div class="res-card" data-cat="lancement">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#00e5a015;">🚀</div>
+          <div class="res-card-cat" style="color:var(--green);">Lancement</div>
+          <div class="res-card-title">Guide lancement tunnel complet</div>
+          <div class="res-card-desc">De la création de ton produit jusqu'à ta première vente. 6 phases étape par étape avec checklists interactives.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">6 phases</span>
+            <span class="res-tag">Checklists</span>
+            <span class="res-tag">60 min</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/guide-lancement-tunnel.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- GUIDE CAMPAGNES -->
+      <div class="res-card" data-cat="ads">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#1877f215;">📢</div>
+          <div class="res-card-cat" style="color:#4da6ff;">Facebook Ads</div>
+          <div class="res-card-title">Guide campagnes Facebook Ads</div>
+          <div class="res-card-desc">3 campagnes (Notoriété · Acquisition · Retargeting), budget semaine par semaine, KPIs à surveiller.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">3 campagnes</span>
+            <span class="res-tag">Copies prêtes</span>
+            <span class="res-tag">Ciblage Afrique</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/guide-campagnes.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- VISUELS ADS -->
+      <div class="res-card" data-cat="visuels">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#a78bfa15;">🎨</div>
+          <div class="res-card-cat" style="color:var(--purple);">Visuels</div>
+          <div class="res-card-title">5 visuels Facebook Ads prêts</div>
+          <div class="res-card-desc">Capture d'écran → upload dans Ads Manager. Accroche, Problème/Solution, Prix, Story, Témoignage.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">5 visuels</span>
+            <span class="res-tag">Screenshot</span>
+            <span class="res-tag">Feed + Story</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/ads-visuels.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- BRAND ASSETS -->
+      <div class="res-card" data-cat="visuels">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#ffb83015;">🖼️</div>
+          <div class="res-card-cat" style="color:var(--gold);">Visuels</div>
+          <div class="res-card-title">Logo & Assets de marque</div>
+          <div class="res-card-desc">Logo icône, logo horizontal, photo de profil Facebook, couverture Facebook, bannière WhatsApp Business.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">Logo</span>
+            <span class="res-tag">Facebook</span>
+            <span class="res-tag">WhatsApp</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/brand-assets.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- GUIDE PIXEL -->
+      <div class="res-card" data-cat="ads avance">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#1877f215;">📡</div>
+          <div class="res-card-cat" style="color:#4da6ff;">Facebook Ads</div>
+          <div class="res-card-title">Guide installation Pixel Facebook</div>
+          <div class="res-card-desc">Créer ton Pixel, installer le code, configurer les événements (Purchase, Registration...), vérifier.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">Pixel</span>
+            <span class="res-tag">Événements</span>
+            <span class="res-tag">Retargeting</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/guide-pixel.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- COPIES ADS -->
+      <div class="res-card" data-cat="ads templates">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#00e5a015;">✍️</div>
+          <div class="res-card-cat" style="color:var(--green);">Copies Ads</div>
+          <div class="res-card-title">4 copies publicitaires prêtes</div>
+          <div class="res-card-desc">Version A (Problème), B (Résultat chiffré), C (Curiosité), D (Direct). Copies optimisées pour l'Afrique francophone.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">4 versions A/B</span>
+            <span class="res-tag">Bouton copier</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/guide-campagnes.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- TEMPLATES WHATSAPP -->
+      <div class="res-card" data-cat="templates lancement">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#25d36615;">📱</div>
+          <div class="res-card-cat" style="color:#25d366;">WhatsApp</div>
+          <div class="res-card-title">Templates messages WhatsApp</div>
+          <div class="res-card-desc">Messages Status, groupes, contacts directs. Textes prêts à copier-coller pour promouvoir ton tunnel sur WhatsApp.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">Status</span>
+            <span class="res-tag">Groupes</span>
+            <span class="res-tag">Broadcast</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/whatsapp.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- SÉQUENCES EMAIL -->
+      <div class="res-card" data-cat="avance templates">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#4da6ff15;">📧</div>
+          <div class="res-card-cat" style="color:var(--blue);">Email</div>
+          <div class="res-card-title">6 séquences email automatiques</div>
+          <div class="res-card-desc">Bienvenue · Relance · Upgrade · Confirmation achat · Panier abandonné · Témoignage. Configurées et prêtes.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">6 séquences</span>
+            <span class="res-tag">Automatique</span>
+            <span class="res-tag">Brevo</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-pro">⚡ Pro+</span>
+          <a href="/email-marketing.html" class="res-btn" id="emailBtn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- AFFILIATION -->
+      <div class="res-card" data-cat="avance">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#a78bfa15;">🤝</div>
+          <div class="res-card-cat" style="color:var(--purple);">Avancé</div>
+          <div class="res-card-title">Programme d'affiliation</div>
+          <div class="res-card-desc">Tes acheteurs deviennent tes vendeurs. Configure les commissions, partage les ressources promo, suivi automatique.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">Commissions</span>
+            <span class="res-tag">Lien affilié</span>
+            <span class="res-tag">Mobile Money</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-scale">🏆 Scale</span>
+          <a href="/affiliation.html" class="res-btn" id="affBtn">Ouvrir →</a>
+        </div>
+      </div>
+
+      <!-- STATISTIQUES -->
+      <div class="res-card" data-cat="avance lancement">
+        <div class="res-card-top">
+          <div class="res-card-icon" style="background:#00e5a015;">📊</div>
+          <div class="res-card-cat" style="color:var(--green);">Analytics</div>
+          <div class="res-card-title">Statistiques avancées</div>
+          <div class="res-card-desc">Revenus, vues, conversions, meilleur tunnel, export CSV. Suivi en temps réel de toutes tes performances.</div>
+          <div class="res-card-tags">
+            <span class="res-tag">Temps réel</span>
+            <span class="res-tag">Export CSV</span>
+            <span class="res-tag">Graphiques</span>
+          </div>
+        </div>
+        <div class="res-card-footer">
+          <span class="res-plan-pill plan-all">✓ Tous les plans</span>
+          <a href="/statistiques.html" class="res-btn">Ouvrir →</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<script>
+  var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var userPlan = 'starter';
+  var progressDone = JSON.parse(localStorage.getItem('fa_res_progress') || '[]');
+
+  sb.auth.getUser().then(function(r) {
+    if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
+    sb.from('profiles').select('full_name,plan').eq('id', r.data.user.id).single().then(function(pr) {
+      if (!pr.data) return;
+      userPlan = pr.data.plan || 'starter';
+      var name = pr.data.full_name || r.data.user.email.split('@')[0];
+      var ini  = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+      document.getElementById('userAvatar').textContent = ini;
+      document.getElementById('userName').textContent   = name;
+      document.getElementById('userPlan').textContent   = 'Plan ' + userPlan;
+      var p = userPlan.charAt(0).toUpperCase() + userPlan.slice(1);
+      document.getElementById('planBadge').textContent = '⚡ Plan ' + p;
+      applyPlanLocks();
+    });
+    renderProgress();
+  });
+
+  // ── PLAN LOCKS ──
+  function applyPlanLocks() {
+    if (userPlan === 'starter') {
+      var emailBtn = document.getElementById('emailBtn');
+      if (emailBtn) { emailBtn.className = 'res-btn locked'; emailBtn.textContent = '🔒 Pro requis'; emailBtn.removeAttribute('href'); }
+      var affBtn = document.getElementById('affBtn');
+      if (affBtn) { affBtn.className = 'res-btn locked'; affBtn.textContent = '🔒 Scale requis'; affBtn.removeAttribute('href'); }
+    }
+    if (userPlan === 'pro') {
+      var affBtn = document.getElementById('affBtn');
+      if (affBtn) { affBtn.className = 'res-btn locked'; affBtn.textContent = '🔒 Scale requis'; affBtn.removeAttribute('href'); }
+    }
+  }
+
+  // ── FILTRE ──
+  function filterRes(cat, btn) {
+    document.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('.res-card').forEach(function(c) {
+      var cats = c.getAttribute('data-cat') || '';
+      c.style.display = (cat === 'all' || cats.includes(cat)) ? 'flex' : 'none';
+    });
+  }
+
+  // ── PROGRESSION ──
+  function renderProgress() {
+    var total = 6;
+    var done  = progressDone.length;
+    progressDone.forEach(function(i) {
+      var icon  = document.getElementById('ps-'+i);
+      var text  = document.getElementById('pt-'+i);
+      if (icon) { icon.className = 'prog-step-icon done'; icon.textContent = '✓'; }
+      if (text) text.classList.add('done');
+    });
+    var pct = Math.round((done/total)*100);
+    document.getElementById('progressBar').style.width  = pct + '%';
+    document.getElementById('progressPct').textContent  = pct + '%';
+    document.getElementById('progressText').textContent = done + ' / ' + total + ' complétés';
+  }
+
+  function toggleProgress(i, el) {
+    var idx = progressDone.indexOf(i);
+    if (idx > -1) progressDone.splice(idx, 1);
+    else progressDone.push(i);
+    localStorage.setItem('fa_res_progress', JSON.stringify(progressDone));
+    renderProgress();
+  }
+
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}
+  function logout(){sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';});}
+
+  function showToast(msg,type){
+    var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};
+    var t=document.getElementById('__toast');
+    t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';
+    t.textContent=msg;
+    setTimeout(function(){t.style.opacity='1';},10);
+    setTimeout(function(){t.style.opacity='0';},3500);
+  }
+</script>
+</body>
+</html>

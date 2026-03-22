@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assets FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--green:#00e5a0;--green2:#00c896;--bg:#070b0f;--surface:#0d1318;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:#111;padding:20px;display:flex;flex-direction:column;gap:32px;}
+  .section-label{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:#4da6ff;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;padding:5px 12px;background:#4da6ff18;border-radius:20px;display:inline-block;}
+  .guide{background:#1a2535;border:1px solid #2a3f55;border-radius:10px;padding:12px 14px;font-size:.75rem;color:#7aa5c0;line-height:1.7;margin-bottom:14px;}
+  .guide strong{color:var(--green);}
+
+  /* ══ LOGO 1 : Icône carrée ══ */
+  .logo-icon{
+    width:200px;height:200px;
+    background:linear-gradient(135deg,#050e08,#0a2018,#050a0f);
+    border-radius:32px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+    box-shadow:0 20px 60px #00000090;
+  }
+  .logo-icon::before{
+    content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+    width:200px;height:200px;
+    background:radial-gradient(circle,#00e5a020 0%,transparent 70%);
+  }
+  .logo-icon-mark{
+    width:80px;height:80px;
+    background:linear-gradient(135deg,var(--green),#00a87a);
+    border-radius:20px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;
+    color:#050e08;
+    position:relative;
+    box-shadow:0 8px 30px #00e5a040;
+  }
+  .logo-icon-text{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;
+    color:var(--green);margin-top:10px;position:relative;letter-spacing:.04em;
+  }
+
+  /* ══ LOGO 2 : Horizontal ══ */
+  .logo-horizontal{
+    width:360px;height:100px;
+    background:linear-gradient(135deg,#050e08,#0a2018);
+    border-radius:16px;
+    display:flex;align-items:center;justify-content:center;gap:16px;
+    box-shadow:0 20px 60px #00000090;
+    position:relative;overflow:hidden;
+  }
+  .logo-horizontal::before{
+    content:'';position:absolute;left:-20px;top:-20px;
+    width:120px;height:120px;
+    background:radial-gradient(circle,#00e5a015,transparent 70%);
+  }
+  .logo-h-mark{
+    width:52px;height:52px;
+    background:linear-gradient(135deg,var(--green),#00a87a);
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+    color:#050e08;flex-shrink:0;
+    box-shadow:0 6px 20px #00e5a040;
+  }
+  .logo-h-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--green);}
+
+  /* ══ LOGO 3 : Blanc pour fond sombre ══ */
+  .logo-white{
+    width:200px;height:200px;
+    background:linear-gradient(135deg,var(--green),#00a87a);
+    border-radius:32px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 20px 60px #00e5a060;
+    position:relative;overflow:hidden;
+  }
+  .logo-white::before{
+    content:'';position:absolute;top:-30px;right:-30px;
+    width:120px;height:120px;background:rgba(255,255,255,.12);border-radius:50%;
+  }
+  .logo-white-mark{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:3.2rem;
+    color:#050e08;position:relative;letter-spacing:-.02em;
+  }
+  .logo-white-sub{
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;
+    color:#050e0890;margin-top:4px;position:relative;letter-spacing:.06em;
+  }
+
+  /* ══ PHOTO DE PROFIL FACEBOOK (180x180) ══ */
+  .fb-profil{
+    width:180px;height:180px;
+    background:linear-gradient(135deg,#050e08,#0a2018);
+    border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 20px 60px #00000090;
+    border:4px solid var(--green);
+    position:relative;overflow:hidden;
+  }
+  .fb-profil::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(circle at 30% 30%,#00e5a015,transparent 60%);
+  }
+  .fb-profil-mark{
+    width:72px;height:72px;
+    background:linear-gradient(135deg,var(--green),#00a87a);
+    border-radius:18px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;
+    color:#050e08;position:relative;
+    box-shadow:0 6px 20px #00e5a050;
+  }
+  .fb-profil-name{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;
+    color:var(--green);margin-top:8px;position:relative;letter-spacing:.05em;
+  }
+
+  /* ══ COUVERTURE FACEBOOK (1640x856 → 360x188) ══ */
+  .fb-cover{
+    width:360px;height:188px;
+    background:linear-gradient(135deg,#030807 0%,#071a0f 40%,#050b12 100%);
+    border-radius:12px;
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;
+    padding:0 28px;
+    box-shadow:0 20px 60px #00000090;
+  }
+  .fb-cover-glow1{position:absolute;top:-60px;left:-40px;width:280px;height:280px;background:radial-gradient(circle,#00e5a012,transparent 70%);}
+  .fb-cover-glow2{position:absolute;bottom:-80px;right:-40px;width:240px;height:240px;background:radial-gradient(circle,#00c89608,transparent 70%);}
+  .fb-cover-grid{position:absolute;inset:0;background-image:linear-gradient(#00e5a005 1px,transparent 1px),linear-gradient(90deg,#00e5a005 1px,transparent 1px);background-size:30px 30px;}
+  .fb-cover-left{position:relative;flex:1;}
+  .fb-cover-logo{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .fb-cover-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#050e08;flex-shrink:0;}
+  .fb-cover-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);}
+  .fb-cover-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:white;line-height:1.2;margin-bottom:8px;}
+  .fb-cover-title em{font-style:normal;color:var(--green);}
+  .fb-cover-pills{display:flex;gap:5px;flex-wrap:wrap;}
+  .fb-cover-pill{background:#00e5a015;border:1px solid #00e5a030;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.52rem;padding:3px 8px;border-radius:20px;}
+  .fb-cover-right{position:relative;text-align:right;}
+  .fb-cover-cta{background:linear-gradient(135deg,var(--green),#00a87a);color:#050e08;font-family:'Syne',sans-serif;font-weight:800;font-size:.65rem;padding:10px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 16px #00e5a040;}
+  .fb-cover-sub{font-size:.55rem;color:#3a6a4a;margin-top:6px;}
+
+  /* ══ COUVERTURE YOUTUBE / BANNIÈRE ══ */
+  .yt-cover{
+    width:360px;height:90px;
+    background:linear-gradient(135deg,#030807,#071a0f);
+    border-radius:10px;
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;
+    padding:0 20px;
+    box-shadow:0 10px 30px #00000090;
+  }
+  .yt-left{display:flex;align-items:center;gap:10px;flex:1;}
+  .yt-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#050e08;}
+  .yt-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--green);}
+  .yt-tag{font-size:.6rem;color:#3a6a4a;}
+  .yt-right{font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;color:white;text-align:right;line-height:1.4;}
+  .yt-right em{font-style:normal;color:var(--green);}
+
+</style>
+</head>
+<body>
+
+<!-- LOGO ICÔNE -->
+<div>
+  <div class="section-label">Logo icône — Photo de profil app</div>
+  <div class="guide"><strong>Usage :</strong> Photo de profil Facebook · WhatsApp Business · Favicon site · Partage WhatsApp</div>
+  <div class="logo-icon">
+    <div class="logo-icon-mark">FA</div>
+    <div class="logo-icon-text">FunnelAfrica</div>
+  </div>
+</div>
+
+<!-- LOGO HORIZONTAL -->
+<div>
+  <div class="section-label">Logo horizontal — Header site</div>
+  <div class="guide"><strong>Usage :</strong> Header de la landing page · Email marketing · Documents</div>
+  <div class="logo-horizontal">
+    <div class="logo-h-mark">FA</div>
+    <div class="logo-h-text">FunnelAfrica</div>
+  </div>
+</div>
+
+<!-- LOGO VERT -->
+<div>
+  <div class="section-label">Logo vert — Version couleur</div>
+  <div class="guide"><strong>Usage :</strong> Fond blanc/clair · Badges · Certificats · Stickers</div>
+  <div class="logo-white">
+    <div class="logo-white-mark">FA</div>
+    <div class="logo-white-sub">FUNNELAFRICA</div>
+  </div>
+</div>
+
+<!-- PHOTO PROFIL FACEBOOK -->
+<div>
+  <div class="section-label">Photo profil Facebook — 180x180px</div>
+  <div class="guide">
+    <strong>Comment utiliser :</strong><br>
+    1. Capture d'écran de ce cercle<br>
+    2. Recadre en carré autour du cercle<br>
+    3. Upload comme photo de profil sur Facebook<br>
+    Facebook recadrera automatiquement en cercle.
+  </div>
+  <div class="fb-profil">
+    <div class="fb-profil-mark">FA</div>
+    <div class="fb-profil-name">FUNNELAFRICA</div>
+  </div>
+</div>
+
+<!-- COUVERTURE FACEBOOK -->
+<div>
+  <div class="section-label">Couverture Facebook — 1640x856px</div>
+  <div class="guide">
+    <strong>Comment utiliser :</strong><br>
+    1. Capture d'écran de cette bannière<br>
+    2. Upload comme photo de couverture sur Facebook<br>
+    3. Recadre si nécessaire dans Facebook<br>
+    <strong>Conseil :</strong> Prends la capture en mode paysage pour meilleure qualité.
+  </div>
+  <div class="fb-cover">
+    <div class="fb-cover-glow1"></div>
+    <div class="fb-cover-glow2"></div>
+    <div class="fb-cover-grid"></div>
+    <div class="fb-cover-left">
+      <div class="fb-cover-logo">
+        <div class="fb-cover-mark">FA</div>
+        <div class="fb-cover-brand">FunnelAfrica</div>
+      </div>
+      <div class="fb-cover-title">Vendez en ligne avec<br><em>Mobile Money</em></div>
+      <div class="fb-cover-pills">
+        <span class="fb-cover-pill">🌊 Wave</span>
+        <span class="fb-cover-pill">💛 MTN MoMo</span>
+        <span class="fb-cover-pill">🟠 Orange Money</span>
+        <span class="fb-cover-pill">🚀 Gratuit</span>
+      </div>
+    </div>
+    <div class="fb-cover-right">
+      <div class="fb-cover-cta">Commencer gratuit →</div>
+      <div class="fb-cover-sub">funnelafrica.vercel.app</div>
+    </div>
+  </div>
+</div>
+
+<!-- BANNIÈRE WHATSAPP -->
+<div>
+  <div class="section-label">Bannière WhatsApp Business</div>
+  <div class="guide"><strong>Usage :</strong> Photo de couverture WhatsApp Business</div>
+  <div class="yt-cover">
+    <div class="yt-left">
+      <div class="yt-mark">FA</div>
+      <div>
+        <div class="yt-brand">FunnelAfrica</div>
+        <div class="yt-tag">Plateforme de vente Mobile Money</div>
+      </div>
+    </div>
+    <div class="yt-right">Vendez en ligne<br>avec <em>Wave · MTN MoMo</em><br>funnelafrica.vercel.app</div>
+  </div>
+</div>
+
+</body>
+</html>

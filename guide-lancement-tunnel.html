@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Lancement Tunnel — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--danger:#ff4d6d;--blue:#4da6ff;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:0 0 60px;}
+
+  /* HEADER */
+  .hero{background:linear-gradient(135deg,#030807,#071a0f,#050b12);padding:32px 20px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,#00e5a010,transparent 70%);}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#00e5a012;border:1px solid #00e5a030;color:var(--green);padding:5px 14px;border-radius:20px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;margin-bottom:14px;position:relative;}
+  .hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:8px;position:relative;}
+  .hero-sub{font-size:.85rem;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto;position:relative;}
+
+  /* PROGRESS */
+  .progress-nav{display:flex;overflow-x:auto;gap:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0;-webkit-overflow-scrolling:touch;}
+  .progress-nav::-webkit-scrollbar{height:0;}
+  .prog-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+  .prog-item.active{border-bottom-color:var(--green);}
+  .prog-item.done{border-bottom-color:#00e5a040;}
+  .prog-dot{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--muted);transition:all .2s;}
+  .prog-item.active .prog-dot{background:#00e5a020;border-color:var(--green);color:var(--green);}
+  .prog-item.done .prog-dot{background:var(--green);border-color:var(--green);color:#070b0f;}
+  .prog-label{font-size:.65rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;}
+  .prog-item.active .prog-label{color:var(--green);}
+
+  /* CONTENT */
+  .content{padding:20px;}
+  .phase{display:none;}
+  .phase.active{display:block;}
+
+  /* PHASE HEADER */
+  .phase-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .phase-icon{width:44px;height:44px;border-radius:12px;background:#00e5a015;border:1px solid #00e5a030;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+  .phase-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .phase-sub{font-size:.78rem;color:var(--muted);}
+  .phase-time{background:var(--gold);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;padding:3px 10px;border-radius:20px;margin-left:auto;white-space:nowrap;}
+
+  /* STEP CARD */
+  .step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+  .step-card-header{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s;}
+  .step-card-header:hover{background:var(--surface2);}
+  .step-num{width:26px;height:26px;border-radius:50%;background:#00e5a015;border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:var(--green);flex-shrink:0;}
+  .step-num.done{background:var(--green);color:#070b0f;border-color:var(--green);}
+  .step-title{font-weight:600;font-size:.88rem;flex:1;}
+  .step-badge{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;padding:2px 9px;border-radius:20px;}
+  .badge-easy{background:#00e5a015;color:var(--green);}
+  .badge-med{background:#ffb83015;color:var(--gold);}
+  .badge-imp{background:#ff4d6d15;color:var(--danger);}
+  .step-toggle{color:var(--muted);font-size:.8rem;transition:transform .2s;}
+  .step-card.open .step-toggle{transform:rotate(180deg);}
+  .step-body{padding:0 16px;max-height:0;overflow:hidden;transition:all .3s;}
+  .step-card.open .step-body{padding:0 16px 16px;max-height:1000px;}
+
+  .sub-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .sub-step:last-child{border-bottom:none;}
+  .sub-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:7px;}
+  .sub-text{font-size:.82rem;color:#a0b8c8;line-height:1.6;}
+  .sub-text strong{color:var(--text);}
+  .sub-text em{font-style:normal;background:#00e5a010;border:1px solid #00e5a025;color:var(--green);padding:1px 7px;border-radius:5px;font-size:.75rem;font-family:'Syne',sans-serif;font-weight:600;}
+  .sub-text code{font-family:monospace;background:var(--surface2);color:var(--blue);padding:2px 6px;border-radius:4px;font-size:.75rem;}
+
+  .tip{background:#00e5a008;border-left:3px solid var(--green);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:.77rem;color:#7ab89a;line-height:1.6;}
+  .tip strong{color:var(--green);}
+  .warn{background:#ffb83008;border-left:3px solid var(--gold);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:.77rem;color:#a08030;line-height:1.6;}
+
+  /* COPY BOX */
+  .copy-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;margin-top:10px;position:relative;}
+  .copy-label{font-size:.62rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .copy-content{font-size:.8rem;color:#a0b8c8;line-height:1.7;white-space:pre-wrap;}
+  .copy-btn{position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.63rem;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
+  .copy-btn:hover{background:var(--green);color:#070b0f;border-color:var(--green);}
+
+  /* CHECKLIST */
+  .check-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .check-row:last-child{border-bottom:none;}
+  .check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;transition:all .2s;}
+  .check-box.done{background:var(--green);border-color:var(--green);color:#070b0f;font-weight:700;}
+  .check-label{font-size:.82rem;transition:color .2s;}
+  .check-label.done{color:var(--muted);text-decoration:line-through;}
+
+  /* NAV BUTTONS */
+  .nav-btns{display:flex;gap:10px;margin-top:24px;}
+  .nav-btn{flex:1;padding:13px;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;border:none;transition:all .2s;text-align:center;}
+  .nav-btn-prev{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .nav-btn-prev:hover{color:var(--text);}
+  .nav-btn-next{background:linear-gradient(135deg,var(--green),#00c896);color:#070b0f;}
+  .nav-btn-next:hover{transform:translateY(-1px);box-shadow:0 6px 20px #00e5a030;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">🚀 Guide complet</div>
+  <h1>Lancer ton premier tunnel de vente</h1>
+  <p class="hero-sub">De la création de ton produit jusqu'à ta première vente. Suis les 6 phases dans l'ordre.</p>
+</div>
+
+<!-- PROGRESS NAV -->
+<div class="progress-nav">
+  <div class="prog-item active" id="nav-0" onclick="goPhase(0)">
+    <div class="prog-dot">1</div>
+    <div class="prog-label">Produit</div>
+  </div>
+  <div class="prog-item" id="nav-1" onclick="goPhase(1)">
+    <div class="prog-dot">2</div>
+    <div class="prog-label">Éditeur</div>
+  </div>
+  <div class="prog-item" id="nav-2" onclick="goPhase(2)">
+    <div class="prog-dot">3</div>
+    <div class="prog-label">Paiement</div>
+  </div>
+  <div class="prog-item" id="nav-3" onclick="goPhase(3)">
+    <div class="prog-dot">4</div>
+    <div class="prog-label">Test</div>
+  </div>
+  <div class="prog-item" id="nav-4" onclick="goPhase(4)">
+    <div class="prog-dot">5</div>
+    <div class="prog-label">Lancement</div>
+  </div>
+  <div class="prog-item" id="nav-5" onclick="goPhase(5)">
+    <div class="prog-dot">6</div>
+    <div class="prog-label">Campagne</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══ PHASE 1 : PRODUIT ══ -->
+<div class="phase active" id="phase-0">
+  <div class="phase-header">
+    <div class="phase-icon">📦</div>
+    <div><div class="phase-title">Phase 1 — Définir ton produit</div><div class="phase-sub">Ce que tu vas vendre et à quel prix</div></div>
+    <div class="phase-time">⏱ 15 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Choisir le type de produit</div>
+      <span class="step-badge badge-easy">Facile</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Décide quoi vendre : <strong>Formation · Coaching · Ebook · Service · Produit physique</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Commence par ce que tu maîtrises déjà — ne cherche pas la perfection</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Exemple : <em>Formation Excel Pro</em> · <em>Coaching Business</em> · <em>Ebook Marketing</em></div></div>
+      <div class="tip"><strong>💡 Conseil :</strong> Le produit qui vend le mieux en Afrique = une formation qui résout un problème professionnel précis (Excel, comptabilité, marketing, couture, cuisine...)</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Fixer le bon prix</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Fourchette recommandée selon le produit :</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Ebook / PDF : <strong>2 000 — 5 000 FCFA</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Formation vidéo : <strong>9 900 — 25 000 FCFA</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Coaching (session) : <strong>20 000 — 75 000 FCFA</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Programme complet : <strong>50 000 — 150 000 FCFA</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Définis un <strong>prix barré</strong> (ancien prix) pour créer une réduction visible. Ex: barré 25 000 → prix 9 900</div></div>
+      <div class="tip"><strong>💡 Règle :</strong> Ne commence pas trop bas. Un prix trop bas = produit perçu comme sans valeur. 9 900 FCFA est le sweet spot pour une formation.</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Préparer le contenu de ta page</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Note ces éléments</strong> avant d'ouvrir l'éditeur :</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✏️ <strong>Titre accrocheur</strong> : "Maîtrisez Excel en 30 jours même si vous débutez"</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✏️ <strong>6 bénéfices</strong> concrets que l'acheteur va obtenir</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✏️ <strong>2 témoignages</strong> (vrais ou simulés pour commencer)</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✏️ <strong>3 FAQ</strong> que tes prospects posent souvent</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✏️ <strong>Garantie</strong> : "Satisfait ou remboursé 7 jours"</div></div>
+      <div class="tip"><strong>💡 Formule titre gagnante :</strong> "Apprenez [COMPÉTENCE] en [DURÉE] même si [OBJECTION]"</div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-next" onclick="goPhase(1)">Phase suivante → Éditeur</button>
+  </div>
+</div>
+
+<!-- ══ PHASE 2 : ÉDITEUR ══ -->
+<div class="phase" id="phase-1">
+  <div class="phase-header">
+    <div class="phase-icon">🎨</div>
+    <div><div class="phase-title">Phase 2 — Créer ta page de vente</div><div class="phase-sub">Dans l'éditeur FunnelAfrica</div></div>
+    <div class="phase-time">⏱ 20 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Créer le tunnel</div>
+      <span class="step-badge badge-easy">Facile</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Dashboard → <strong>+ Nouveau Tunnel</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Choisis un template → <em>Formation Pro</em> ou <em>Digital Download</em></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">L'éditeur s'ouvre avec 3 panels : <strong>Sections à gauche · Aperçu au centre · Propriétés à droite</strong></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Section Hero — Le plus important</div>
+      <span class="step-badge badge-imp">Critique</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Panel droit → <strong>🎯 Hero</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Titre :</strong> Ta promesse principale — doit être claire en 5 secondes</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Sous-titre :</strong> La promesse secondaire en couleur verte</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Description :</strong> 2-3 phrases max — qui c'est pour, quel résultat, en combien de temps</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Badge :</strong> "Formation en ligne · Accès immédiat · Paiement Mobile Money"</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Icône :</strong> Choisir l'emoji qui représente ton produit</div></div>
+      <div class="tip"><strong>💡 Le titre doit répondre à :</strong> "Si je lis ça en 5 secondes, est-ce que je comprends ce que je vais apprendre ?"</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Remplir bénéfices, témoignages, prix</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">✅ <strong>Bénéfices</strong> : 6 points — commence chaque point par un verbe d'action (Créer, Maîtriser, Automatiser...)</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">⭐ <strong>Témoignages</strong> : ajoute 2 témoignages avec un vrai nom et une vraie ville</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">💰 <strong>Prix</strong> : entre le prix + prix barré + texte bouton + garantie + 4 inclus</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">❓ <strong>FAQ</strong> : 3 questions que tes prospects posent souvent</div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Paramètres avancés</div>
+      <span class="step-badge badge-easy">Facile</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Couleur principale</strong> : vert par défaut — change si tu veux personnaliser ta marque</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Slug URL</strong> : <em>formation-excel-pro</em> → ton lien sera <code>/t/formation-excel-pro</code></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Nom vendeur</strong> : ton prénom et nom — affiché en bas de page</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Timer d'urgence</strong> : active si tu veux créer de la rareté</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Upsell</strong> : configure si tu as un produit complémentaire à vendre après l'achat</div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Vérifier l'aperçu mobile</div>
+      <span class="step-badge badge-imp">Critique</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Clique sur l'icône 📲 (mobile) dans la barre du haut</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Vérifie que tout est lisible sur petit écran</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Le titre ne doit pas être coupé — raccourcis si nécessaire</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Le bouton "Accéder maintenant" doit être bien visible</div></div>
+      <div class="warn">⚠️ <strong>80% de tes acheteurs viendront sur mobile.</strong> Si la page est mauvaise sur mobile, tu perdras des ventes.</div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-prev" onclick="goPhase(0)">← Phase 1</button>
+    <button class="nav-btn nav-btn-next" onclick="goPhase(2)">Phase suivante → Paiement</button>
+  </div>
+</div>
+
+<!-- ══ PHASE 3 : PAIEMENT ══ -->
+<div class="phase" id="phase-2">
+  <div class="phase-header">
+    <div class="phase-icon">💳</div>
+    <div><div class="phase-title">Phase 3 — Configurer le paiement</div><div class="phase-sub">FedaPay · Mobile Money · Checkout</div></div>
+    <div class="phase-time">⏱ 10 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Vérifier les variables Vercel</div>
+      <span class="step-badge badge-imp">Critique</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Va sur <strong>vercel.com</strong> → ton projet → <strong>Settings → Environment Variables</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Vérifie ces 3 variables :</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><code>FEDAPAY_SECRET_KEY</code> = <strong>sk_live_xxx</strong> (clé live FedaPay)</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><code>SUPABASE_SERVICE_KEY</code> = ta clé service role</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><code>APP_URL</code> = <strong>https://funnelafrica.vercel.app</strong></div></div>
+      <div class="warn">⚠️ Si FEDAPAY_SECRET_KEY manque ou est en mode test → les paiements échouent en silencieux.</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Vérifier les webhooks FedaPay</div>
+      <span class="step-badge badge-imp">Critique</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Va sur <strong>live.fedapay.com</strong> → Paramètres → Webhooks</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Vérifie que ces 2 webhooks existent :</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><code>https://funnelafrica.vercel.app/api/payment/webhook</code></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><code>https://funnelafrica.vercel.app/api/subscription/webhook</code></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Événement à écouter : <strong>transaction.approved</strong></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Vérifier le checkout</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Ouvre <code>/funnelafrica-checkout.html?tunnel=TON_SLUG</code></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Le nom du produit et le prix doivent s'afficher correctement</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Les méthodes de paiement Wave · MTN · Orange doivent apparaître</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Clique sur "Payer" → FedaPay s'ouvre → <strong>Ne finalise pas</strong> (sauf si tu veux faire un vrai test)</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-prev" onclick="goPhase(1)">← Phase 2</button>
+    <button class="nav-btn nav-btn-next" onclick="goPhase(3)">Phase suivante → Test complet</button>
+  </div>
+</div>
+
+<!-- ══ PHASE 4 : TEST ══ -->
+<div class="phase" id="phase-3">
+  <div class="phase-header">
+    <div class="phase-icon">🧪</div>
+    <div><div class="phase-title">Phase 4 — Tester tout le flow</div><div class="phase-sub">Avant de publier et lancer les Ads</div></div>
+    <div class="phase-time">⏱ 15 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Test flow complet (checklist)</div>
+      <span class="step-badge badge-imp">Critique</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Page tunnel public s'affiche avec ton contenu</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Prix correct affiché sur la page</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Bouton "Accéder maintenant" pointe vers le checkout</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Checkout affiche le bon produit et prix</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">FedaPay s'ouvre quand on clique Payer</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Page merci.html s'affiche après paiement</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Espace membre accessible depuis la page merci</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">Email de confirmation reçu après achat</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this);event.stopPropagation()">
+        <div class="check-box">○</div><div class="check-label">La commande apparaît dans ton dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Tester sur différents appareils</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Teste sur <strong>ton propre Android</strong> — est-ce que tout s'affiche bien ?</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Envoie le lien à <strong>un ami</strong> — il doit pouvoir voir la page sans être connecté</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Teste sur <strong>Yandex Browser</strong> et <strong>Chrome mobile</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Vérifie que la page charge en <strong>moins de 3 secondes</strong> sur 4G</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-prev" onclick="goPhase(2)">← Phase 3</button>
+    <button class="nav-btn nav-btn-next" onclick="goPhase(4)">Phase suivante → Lancement</button>
+  </div>
+</div>
+
+<!-- ══ PHASE 5 : LANCEMENT ══ -->
+<div class="phase" id="phase-4">
+  <div class="phase-header">
+    <div class="phase-icon">🚀</div>
+    <div><div class="phase-title">Phase 5 — Publier et partager</div><div class="phase-sub">Ton tunnel est en ligne — recrute tes premiers acheteurs</div></div>
+    <div class="phase-time">⏱ 10 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Publier le tunnel</div>
+      <span class="step-badge badge-easy">Facile</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Dans l'éditeur → bouton <em>🚀 Publier</em> en haut à droite</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Le statut passe de <strong>Brouillon</strong> à <strong>🟢 En ligne</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Copie ton lien : <code>funnelafrica.vercel.app/t/ton-slug</code></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Partager sur WhatsApp</div>
+      <span class="step-badge badge-imp">Priorité 1</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">C'est ton canal de vente le plus rapide — commence par là</div></div>
+      <div class="copy-wrap">
+        <div class="copy-label">Message WhatsApp Status</div>
+        <button class="copy-btn" onclick="doCopy(this)">📋 Copier</button>
+        <div class="copy-content">🔥 J'ai lancé ma nouvelle formation !
+
+✅ [TITRE DE TON PRODUIT]
+✅ Accès immédiat
+✅ Paiement Wave / MTN MoMo / Orange Money
+
+👉 [TON LIEN ICI]
+
+Profites-en — offre limitée !</div>
+      </div>
+      <div class="copy-wrap" style="margin-top:8px;">
+        <div class="copy-label">Message WhatsApp Groupes</div>
+        <button class="copy-btn" onclick="doCopy(this)">📋 Copier</button>
+        <div class="copy-content">Bonjour à tous 👋
+
+Je viens de lancer [TITRE] — une formation pour [PUBLIC CIBLE].
+
+Ce que tu vas apprendre :
+→ [Bénéfice 1]
+→ [Bénéfice 2]
+→ [Bénéfice 3]
+
+Prix : [PRIX] FCFA · Paiement Mobile Money
+Lien : [TON LIEN]</div>
+      </div>
+      <div class="tip"><strong>💡 Envoie dans :</strong> Tous tes groupes WhatsApp · Ton statut WhatsApp · Tes contacts directs ciblés</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Partager sur Facebook</div>
+      <span class="step-badge badge-med">Priorité 2</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Poste sur ta <strong>page Facebook FunnelAfrica</strong> + ton <strong>profil personnel</strong></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Utilise un des visuels de <code>ads-visuels.html</code> comme image</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Poste dans des <strong>groupes Facebook</strong> d'entrepreneurs africains</div></div>
+      <div class="copy-wrap">
+        <div class="copy-label">Post Facebook</div>
+        <button class="copy-btn" onclick="doCopy(this)">📋 Copier</button>
+        <div class="copy-content">🚀 [TITRE DE TON PRODUIT]
+
+[Description courte de ce que les gens vont apprendre]
+
+✅ [Bénéfice 1]
+✅ [Bénéfice 2]
+✅ [Bénéfice 3]
+
+💰 Prix : [PRIX] FCFA
+📱 Paiement : Wave · MTN MoMo · Orange Money · Carte
+⚡ Accès immédiat
+
+👉 Inscris-toi ici : [TON LIEN]
+
+⏰ Offre valable cette semaine seulement !</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-prev" onclick="goPhase(3)">← Phase 4</button>
+    <button class="nav-btn nav-btn-next" onclick="goPhase(5)">Phase finale → Campagne Ads</button>
+  </div>
+</div>
+
+<!-- ══ PHASE 6 : CAMPAGNE ADS ══ -->
+<div class="phase" id="phase-5">
+  <div class="phase-header">
+    <div class="phase-icon">📢</div>
+    <div><div class="phase-title">Phase 6 — Lancer la campagne Facebook Ads</div><div class="phase-sub">Pour amener des inconnus vers ton tunnel</div></div>
+    <div class="phase-time">⏱ 30 min</div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Créer la campagne dans Ads Manager</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Ouvre <strong>guide-campagnes.html</strong> sur ton téléphone</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Commence par <strong>Campagne 1 — Notoriété</strong> à 3 000 FCFA/jour</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">URL de destination : ton lien tunnel <code>/t/ton-slug</code></div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Visuel : capture d'écran du <strong>Visuel 1</strong> dans ads-visuels.html</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Texte : copie la <strong>Version A</strong> depuis guide-campagnes.html</div></div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Surveiller les métriques J+1</div>
+      <span class="step-badge badge-med">Important</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Après 24h vérifie dans Ads Manager :</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>CPM</strong> (coût 1000 impressions) : doit être entre 500 et 2 000 FCFA</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>CTR</strong> (taux de clic) : doit être supérieur à 1.5%</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text"><strong>Portée</strong> : doit être supérieure à 2 000 personnes/jour</div></div>
+      <div class="tip"><strong>💡 Si le CTR est &lt; 1% après 48h</strong> → change le visuel ou le texte. Ne touche pas au ciblage en premier.</div>
+    </div>
+  </div>
+
+  <div class="step-card" onclick="toggleStep(this)">
+    <div class="step-card-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Après les premières ventes</div>
+      <span class="step-badge badge-easy">Bonus</span>
+      <span class="step-toggle">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Ajoute les <strong>vrais témoignages</strong> de tes premiers acheteurs dans l'éditeur</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Augmente ton budget Ads si le coût par vente est rentable</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Lance la <strong>Campagne 2 Acquisition</strong> avec 3 textes en A/B test</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Active le <strong>programme d'affiliation</strong> — tes acheteurs vendent pour toi</div></div>
+      <div class="sub-step"><div class="sub-dot"></div><div class="sub-text">Crée un <strong>deuxième tunnel</strong> avec un produit complémentaire (upsell)</div></div>
+      <div class="tip"><strong>🎯 Objectif semaine 4 :</strong> 50 ventes · 150 000 FCFA de revenus · Programme d'affiliation actif</div>
+    </div>
+  </div>
+
+  <!-- RÉSUMÉ FINAL -->
+  <div style="background:linear-gradient(135deg,#030807,#071a0f);border:1px solid #00e5a030;border-radius:var(--radius);padding:20px;margin-top:20px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:10px;">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:8px;color:var(--green);">Ton tunnel est prêt à vendre !</div>
+    <div style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:16px;">Tu as suivi les 6 phases. Ton tunnel est en ligne, tes paiements configurés, ta campagne Ads lancée. Maintenant — surveille, itère, scale.</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <a href="/funnelafrica-dashboard.html" style="background:var(--green);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:10px 18px;border-radius:9px;text-decoration:none;">→ Dashboard</a>
+      <a href="/statistiques.html" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:10px 18px;border-radius:9px;text-decoration:none;">📊 Statistiques</a>
+      <a href="/guide-campagnes.html" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:10px 18px;border-radius:9px;text-decoration:none;">📢 Campagnes Ads</a>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn nav-btn-prev" onclick="goPhase(4)">← Phase 5</button>
+    <button class="nav-btn nav-btn-next" onclick="window.location.href='/funnelafrica-dashboard.html'">🚀 Aller au Dashboard</button>
+  </div>
+</div>
+
+</div><!-- fin content -->
+
+<script>
+  var currentPhase = 0;
+
+  function goPhase(n) {
+    document.getElementById('phase-'+currentPhase).classList.remove('active');
+    document.getElementById('nav-'+currentPhase).classList.remove('active');
+    if (n > currentPhase) document.getElementById('nav-'+currentPhase).classList.add('done');
+    currentPhase = n;
+    document.getElementById('phase-'+n).classList.add('active');
+    document.getElementById('nav-'+n).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function toggleStep(card) {
+    card.classList.toggle('open');
+  }
+
+  function toggleCheck(el) {
+    var box   = el.querySelector('.check-box');
+    var label = el.querySelector('.check-label');
+    var done  = box.classList.contains('done');
+    box.classList.toggle('done', !done);
+    box.textContent = done ? '○' : '✓';
+    label.classList.toggle('done', !done);
+  }
+
+  function doCopy(btn) {
+    var text = btn.nextElementSibling.textContent.trim();
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = '✓ Copié !';
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#070b0f';
+      setTimeout(function(){btn.textContent='📋 Copier';btn.style.background='';btn.style.color='';}, 2500);
+    });
+  }
+
+  function showToast(msg,type){
+    var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};
+    var t=document.getElementById('__toast');
+    t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';
+    t.textContent=msg;
+    setTimeout(function(){t.style.opacity='1';},10);
+    setTimeout(function(){t.style.opacity='0';},3500);
+  }
+</script>
+</body>
+</html>

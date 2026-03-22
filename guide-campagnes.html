@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Campagnes Facebook Ads — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--fb:#1877f2;--danger:#ff4d6d;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:700px;margin:0 auto;}
+
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:6px;}
+  .page-sub{font-size:.85rem;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+
+  /* TABS */
+  .tabs{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:24px;overflow-x:auto;}
+  .tab{padding:8px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .2s;white-space:nowrap;}
+  .tab.active{background:var(--surface);color:var(--text);}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+  .card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .card-num{width:26px;height:26px;background:var(--fb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:white;flex-shrink:0;}
+  .card-num.green{background:var(--green);color:#070b0f;}
+  .card-num.gold{background:var(--gold);color:#070b0f;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
+  .card-body{padding:16px 18px;}
+
+  .step{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .step:last-child{border-bottom:none;}
+  .step-dot{width:22px;height:22px;border-radius:50%;background:#1877f215;border:1.5px solid var(--fb);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--fb);flex-shrink:0;margin-top:2px;}
+  .step-dot.green{background:#00e5a015;border-color:var(--green);color:var(--green);}
+  .step-text{font-size:.83rem;color:#a0b8c8;line-height:1.6;flex:1;}
+  .step-text strong{color:var(--text);}
+  .step-text em{font-style:normal;background:#1877f215;color:var(--fb);padding:1px 8px;border-radius:5px;font-family:'Syne',sans-serif;font-weight:600;font-size:.75rem;}
+  .step-text code{font-family:monospace;background:var(--surface2);color:var(--green);padding:2px 6px;border-radius:4px;font-size:.75rem;}
+  .note{background:#00e5a010;border-left:3px solid var(--green);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:8px;font-size:.75rem;color:var(--muted);line-height:1.5;}
+  .warning{background:#ffb83010;border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:8px;font-size:.75rem;color:#a0883a;line-height:1.5;}
+
+  /* COPY BOX */
+  .copy-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;position:relative;margin-top:10px;}
+  .copy-label{font-size:.65rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .copy-text{font-size:.82rem;color:#a0b8c8;line-height:1.7;white-space:pre-wrap;}
+  .copy-btn{position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.65rem;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
+  .copy-btn:hover{background:var(--green);color:#070b0f;border-color:var(--green);}
+
+  /* TARGETING */
+  .target-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .target-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;}
+  .target-label{font-size:.68rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .target-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .target-tag{background:var(--surface);border:1px solid var(--border);color:#a0b8c8;font-size:.7rem;padding:3px 9px;border-radius:20px;}
+  .target-tag.highlight{background:#00e5a012;border-color:#00e5a030;color:var(--green);}
+
+  /* BUDGET TABLE */
+  .budget-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .budget-table th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;border:1px solid var(--border);}
+  .budget-table td{padding:9px 12px;border:1px solid var(--border);font-size:.8rem;color:#a0b8c8;}
+  .budget-table td strong{color:var(--text);}
+  .budget-table .highlight-row td{background:#00e5a008;}
+
+  /* SEMAINE PLANNING */
+  .week{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+  .week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .week-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;}
+  .week-budget{background:var(--gold);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;padding:3px 12px;border-radius:20px;}
+  .week-budget.green{background:var(--green);}
+  .week-tasks{display:flex;flex-direction:column;gap:6px;}
+  .week-task{display:flex;align-items:flex-start;gap:8px;font-size:.78rem;color:#8fa5bc;}
+  .week-task::before{content:'→';color:var(--green);flex-shrink:0;margin-top:1px;}
+
+  /* KPI CARDS */
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+  .kpi-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;}
+  .kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--green);margin-bottom:3px;}
+  .kpi-label{font-size:.65rem;color:var(--muted);}
+
+  /* CHECKLIST */
+  .check-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;}
+  .check-item:last-child{border-bottom:none;}
+  .check-item:hover{background:var(--surface2);margin:0 -18px;padding:11px 18px;}
+  .check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;flex-shrink:0;transition:all .2s;}
+  .check-circle.done{background:var(--green);border-color:var(--green);color:#070b0f;}
+  .check-text{font-size:.82rem;}
+  .check-text.done{color:var(--muted);text-decoration:line-through;}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+
+<div class="page-title">📢 Lancer tes campagnes Facebook Ads</div>
+<div class="page-sub">Guide complet pour recruter tes premiers vendeurs sur FunnelAfrica. Suis les étapes dans l'ordre.</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('setup',this)">⚙️ Configuration</button>
+  <button class="tab" onclick="showTab('campagne1',this)">🎬 Campagne 1</button>
+  <button class="tab" onclick="showTab('campagne2',this)">🎯 Campagne 2</button>
+  <button class="tab" onclick="showTab('campagne3',this)">🔄 Retargeting</button>
+  <button class="tab" onclick="showTab('budget',this)">💰 Budget</button>
+  <button class="tab" onclick="showTab('checklist',this)">✅ Checklist</button>
+</div>
+
+<!-- ══ TAB 1 : CONFIGURATION ══ -->
+<div id="tab-setup">
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">1</div><div class="card-title">Ouvrir Facebook Ads Manager</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Va sur <strong>business.facebook.com</strong> depuis ton téléphone</div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Menu → <strong>Gestionnaire de publicités</strong></div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Si première fois → <strong>Créer un compte publicitaire</strong><br>Nom : <em>FunnelAfrica Ads</em> · Devise : XOF · Pays : Bénin</div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Ajouter une méthode de paiement → <strong>Carte bancaire</strong> ou Orange Money selon disponibilité</div></div>
+      <div class="note">💡 Le compte publicitaire est séparé de ta page Facebook. Tu as besoin des deux.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">2</div><div class="card-title">Lier ta page Facebook à Ads Manager</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Paramètres du compte publicitaire → <strong>Pages</strong></div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Ajouter ta page <strong>FunnelAfrica</strong></div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text">Paramètres → <strong>Pixels</strong> → Ajouter ton Pixel ID</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">3</div><div class="card-title">Préparer les assets avant de créer les campagnes</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot green">✓</div><div class="step-text">Page Facebook créée ✅</div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text"><strong>5 visuels</strong> depuis <code>ads-visuels.html</code> — captures d'écran prêtes</div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text"><strong>Pixel Facebook</strong> installé sur le site</div></div>
+      <div class="step"><div class="step-dot">→</div><div class="step-text"><strong>URL de destination</strong> : <code>https://funnelafrica.vercel.app/landing.html</code></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ TAB 2 : CAMPAGNE 1 ══ -->
+<div id="tab-campagne1" style="display:none;">
+
+  <div class="card">
+    <div class="card-header"><div class="card-num green">C1</div><div class="card-title">Campagne Notoriété — Semaine 1-2</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">1</div><div class="step-text">Clique <strong>+ Créer</strong> dans Ads Manager</div></div>
+      <div class="step"><div class="step-dot">2</div><div class="step-text">Objectif : <em>Notoriété</em> → <strong>Notoriété de la marque</strong></div></div>
+      <div class="step"><div class="step-dot">3</div><div class="step-text">Nom de la campagne : <strong>FA - Notoriété - Afrique - S1</strong></div></div>
+      <div class="step"><div class="step-dot">4</div><div class="step-text">Budget : <strong>3 000 FCFA/jour</strong> · Type : Budget quotidien</div></div>
+      <div class="step"><div class="step-dot">5</div><div class="step-text">Nom du groupe d'annonces : <strong>FA - Entrepreneurs Afrique</strong></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">👥</div><div class="card-title">Ciblage Campagne 1</div></div>
+    <div class="card-body">
+      <div class="target-grid">
+        <div class="target-box">
+          <div class="target-label">🌍 Pays</div>
+          <div class="target-tags">
+            <span class="target-tag highlight">Bénin</span>
+            <span class="target-tag highlight">Côte d'Ivoire</span>
+            <span class="target-tag highlight">Sénégal</span>
+            <span class="target-tag">Mali</span>
+            <span class="target-tag">Togo</span>
+          </div>
+        </div>
+        <div class="target-box">
+          <div class="target-label">👤 Âge</div>
+          <div class="target-tags">
+            <span class="target-tag highlight">22 — 42 ans</span>
+            <span class="target-tag">Hommes + Femmes</span>
+            <span class="target-tag">Android</span>
+          </div>
+        </div>
+        <div class="target-box">
+          <div class="target-label">🎯 Intérêts</div>
+          <div class="target-tags">
+            <span class="target-tag highlight">Entrepreneuriat</span>
+            <span class="target-tag highlight">Formation en ligne</span>
+            <span class="target-tag">Marketing digital</span>
+            <span class="target-tag">Petites entreprises</span>
+          </div>
+        </div>
+        <div class="target-box">
+          <div class="target-label">📱 Placement</div>
+          <div class="target-tags">
+            <span class="target-tag highlight">Facebook Feed</span>
+            <span class="target-tag highlight">Instagram Feed</span>
+            <span class="target-tag">Reels</span>
+          </div>
+        </div>
+      </div>
+      <div class="warning" style="margin-top:12px;">⚠️ Désactive le placement automatique — sélectionne manuellement Facebook Feed + Instagram Feed uniquement au départ.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">✍️</div><div class="card-title">Texte de l'annonce — Version A</div></div>
+    <div class="card-body">
+      <div class="copy-box">
+        <div class="copy-label">Texte principal</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">🚫 Marre de perdre des ventes parce que vos clients ne peuvent pas payer par carte ?
+
+Avec FunnelAfrica, vos acheteurs paient par :
+📱 Wave · Orange Money · MTN MoMo
+
+✅ Page de vente en 15 minutes
+✅ Encaissez immédiatement
+✅ Depuis votre téléphone Android
+
+👉 Créez votre tunnel gratuitement :</div>
+      </div>
+      <div class="copy-box" style="margin-top:8px;">
+        <div class="copy-label">Titre</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">Vendez en ligne avec Mobile Money</div>
+      </div>
+      <div class="copy-box" style="margin-top:8px;">
+        <div class="copy-label">Description</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">Gratuit pour démarrer · Wave · MTN MoMo · Orange Money</div>
+      </div>
+      <div class="copy-box" style="margin-top:8px;">
+        <div class="copy-label">URL de destination</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">https://funnelafrica.vercel.app/landing.html</div>
+      </div>
+      <div class="note" style="margin-top:10px;">💡 Visuel : utilise <strong>Visuel 1</strong> de ads-visuels.html (accroche principale)</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ TAB 3 : CAMPAGNE 2 ══ -->
+<div id="tab-campagne2" style="display:none;">
+
+  <div class="card">
+    <div class="card-header"><div class="card-num green">C2</div><div class="card-title">Campagne Acquisition — Semaine 2-4</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">1</div><div class="step-text">Objectif : <em>Conversions</em> → <strong>Leads</strong> ou <strong>Inscriptions</strong></div></div>
+      <div class="step"><div class="step-dot">2</div><div class="step-text">Nom : <strong>FA - Acquisition - Inscriptions - S2</strong></div></div>
+      <div class="step"><div class="step-dot">3</div><div class="step-text">Budget : <strong>8 000 FCFA/jour</strong></div></div>
+      <div class="step"><div class="step-dot">4</div><div class="step-text">Événement de conversion : <strong>CompleteRegistration</strong> (via Pixel)</div></div>
+      <div class="step"><div class="step-dot">5</div><div class="step-text">Crée <strong>3 groupes d'annonces</strong> en A/B test — un pour chaque texte</div></div>
+      <div class="note">💡 Lance 3 textes différents en même temps. Après 3-4 jours, coupe les 2 qui performent moins et double le budget sur le meilleur.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">✍️</div><div class="card-title">3 Textes en A/B Test</div></div>
+    <div class="card-body">
+
+      <div class="copy-box">
+        <div class="copy-label">Version B — Résultat chiffré</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">💰 Comment Amadou a fait 485 000 FCFA en 30 jours depuis son téléphone.
+
+Il n'a pas de site web.
+Il ne sait pas coder.
+Il vit à Cotonou.
+
+Il a juste utilisé FunnelAfrica pour vendre sa formation en ligne.
+
+🔥 Voici comment :
+1. Page de vente créée en 20 min
+2. Paiement Wave + MTN MoMo activé
+3. Lien partagé sur WhatsApp
+4. Premiers paiements reçus le jour même
+
+👉 Essaie gratuitement :</div>
+      </div>
+
+      <div class="copy-box" style="margin-top:10px;">
+        <div class="copy-label">Version C — Curiosité</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">🤔 Pourquoi des entrepreneurs africains quittent Systeme.io ?
+
+La réponse va vous surprendre...
+
+Ce n'est pas le prix.
+Ce n'est pas la complexité.
+
+C'est simple : Systeme.io ne parle pas Mobile Money.
+
+Ni Wave. Ni Orange Money. Ni MTN MoMo.
+
+FunnelAfrica, oui. Et c'est gratuit pour démarrer.
+
+👉 Testez la différence :</div>
+      </div>
+
+      <div class="copy-box" style="margin-top:10px;">
+        <div class="copy-label">Version D — Direct / Offre</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">🚀 Créez votre page de vente en ligne aujourd'hui.
+
+Formation · Coaching · Ebook · Service
+
+✅ Paiement Wave · MTN MoMo · Orange Money
+✅ Depuis votre téléphone Android
+✅ 0 FCFA pour démarrer
+
+Rejoignez les entrepreneurs qui vendent déjà avec FunnelAfrica.
+
+👉 Commencer gratuitement :</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ TAB 4 : RETARGETING ══ -->
+<div id="tab-campagne3" style="display:none;">
+
+  <div class="card">
+    <div class="card-header"><div class="card-num gold">C3</div><div class="card-title">Campagne Retargeting — Semaine 3+</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">1</div><div class="step-text">Objectif : <strong>Conversions</strong></div></div>
+      <div class="step"><div class="step-dot">2</div><div class="step-text">Nom : <strong>FA - Retargeting - Visiteurs - S3</strong></div></div>
+      <div class="step"><div class="step-dot">3</div><div class="step-text">Budget : <strong>5 000 FCFA/jour</strong></div></div>
+      <div class="step"><div class="step-dot">4</div><div class="step-text">Audience : <em>Audience personnalisée</em> → <strong>Visiteurs du site web (Pixel)</strong> → 30 derniers jours<br>Exclure : ceux qui se sont déjà inscrits</div></div>
+      <div class="warning">⚠️ Le retargeting ne fonctionne qu'après avoir eu au moins 100 visiteurs sur ton site via le Pixel. Lance les campagnes 1 et 2 d'abord.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">✍️</div><div class="card-title">Texte Retargeting</div></div>
+    <div class="card-body">
+      <div class="copy-box">
+        <div class="copy-label">Texte — Rappel visiteur</div>
+        <button class="copy-btn" onclick="copyText(this)">📋 Copier</button>
+        <div class="copy-text">Vous avez visité FunnelAfrica... 👀
+
+Vous n'avez pas encore créé votre tunnel de vente.
+
+Pendant ce temps, vos concurrents vendent déjà leurs formations via Wave et MTN MoMo.
+
+⏰ L'inscription est toujours gratuite.
+
+👉 Revenez et créez votre page en 15 minutes :</div>
+      </div>
+
+      <div class="note" style="margin-top:10px;">💡 Utilise le <strong>Visuel 3</strong> (Offre/Prix) ou le <strong>Visuel 5</strong> (Témoignage) pour le retargeting — ils convertissent mieux.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">🔮</div><div class="card-title">Audience Lookalike — Semaine 4</div></div>
+    <div class="card-body">
+      <div class="step"><div class="step-dot">1</div><div class="step-text">Attends d'avoir <strong>50+ inscrits</strong> via le Pixel</div></div>
+      <div class="step"><div class="step-dot">2</div><div class="step-text">Audiences → <strong>Créer une audience</strong> → <strong>Audience similaire</strong></div></div>
+      <div class="step"><div class="step-dot">3</div><div class="step-text">Source : Visiteurs ayant complété l'inscription (CompleteRegistration)<br>Pays : Côte d'Ivoire + Sénégal + Bénin<br>Taille : <strong>1%</strong> (plus précis)</div></div>
+      <div class="note">💡 Le Lookalike 1% va trouver des milliers de personnes similaires à tes inscrits. C'est la campagne la plus rentable à long terme.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ TAB 5 : BUDGET ══ -->
+<div id="tab-budget" style="display:none;">
+
+  <div class="card">
+    <div class="card-header"><div class="card-num green">💰</div><div class="card-title">Planning budget 4 semaines</div></div>
+    <div class="card-body">
+      <div class="week">
+        <div class="week-header"><div class="week-title">Semaine 1</div><div class="week-budget">3 000 FCFA/jour</div></div>
+        <div class="week-tasks">
+          <div class="week-task">Lancer Campagne 1 Notoriété</div>
+          <div class="week-task">1 seul groupe d'annonces · 1 visuel</div>
+          <div class="week-task">Observer les métriques (portée, CPM)</div>
+          <div class="week-task">Budget total semaine : 21 000 FCFA</div>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-header"><div class="week-title">Semaine 2</div><div class="week-budget">8 000 FCFA/jour</div></div>
+        <div class="week-tasks">
+          <div class="week-task">Garder Campagne 1 · Lancer Campagne 2</div>
+          <div class="week-task">3 textes en A/B test simultanément</div>
+          <div class="week-task">Observer : CTR, coût par inscription</div>
+          <div class="week-task">Budget total semaine : 56 000 FCFA</div>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-header"><div class="week-title">Semaine 3</div><div class="week-budget green">12 000 FCFA/jour</div></div>
+        <div class="week-tasks">
+          <div class="week-task">Couper les 2 textes qui performent moins</div>
+          <div class="week-task">Doubler le budget sur le texte gagnant</div>
+          <div class="week-task">Lancer Campagne 3 Retargeting</div>
+          <div class="week-task">Budget total semaine : 84 000 FCFA</div>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-header"><div class="week-title">Semaine 4</div><div class="week-budget green">20 000 FCFA/jour</div></div>
+        <div class="week-tasks">
+          <div class="week-task">Scaler la campagne gagnante</div>
+          <div class="week-task">Créer audience Lookalike 1%</div>
+          <div class="week-task">Ajouter témoignages clients réels</div>
+          <div class="week-task">Budget total semaine : 140 000 FCFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-num">📊</div><div class="card-title">KPIs à surveiller chaque jour</div></div>
+    <div class="card-body">
+      <table class="budget-table">
+        <tr><th>Métrique</th><th>Bon</th><th>Mauvais → Action</th></tr>
+        <tr><td><strong>CPM</strong> (coût 1000 vues)</td><td>500–1 500 FCFA</td><td>&gt;3 000 → changer visuel</td></tr>
+        <tr><td><strong>CTR</strong> (taux de clic)</td><td>&gt;2%</td><td>&lt;1% → changer texte</td></tr>
+        <tr class="highlight-row"><td><strong>Coût/Inscription</strong></td><td>&lt;3 000 FCFA</td><td>&gt;5 000 → revoir ciblage</td></tr>
+        <tr><td><strong>Portée quotidienne</strong></td><td>5 000–20 000</td><td>&lt;1 000 → élargir audience</td></tr>
+        <tr><td><strong>Fréquence</strong></td><td>1.5–3</td><td>&gt;5 → fatigue pub, changer visuel</td></tr>
+      </table>
+      <div class="kpi-row">
+        <div class="kpi-box"><div class="kpi-val">S1</div><div class="kpi-label">Objectif : 500+ vues/jour</div></div>
+        <div class="kpi-box"><div class="kpi-val">S2</div><div class="kpi-label">Objectif : 10 inscrits/jour</div></div>
+        <div class="kpi-box"><div class="kpi-val">S4</div><div class="kpi-label">Objectif : 50 inscrits/jour</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ TAB 6 : CHECKLIST ══ -->
+<div id="tab-checklist" style="display:none;">
+  <div class="card">
+    <div class="card-header"><div class="card-num green">✅</div><div class="card-title">Checklist avant lancement</div></div>
+    <div class="card-body" id="checklistBody">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Page Facebook Business créée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Photo de profil uploadée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Photo de couverture uploadée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Compte publicitaire créé (Ads Manager)</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Méthode de paiement Ads ajoutée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Pixel Facebook installé sur landing.html</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Pixel vérifié — événements reçus</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">5 visuels capturés depuis ads-visuels.html</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">landing.html teste sur mobile — OK</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Inscription testée — onboarding fonctionne</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Campagne 1 Notoriété créée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Campagne 1 soumise et approuvée</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-circle">○</div><div class="check-text">Premières vues reçues dans Ads Manager</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('[id^="tab-"]').forEach(function(t){t.style.display='none';});
+    document.getElementById('tab-'+id).style.display='block';
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+  }
+
+  function copyText(btn) {
+    var text = btn.nextElementSibling.textContent.trim();
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = '✓ Copié !';
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#070b0f';
+      setTimeout(function(){btn.textContent='📋 Copier';btn.style.background='';btn.style.color='';},2500);
+    });
+  }
+
+  function toggleCheck(el) {
+    var circle = el.querySelector('.check-circle');
+    var text   = el.querySelector('.check-text');
+    var isDone = circle.classList.contains('done');
+    circle.classList.toggle('done', !isDone);
+    circle.textContent = isDone ? '○' : '✓';
+    text.classList.toggle('done', !isDone);
+  }
+
+  function showToast(msg,type){
+    var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};
+    var t=document.getElementById('__toast');
+    t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';
+    t.textContent=msg;
+    setTimeout(function(){t.style.opacity='1';},10);
+    setTimeout(function(){t.style.opacity='0';},3500);
+  }
+</script>
+</body>
+</html>

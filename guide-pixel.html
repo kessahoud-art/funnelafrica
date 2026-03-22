@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Pixel Facebook — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--fb:#1877f2;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:680px;margin:0 auto;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:6px;}
+  .page-sub{font-size:.85rem;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+
+  /* PARTIE 1 — CRÉER LE PIXEL */
+  .part{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;}
+  .part-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .part-num{width:28px;height:28px;background:var(--fb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.75rem;color:white;flex-shrink:0;}
+  .part-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .part-body{padding:18px;}
+
+  .step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .step:last-child{border-bottom:none;}
+  .step-dot{width:24px;height:24px;border-radius:50%;background:#00e5a015;border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px;}
+  .step-content{flex:1;}
+  .step-text{font-size:.85rem;line-height:1.6;color:#a0b8c8;}
+  .step-text strong{color:var(--text);}
+  .step-text em{font-style:normal;background:#00e5a012;border:1px solid #00e5a025;color:var(--green);padding:1px 8px;border-radius:6px;font-family:'Syne',sans-serif;font-weight:600;font-size:.78rem;}
+  .step-note{background:var(--surface2);border-left:3px solid var(--green);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:8px;font-size:.78rem;color:var(--muted);line-height:1.5;}
+
+  /* PIXEL ID INPUT */
+  .pixel-input-box{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .pixel-label{font-size:.72rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block;}
+  .pixel-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:monospace;font-size:.9rem;outline:none;transition:border-color .2s;}
+  .pixel-input:focus{border-color:var(--green);}
+  .pixel-input::placeholder{color:#3a4f65;}
+  .pixel-save-btn{width:100%;padding:11px;border-radius:9px;background:var(--green);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;margin-top:8px;transition:all .2s;}
+  .pixel-save-btn:hover{background:#00f5b0;}
+
+  /* CODE SNIPPET */
+  .code-box{background:#050810;border:1px solid var(--border);border-radius:9px;padding:14px;font-family:monospace;font-size:.72rem;color:#7aa5c0;line-height:1.8;overflow-x:auto;position:relative;margin-top:10px;}
+  .code-box .comment{color:#3a5a4a;}
+  .code-box .keyword{color:var(--green);}
+  .code-box .string{color:#ffb830;}
+  .copy-code-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.65rem;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
+  .copy-code-btn:hover{background:var(--green);color:#070b0f;border-color:var(--green);}
+
+  /* FICHIERS À MODIFIER */
+  .files-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+  .file-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+  .file-name{font-family:monospace;font-size:.8rem;color:var(--green);}
+  .file-event{font-size:.72rem;color:var(--muted);}
+
+  /* EVENTS TABLE */
+  .events-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .events-table th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;border:1px solid var(--border);}
+  .events-table td{padding:9px 12px;border:1px solid var(--border);font-size:.78rem;color:#a0b8c8;vertical-align:top;}
+  .events-table td code{font-family:monospace;color:var(--green);font-size:.72rem;}
+  .events-table td strong{color:var(--text);}
+
+  /* STATUS */
+  .status-check{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:9px;margin-bottom:8px;font-size:.83rem;}
+  .status-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;}
+  .status-icon.done{background:#00e5a020;color:var(--green);}
+  .status-icon.todo{background:#f5a62320;color:var(--gold);}
+  .status-icon.wait{background:#6b708020;color:var(--muted);}
+
+  /* TOAST */
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+
+<div class="page-title">📡 Guide Pixel Facebook</div>
+<div class="page-sub">Installation étape par étape du Pixel Facebook sur FunnelAfrica. Durée : 15 minutes.</div>
+
+<!-- PARTIE 1 — CRÉER LE PIXEL -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">1</div>
+    <div class="part-title">Créer votre Pixel Facebook</div>
+  </div>
+  <div class="part-body">
+    <div class="step">
+      <div class="step-dot">1</div>
+      <div class="step-content">
+        <div class="step-text">Ouvre <strong>business.facebook.com</strong> sur ton téléphone</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">2</div>
+      <div class="step-content">
+        <div class="step-text">Va dans <strong>Gestionnaire d'événements</strong> (menu ☰)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div class="step-content">
+        <div class="step-text">Clique sur <em>+ Connecter une source de données</em></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">4</div>
+      <div class="step-content">
+        <div class="step-text">Sélectionne <strong>Web</strong> → <strong>Pixel Facebook</strong></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">5</div>
+      <div class="step-content">
+        <div class="step-text">Nom : <strong>FunnelAfrica CEO</strong><br>URL : <strong>funnelafrica.vercel.app</strong></div>
+        <div class="step-note">💡 Ce Pixel est pour toi — pour tracker les inscriptions de nouveaux vendeurs.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">6</div>
+      <div class="step-content">
+        <div class="step-text">Clique <strong>Créer le Pixel</strong> → tu reçois ton <strong>Pixel ID</strong> (15 chiffres)</div>
+        <div class="step-note">⚠️ Copie ce Pixel ID — tu en as besoin pour l'étape suivante.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIE 2 — SAUVEGARDER LE PIXEL ID -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">2</div>
+    <div class="part-title">Enregistrer ton Pixel ID</div>
+  </div>
+  <div class="part-body">
+    <div class="pixel-input-box">
+      <label class="pixel-label">Ton Pixel ID (15 chiffres)</label>
+      <input class="pixel-input" type="text" id="pixelIdInput" placeholder="Ex: 1234567890123456" oninput="validateAndSave()">
+      <button class="pixel-save-btn" onclick="savePixelId()">💾 Sauvegarder mon Pixel ID</button>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);line-height:1.6;">Ton Pixel ID sera sauvegardé localement pour référence. Tu le colleras dans tes fichiers HTML à l'étape suivante.</div>
+  </div>
+</div>
+
+<!-- PARTIE 3 — INSTALLER LE CODE -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">3</div>
+    <div class="part-title">Installer le code dans tes fichiers HTML</div>
+  </div>
+  <div class="part-body">
+    <p style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Colle ce code juste avant <code style="color:var(--green);font-size:.8rem;">&lt;/head&gt;</code> dans ces fichiers :</p>
+
+    <div class="files-list">
+      <div class="file-item"><span class="file-name">funnelafrica-auth.html</span><span class="file-event">CompleteRegistration</span></div>
+      <div class="file-item"><span class="file-name">funnelafrica-dashboard.html</span><span class="file-event">PageView</span></div>
+      <div class="file-item"><span class="file-name">funnelafrica-checkout.html</span><span class="file-event">InitiateCheckout</span></div>
+      <div class="file-item"><span class="file-name">merci.html</span><span class="file-event">Purchase</span></div>
+      <div class="file-item"><span class="file-name">abonnement.html</span><span class="file-event">Subscribe</span></div>
+      <div class="file-item"><span class="file-name">landing.html</span><span class="file-event">PageView</span></div>
+    </div>
+
+    <div class="code-box" id="pixelCode">
+      <button class="copy-code-btn" onclick="copyPixelCode()">📋 Copier</button>
+<span class="comment">&lt;!-- Pixel Facebook FunnelAfrica --&gt;</span>
+&lt;<span class="keyword">script</span>&gt;
+!<span class="keyword">function</span>(f,b,e,v,n,t,s)
+{<span class="keyword">if</span>(f.fbq)<span class="keyword">return</span>;n=f.fbq=<span class="keyword">function</span>()
+{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+<span class="keyword">if</span>(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version=<span class="string">'2.0'</span>;
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,<span class="string">'script'</span>,
+<span class="string">'https://connect.facebook.net/en_US/fbevents.js'</span>);
+fbq(<span class="string">'init'</span>, <span class="string" id="pixelIdInCode">'TON_PIXEL_ID'</span>);
+fbq(<span class="string">'track'</span>, <span class="string">'PageView'</span>);
+&lt;/<span class="keyword">script</span>&gt;
+&lt;<span class="keyword">noscript</span>&gt;
+&lt;<span class="keyword">img</span> height=<span class="string">"1"</span> width=<span class="string">"1"</span> style=<span class="string">"display:none"</span>
+src=<span class="string">"https://www.facebook.com/tr?id=<span id="pixelIdInImg">TON_PIXEL_ID</span>&amp;ev=PageView&amp;noscript=1"</span>/&gt;
+&lt;/<span class="keyword">noscript</span>&gt;
+<span class="comment">&lt;!-- Fin Pixel Facebook --&gt;</span>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIE 4 — ÉVÉNEMENTS SPÉCIFIQUES -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">4</div>
+    <div class="part-title">Événements spécifiques par page</div>
+  </div>
+  <div class="part-body">
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">Ajoute ces lignes dans le <code style="color:var(--green);font-size:.78rem;">&lt;script&gt;</code> de chaque page, après une action réussie.</p>
+    <table class="events-table">
+      <tr><th>Page</th><th>Événement à ajouter</th></tr>
+      <tr>
+        <td><strong>funnelafrica-auth.html</strong><br><span style="font-size:.7rem;color:var(--muted);">Après inscription réussie</span></td>
+        <td><code>fbq('track', 'CompleteRegistration');</code></td>
+      </tr>
+      <tr>
+        <td><strong>funnelafrica-checkout.html</strong><br><span style="font-size:.7rem;color:var(--muted);">À l'ouverture de la page</span></td>
+        <td><code>fbq('track', 'InitiateCheckout', {value: PRIX, currency: 'XOF'});</code></td>
+      </tr>
+      <tr>
+        <td><strong>merci.html</strong><br><span style="font-size:.7rem;color:var(--muted);">Après paiement confirmé</span></td>
+        <td><code>fbq('track', 'Purchase', {value: MONTANT, currency: 'XOF'});</code></td>
+      </tr>
+      <tr>
+        <td><strong>abonnement.html</strong><br><span style="font-size:.7rem;color:var(--muted);">Après choix de plan</span></td>
+        <td><code>fbq('track', 'Subscribe', {value: PRIX_PLAN, currency: 'XOF'});</code></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- PARTIE 5 — VÉRIFIER -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">5</div>
+    <div class="part-title">Vérifier que le Pixel fonctionne</div>
+  </div>
+  <div class="part-body">
+    <div class="step">
+      <div class="step-dot">1</div>
+      <div class="step-content">
+        <div class="step-text">Installe <strong>Facebook Pixel Helper</strong> sur Chrome (extension)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">2</div>
+      <div class="step-content">
+        <div class="step-text">Visite <strong>funnelafrica.vercel.app</strong></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div class="step-content">
+        <div class="step-text">L'extension doit afficher un <strong>✓ vert</strong> avec ton Pixel ID</div>
+        <div class="step-note">Sur Android : vérifie dans Gestionnaire d'événements → tu dois voir "Événements reçus" avec PageView.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-dot">4</div>
+      <div class="step-content">
+        <div class="step-text">Attends <strong>24h</strong> pour que les données apparaissent dans ton compte Ads</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="part">
+  <div class="part-header">
+    <div class="part-num">✓</div>
+    <div class="part-title">Checklist Pixel</div>
+  </div>
+  <div class="part-body">
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Pixel créé sur business.facebook.com</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Pixel ID copié et sauvegardé</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Code installé dans landing.html</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Code installé dans funnelafrica-auth.html</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Code installé dans merci.html</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Pixel vérifié — événements reçus</span>
+    </div>
+    <div class="status-check" onclick="toggleCheck(this)" style="cursor:pointer;">
+      <div class="status-icon todo">○</div>
+      <span style="font-size:.83rem;">Fichiers uploadés sur GitHub</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Charger le Pixel ID sauvegardé
+  var savedPixel = localStorage.getItem('fa_ceo_pixel_id');
+  if (savedPixel) {
+    document.getElementById('pixelIdInput').value = savedPixel;
+    updateCodeWithPixel(savedPixel);
+  }
+
+  function validateAndSave() {
+    var id = document.getElementById('pixelIdInput').value.trim();
+    if (id.length >= 15 && /^\d+$/.test(id)) {
+      updateCodeWithPixel(id);
+    }
+  }
+
+  function savePixelId() {
+    var id = document.getElementById('pixelIdInput').value.trim();
+    if (!id || id.length < 10 || !/^\d+$/.test(id)) {
+      showToast('Entrez un Pixel ID valide (15 chiffres)', 'error');
+      return;
+    }
+    localStorage.setItem('fa_ceo_pixel_id', id);
+    updateCodeWithPixel(id);
+    showToast('✓ Pixel ID sauvegardé : ' + id, 'success');
+  }
+
+  function updateCodeWithPixel(id) {
+    var el1 = document.getElementById('pixelIdInCode');
+    var el2 = document.getElementById('pixelIdInImg');
+    if (el1) el1.textContent = "'" + id + "'";
+    if (el2) el2.textContent = id;
+  }
+
+  function copyPixelCode() {
+    var id = document.getElementById('pixelIdInput').value.trim() || 'TON_PIXEL_ID';
+    var code = `<!-- Pixel Facebook FunnelAfrica -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function()
+{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${id}');
+fbq('track', 'PageView');
+<\/script>
+<noscript>
+<img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1"/>
+</noscript>
+<!-- Fin Pixel Facebook -->`;
+    navigator.clipboard.writeText(code).then(function() {
+      showToast('✓ Code Pixel copié avec ton ID !', 'success');
+    });
+  }
+
+  function toggleCheck(el) {
+    var icon = el.querySelector('.status-icon');
+    var isDone = icon.classList.contains('done');
+    if (isDone) {
+      icon.className = 'status-icon todo';
+      icon.textContent = '○';
+    } else {
+      icon.className = 'status-icon done';
+      icon.textContent = '✓';
+    }
+  }
+
+  function showToast(msg, type) {
+    var c = type === 'error'
+      ? {bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}
+      : {bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};
+    var t = document.getElementById('__toast');
+    t.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';
+    t.textContent = msg;
+    setTimeout(function(){t.style.opacity='1';}, 10);
+    setTimeout(function(){t.style.opacity='0';}, 3500);
+  }
+</script>
+</body>
+</html>

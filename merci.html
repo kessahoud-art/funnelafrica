@@ -74,6 +74,15 @@
   .error-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#ff4d6d;margin-bottom:8px;}
   .error-sub{font-size:.83rem;color:var(--muted);margin-bottom:20px;}
 </style>
+<link rel="stylesheet" href="/mobile.css">
+<!-- Pixel Facebook -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+fbq("init","TON_PIXEL_ID");
+fbq("track","PageView");
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=TON_PIXEL_ID</head>ev=PageView</head>noscript=1"/></noscript>
+<!-- Fin Pixel -->
 </head>
 <body>
 
@@ -165,7 +174,7 @@
   //  SEUL ENDROIT À MODIFIER — ta clé anon
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   // ══════════════════════════════════════════
 
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
