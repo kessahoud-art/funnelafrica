@@ -211,15 +211,17 @@ fbq("track","PageView");
       Ressources
     </div>
     <div class="nav-section-label">Avancé</div>
-    <div class="nav-item" onclick="window.location.href='/ab-testing.html'">
+    <div class="nav-item" id="navAbTest" onclick="goPhase4('ab-testing.html','pro')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
       A/B Testing
+      <span class="nav-plan-lock" id="lockAbTest" style="display:none;font-size:.58rem;font-family:'Syne',sans-serif;font-weight:700;padding:1px 6px;border-radius:20px;background:#f5a62325;color:var(--gold);margin-left:auto;">Pro</span>
     </div>
-    <div class="nav-item" onclick="window.location.href='/api-docs.html'">
+    <div class="nav-item" id="navApi" onclick="goPhase4('api-docs.html','pro')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
       API
+      <span class="nav-plan-lock" id="lockApi" style="display:none;font-size:.58rem;font-family:'Syne',sans-serif;font-weight:700;padding:1px 6px;border-radius:20px;background:#f5a62325;color:var(--gold);margin-left:auto;">Pro</span>
     </div>
-    <div class="nav-item" onclick="window.location.href='/payout.html'">
+    <div class="nav-item" id="navPayout" onclick="goPhase4('payout.html','all')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
       Retrait
     </div>
@@ -470,6 +472,38 @@ fbq("track","PageView");
   </div>
 </div>
 
+<!-- MODAL UPGRADE PHASE 4 (A/B Testing + API) -->
+<div class="modal-overlay" id="upgradePhase4Modal">
+  <div class="modal">
+    <div style="text-align:center;margin-bottom:16px;font-size:2.5rem;" id="p4ModalIcon">🧪</div>
+    <div class="modal-title" style="text-align:center;" id="p4ModalTitle">Fonctionnalité Pro</div>
+    <div class="modal-sub" style="text-align:center;" id="p4ModalDesc">
+      L'A/B Testing est disponible à partir du plan Pro.
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--green);border-radius:12px;padding:18px;margin-bottom:20px;">
+      <div style="font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:10px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;">Ce que tu débloques avec Pro</div>
+      <div style="font-size:.78rem;line-height:1.9;color:var(--muted);">
+        ✓ <span style="color:var(--text);">A/B Testing</span> — Compare 2 versions de ta page<br>
+        ✓ <span style="color:var(--text);">API publique</span> — Connecte tes outils (Zapier, Make)<br>
+        ✓ <span style="color:var(--text);">Tunnels illimités</span> — Sans restriction<br>
+        ✓ <span style="color:var(--text);">Email marketing</span> — 6 séquences automatiques<br>
+        ✓ <span style="color:var(--text);">WhatsApp automation</span> — 5 séquences<br>
+        ✓ <span style="color:var(--text);">5 000 contacts</span> — Base de données clients
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--green);">9 900 FCFA</span>
+        <span style="font-size:.8rem;color:var(--muted);">/mois</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="document.getElementById('upgradePhase4Modal').classList.remove('open')">Plus tard</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="window.location.href='/abonnement.html'">
+        ⚡ Passer au plan Pro →
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ══════════════════════════════════════════
   //  CONFIG — remplace par tes vraies clés
@@ -522,6 +556,22 @@ fbq("track","PageView");
       var planName = (p.plan||'starter');
       planName = planName.charAt(0).toUpperCase() + planName.slice(1);
       document.getElementById('planBadge').textContent  = '⚡ Plan ' + planName;
+
+      // ── LOCKS PHASE 4 ──
+      var isPro   = p.plan === 'pro'   || p.plan === 'scale';
+      var isScale = p.plan === 'scale';
+      // A/B Testing et API : Pro+
+      var lockAb  = document.getElementById('lockAbTest');
+      var lockApi = document.getElementById('lockApi');
+      if (!isPro && !isCEO) {
+        if (lockAb)  lockAb.style.display  = 'inline-block';
+        if (lockApi) lockApi.style.display  = 'inline-block';
+        // Griser visuellement les items
+        var navAb  = document.getElementById('navAbTest');
+        var navApi = document.getElementById('navApi');
+        if (navAb)  navAb.style.opacity  = '.55';
+        if (navApi) navApi.style.opacity = '.55';
+      }
     });
   }
 
@@ -619,6 +669,29 @@ fbq("track","PageView");
     });
   }
 
+  // ── NAVIGATION PHASE 4 avec vérification plan ──
+  function goPhase4(page, requiredPlan) {
+    var plan = currentProfile ? (currentProfile.plan || 'starter') : 'starter';
+    var isCEO = currentProfile && (currentProfile.role === 'admin');
+    var isPro = plan === 'pro' || plan === 'scale';
+    // Si accès libre (retrait) ou CEO ou plan suffisant → go
+    if (requiredPlan === 'all' || isCEO || isPro) {
+      window.location.href = '/' + page;
+      return;
+    }
+    // Sinon → modal upgrade Phase 4
+    var icons  = { 'ab-testing.html':'🧪', 'api-docs.html':'🔌' };
+    var titles = { 'ab-testing.html':'A/B Testing — Fonctionnalité Pro', 'api-docs.html':'API Publique — Fonctionnalité Pro' };
+    var descs  = {
+      'ab-testing.html':'L\'A/B Testing te permet de comparer 2 versions de ta page de vente pour maximiser tes conversions. Disponible à partir du plan Pro.',
+      'api-docs.html':'L\'API publique te permet de connecter FunnelAfrica à tes outils (Zapier, Make, scripts...). Disponible à partir du plan Pro.'
+    };
+    document.getElementById('p4ModalIcon').textContent  = icons[page]  || '⚡';
+    document.getElementById('p4ModalTitle').textContent = titles[page] || 'Fonctionnalité Pro';
+    document.getElementById('p4ModalDesc').textContent  = descs[page]  || 'Cette fonctionnalité est disponible à partir du plan Pro.';
+    document.getElementById('upgradePhase4Modal').classList.add('open');
+  }
+
   // ── CRÉER TUNNEL — avec vérification plan ──
   function goToTemplates() {
     closeModal();
@@ -668,6 +741,9 @@ fbq("track","PageView");
   });
   document.getElementById('upgradeModal').addEventListener('click', function(e) {
     if (e.target === this) closeUpgradeModal();
+  });
+  document.getElementById('upgradePhase4Modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
   });
 </script>
 </body>

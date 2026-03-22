@@ -239,7 +239,22 @@ GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
   sb.auth.getUser().then(function(r){
     if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
     currentUser=r.data.user;
-    loadKeys();
+    sb.from('profiles').select('plan,role').eq('id',currentUser.id).single().then(function(pr){
+      var plan  = pr.data ? (pr.data.plan||'starter') : 'starter';
+      var isCEO = pr.data && (pr.data.role==='admin' || currentUser.email==='kessahoud@gmail.com');
+      var isPro = plan==='pro' || plan==='scale';
+      if(!isPro && !isCEO) {
+        var banner = document.createElement('div');
+        banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(135deg,#1a1000,#201800);border-bottom:2px solid #f5a62360;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+        banner.innerHTML='<div style="font-size:.85rem;"><span style="font-family:Syne,sans-serif;font-weight:700;color:var(--gold);">🔌 Fonctionnalité Pro</span><br><span style="color:var(--muted);font-size:.78rem;">L\'API publique est disponible à partir du plan Pro (9 900 FCFA/mois)</span></div><button onclick="window.location.href=\'/abonnement.html\'" style="background:var(--gold);color:#0a0f14;font-family:Syne,sans-serif;font-weight:700;font-size:.8rem;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;white-space:nowrap;">Passer au Pro →</button>';
+        document.body.prepend(banner);
+        document.querySelector('.main').style.marginTop='70px';
+        document.querySelector('.main').style.filter='blur(2px) grayscale(40%)';
+        document.querySelector('.main').style.pointerEvents='none';
+        return;
+      }
+      loadKeys();
+    });
   });
 
   function loadKeys() {
