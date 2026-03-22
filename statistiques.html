@@ -147,8 +147,10 @@
       Paiements
     </div>
     
-    <div class="nav-item" onclick="window.location.href='/ab-testing.html'">🧪 A/B Testing</div>
-    <div class="nav-item" onclick="window.location.href='/api-docs.html'">🔌 API</div>
+    
+    <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 5px;font-family:'Syne',sans-serif;">Avancé</div>
+    <div class="nav-item" onclick="navPhase4('ab-testing.html','pro')">🧪 A/B Testing</div>
+    <div class="nav-item" onclick="navPhase4('api-docs.html','pro')">🔌 API</div>
     <div class="nav-item" onclick="window.location.href='/payout.html'">💸 Retrait</div>
     <div class="nav-item" onclick="logout()">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -620,6 +622,17 @@
   function logout() {
     sb.auth.signOut().then(function() { window.location.href = '/funnelafrica-auth.html'; });
   }
+
+  function navPhase4(page,req){
+    var plan=localStorage.getItem('fa_plan')||'starter';
+    var email=localStorage.getItem('fa_email')||'';
+    var isCEO=email==='kessahoud@gmail.com';
+    var isPro=plan==='pro'||plan==='scale';
+    if(req==='all'||isCEO||isPro){window.location.href='/'+page;return;}
+    if(confirm('Fonctionnalité Pro — Disponible à partir du plan Pro (9 900 FCFA/mois). Voir les plans ?')){window.location.href='/abonnement.html';}
+  }
+  // Sauvegarder plan
+  if(typeof sb!=='undefined'){sb.auth.getUser().then(function(r){if(r.data&&r.data.user){localStorage.setItem('fa_email',r.data.user.email||'');sb.from('profiles').select('plan').eq('id',r.data.user.id).single().then(function(pr){if(pr.data)localStorage.setItem('fa_plan',pr.data.plan||'starter');});}});}
 </script>
 </body>
 </html>

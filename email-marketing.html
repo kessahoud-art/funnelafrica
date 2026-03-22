@@ -155,12 +155,13 @@
     <div class="nav-item" onclick="window.location.href='/whatsapp.html'"><span class="nav-icon">📱</span>WhatsApp</div>
     <div class="nav-item" onclick="window.location.href='/affiliation.html'"><span class="nav-icon">🤝</span>Affiliation</div>
     <div class="nav-item" onclick="window.location.href='/facebook-ads.html'"><span class="nav-icon">📢</span>Facebook Ads</div>
-    <div class="nav-section">Paramètres</div>
+        <div class="nav-section">Avancé</div>
+    <div class="nav-item" onclick="navPhase4('ab-testing.html','pro')"><span class="nav-icon">🧪</span>A/B Testing<span style="display:none;font-size:.58rem;font-family:Syne,sans-serif;font-weight:700;padding:1px 6px;border-radius:20px;background:#f5a62325;color:#f5a623;margin-left:auto;">Pro</span></div>
+    <div class="nav-item" onclick="navPhase4('api-docs.html','pro')"><span class="nav-icon">🔌</span>API<span style="display:none;font-size:.58rem;font-family:Syne,sans-serif;font-weight:700;padding:1px 6px;border-radius:20px;background:#f5a62325;color:#f5a623;margin-left:auto;">Pro</span></div>
+    <div class="nav-item" onclick="window.location.href='/payout.html'"><span class="nav-icon">💸</span>Retrait</div>
+<div class="nav-section">Paramètres</div>
     <div class="nav-item" onclick="window.location.href='/abonnement.html'"><span class="nav-icon">💳</span>Plans & Paiements</div>
     
-    <div class="nav-item" onclick="window.location.href='/ab-testing.html'">🧪 A/B Testing</div>
-    <div class="nav-item" onclick="window.location.href='/api-docs.html'">🔌 API</div>
-    <div class="nav-item" onclick="window.location.href='/payout.html'">💸 Retrait</div>
     <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span>Déconnexion</div>
   </nav>
   <div class="sidebar-footer">
@@ -578,6 +579,18 @@ Cordialement,
     setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)';},3500);
   }
   document.getElementById('campaignModal').addEventListener('click',function(e){if(e.target===this)closeCampaignModal();});
+
+  // Sauvegarder plan pour navPhase4
+  if(typeof sb !== 'undefined') {
+    sb.auth.getUser().then(function(r){
+      if(r.data&&r.data.user){
+        localStorage.setItem('fa_email',r.data.user.email||'');
+        sb.from('profiles').select('plan').eq('id',r.data.user.id).single().then(function(pr){
+          if(pr.data)localStorage.setItem('fa_plan',pr.data.plan||'starter');
+        });
+      }
+    });
+  }
 </script>
 </body>
 </html>
