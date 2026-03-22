@@ -99,6 +99,8 @@
 
   @media(max-width:640px){.templates-grid{grid-template-columns:1fr;padding:0 16px 80px;}.hero{padding:32px 16px 20px;}.filters{padding:0 16px 20px;}}
 </style>
+<link rel="stylesheet" href="/mobile.css">
+<script src="/js/config.js"></script>
 </head>
 <body>
 
@@ -396,8 +398,8 @@
   // ══════════════════════════════
   //  CONFIG — remplace tes clés
   // ══════════════════════════════
-  const SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  const SUPABASE_ANON_KEY = ' eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  const SUPABASE_URL      = 'https://VOTRE_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
   const supabase          = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const params     = new URLSearchParams(window.location.search);
