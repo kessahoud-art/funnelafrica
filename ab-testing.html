@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A/B Testing — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--danger:#ff4d6d;--blue:#4da6ff;--purple:#a78bfa;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
+  .logo{padding:20px 16px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-mark span{width:28px;height:28px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#070b0f;font-weight:800;}
+  .nav{padding:10px;flex:1;}
+  .nav-section{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 4px;font-family:'Syne',sans-serif;}
+  .nav-item{padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.84rem;transition:all .2s;margin-bottom:2px;}
+  .nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+  .nav-item.active{color:var(--green);}
+  .main{margin-left:220px;flex:1;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn-primary{background:var(--green);color:#070b0f;}
+  .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .content{padding:24px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:14px;}
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;}
+  .form-input,.form-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.88rem;outline:none;}
+  .form-input:focus,.form-select:focus{border-color:var(--green);}
+  .ab-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;}
+  .ab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .ab-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;}
+  .ab-status{font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;padding:3px 10px;border-radius:20px;}
+  .st-running{background:#00e5a020;color:var(--green);}
+  .st-winner-a,.st-winner-b{background:#ffb83020;color:var(--gold);}
+  .st-paused{background:var(--surface2);color:var(--muted);}
+  .ab-variants{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .variant{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:14px;}
+  .variant.winner{border-color:var(--gold);}
+  .variant-label{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;margin-bottom:8px;}
+  .variant-stats{display:flex;gap:16px;}
+  .vstat{text-align:center;}
+  .vstat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .vstat-label{font-size:.62rem;color:var(--muted);}
+  .conv-bar{height:6px;border-radius:3px;margin-top:8px;overflow:hidden;background:var(--border);}
+  .conv-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+  .ab-actions{display:flex;gap:8px;}
+  .empty-state{text-align:center;padding:40px;color:var(--muted);}
+  .hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1.3rem;padding:8px 12px;border-radius:8px;}
+  .overlay-sb{display:none;position:fixed;inset:0;background:#00000080;z-index:90;}
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+  @media(max-width:760px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.overlay-sb.open{display:block;}.main{margin-left:0;}.hamburger{display:flex;}.content{padding:16px;}.ab-variants{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<div class="overlay-sb" id="overlaySb" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo"><div class="logo-mark"><span>FA</span>FunnelAfrica</div></div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'">📊 Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-templates.html?new=1'">🚀 Mes Tunnels</div>
+    <div class="nav-item" onclick="window.location.href='/statistiques.html'">📈 Statistiques</div>
+    <div class="nav-section">Avancé</div>
+    <div class="nav-item active">🧪 A/B Testing</div>
+    <div class="nav-item" onclick="window.location.href='/api-docs.html'">🔌 API</div>
+    <div class="nav-item" onclick="window.location.href='/payout.html'">💸 Retrait</div>
+    <div class="nav-section">Paramètres</div>
+    <div class="nav-item" onclick="window.location.href='/profil.html'">👤 Mon profil</div>
+    <div class="nav-item" onclick="logout()">🚪 Déconnexion</div>
+  </nav>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">🧪 A/B Testing</span>
+    </div>
+    <button class="btn btn-primary" onclick="showCreateModal()">➕ Nouveau test</button>
+  </div>
+  <div class="content">
+
+    <!-- CRÉER UN TEST -->
+    <div id="createForm" style="display:none;">
+      <div class="card">
+        <div class="card-title">➕ Créer un A/B test</div>
+        <div class="form-group">
+          <label class="form-label">Nom du test</label>
+          <input class="form-input" id="testName" placeholder="Ex: Test prix 9900 vs 14900">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">🅰️ Tunnel A (original)</label>
+            <select class="form-select" id="tunnelA"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">🅱️ Tunnel B (variante)</label>
+            <select class="form-select" id="tunnelB"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Split trafic A/B (%)</label>
+          <input class="form-input" type="range" id="splitRange" min="10" max="90" value="50" oninput="updateSplit()">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:4px;">
+            <span>A : <span id="splitA">50</span>%</span>
+            <span>B : <span id="splitB">50</span>%</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" onclick="createTest()">🚀 Lancer le test</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('createForm').style.display='none'">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTE DES TESTS -->
+    <div id="testsList"></div>
+  </div>
+</main>
+
+<script>
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+  var allTunnels = [];
+
+  sb.auth.getUser().then(function(r){
+    if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
+    currentUser=r.data.user;
+    loadTunnels();
+    loadTests();
+  });
+
+  function loadTunnels() {
+    sb.from('tunnels').select('id,name,slug').eq('user_id',currentUser.id).then(function(r){
+      allTunnels=r.data||[];
+      var opts=allTunnels.map(function(t){return '<option value="'+t.id+'">'+t.name+' (/t/'+t.slug+')</option>';}).join('');
+      document.getElementById('tunnelA').innerHTML=opts;
+      document.getElementById('tunnelB').innerHTML=opts;
+    });
+  }
+
+  function loadTests() {
+    sb.from('ab_tests').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).then(function(r){
+      var tests=r.data||[];
+      if(!tests.length){
+        document.getElementById('testsList').innerHTML='<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:12px;">🧪</div><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--text);margin-bottom:6px;">Aucun A/B test</div><div style="font-size:.82rem;">Crée un test pour comparer deux versions de ta page de vente et trouver celle qui convertit le mieux.</div></div>';
+        return;
+      }
+      document.getElementById('testsList').innerHTML=tests.map(function(t){return renderTest(t);}).join('');
+    });
+  }
+
+  function renderTest(t) {
+    var rateA=t.views_a>0?((t.conversions_a/t.views_a)*100).toFixed(1):0;
+    var rateB=t.views_b>0?((t.conversions_b/t.views_b)*100).toFixed(1):0;
+    var maxRate=Math.max(rateA,rateB)||1;
+    var statusClass={'running':'st-running','paused':'st-paused','winner_a':'st-winner-a','winner_b':'st-winner-b'}[t.status]||'st-paused';
+    var statusText={'running':'🔄 En cours','paused':'⏸ En pause','winner_a':'🏆 Gagnant : A','winner_b':'🏆 Gagnant : B'}[t.status]||t.status;
+    var isWinnerA=t.status==='winner_a',isWinnerB=t.status==='winner_b';
+    return '<div class="ab-card"><div class="ab-header"><div class="ab-name">'+t.name+'</div><span class="ab-status '+statusClass+'">'+statusText+'</span></div><div class="ab-variants"><div class="variant'+(isWinnerA?' winner':'')+'"><div class="variant-label" style="color:var(--blue);">🅰️ Variante A'+(isWinnerA?' 🏆':' ')+'</div><div class="variant-stats"><div class="vstat"><div class="vstat-val" style="color:var(--blue);">'+t.views_a+'</div><div class="vstat-label">Vues</div></div><div class="vstat"><div class="vstat-val" style="color:var(--green);">'+t.conversions_a+'</div><div class="vstat-label">Conv.</div></div><div class="vstat"><div class="vstat-val" style="color:var(--gold);">'+rateA+'%</div><div class="vstat-label">Taux</div></div></div><div class="conv-bar"><div class="conv-fill" style="width:'+(rateA/maxRate*100)+'%;background:var(--blue);"></div></div></div><div class="variant'+(isWinnerB?' winner':'')+'"><div class="variant-label" style="color:var(--purple);">🅱️ Variante B'+(isWinnerB?' 🏆':' ')+'</div><div class="variant-stats"><div class="vstat"><div class="vstat-val" style="color:var(--purple);">'+t.views_b+'</div><div class="vstat-label">Vues</div></div><div class="vstat"><div class="vstat-val" style="color:var(--green);">'+t.conversions_b+'</div><div class="vstat-label">Conv.</div></div><div class="vstat"><div class="vstat-val" style="color:var(--gold);">'+rateB+'%</div><div class="vstat-label">Taux</div></div></div><div class="conv-bar"><div class="conv-fill" style="width:'+(rateB/maxRate*100)+'%;background:var(--purple);"></div></div></div></div><div class="ab-actions"><button class="btn btn-ghost" style="font-size:.75rem;padding:6px 12px;" onclick="togglePause(\''+t.id+'\',\''+t.status+'\')">'+( t.status==='running'?'⏸ Pause':'▶ Relancer')+'</button><button class="btn btn-ghost" style="font-size:.75rem;padding:6px 12px;color:var(--danger);" onclick="deleteTest(\''+t.id+'\')">🗑 Supprimer</button><div style="margin-left:auto;font-size:.7rem;color:var(--muted);">Créé le '+new Date(t.created_at).toLocaleDateString('fr')+'</div></div></div>';
+  }
+
+  function showCreateModal(){document.getElementById('createForm').style.display='block';document.getElementById('createForm').scrollIntoView({behavior:'smooth'});}
+  function updateSplit(){var v=document.getElementById('splitRange').value;document.getElementById('splitA').textContent=v;document.getElementById('splitB').textContent=100-v;}
+
+  function createTest(){
+    var name=document.getElementById('testName').value.trim();
+    var tunnelA=document.getElementById('tunnelA').value;
+    var tunnelB=document.getElementById('tunnelB').value;
+    var split=parseInt(document.getElementById('splitRange').value);
+    if(!name||!tunnelA||!tunnelB){showToast('Remplissez tous les champs','error');return;}
+    if(tunnelA===tunnelB){showToast('Choisissez deux tunnels différents','error');return;}
+    sb.from('ab_tests').insert({user_id:currentUser.id,name,tunnel_a_id:tunnelA,tunnel_b_id:tunnelB,split,status:'running'}).then(function(r){
+      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+      document.getElementById('createForm').style.display='none';
+      document.getElementById('testName').value='';
+      showToast('✓ Test A/B lancé !','success');
+      loadTests();
+    });
+  }
+
+  function togglePause(id,status){
+    var newStatus=status==='running'?'paused':'running';
+    sb.from('ab_tests').update({status:newStatus}).eq('id',id).then(function(){loadTests();showToast(newStatus==='paused'?'Test mis en pause':'Test relancé','success');});
+  }
+
+  function deleteTest(id){
+    if(!confirm('Supprimer ce test A/B ? Les données seront perdues.'))return;
+    sb.from('ab_tests').delete().eq('id',id).then(function(){loadTests();showToast('Test supprimé','success');});
+  }
+
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlaySb').classList.toggle('open');}
+  function logout(){sb.auth.signOut().then(function(){window.location.href='/funnelafrica-auth.html';});}
+  function showToast(msg,type){var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};var t=document.getElementById('__toast');t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';t.textContent=msg;setTimeout(function(){t.style.opacity='1';},10);setTimeout(function(){t.style.opacity='0';},3500);}
+</script>
+</body>
+</html>

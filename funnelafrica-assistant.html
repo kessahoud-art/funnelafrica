@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunnelAfrica — Assistant Technique</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;
+  --green:#00e5a0;--gold:#ffb830;--danger:#ff4d6d;--blue:#4da6ff;--purple:#a78bfa;
+  --text:#f0f6ff;--muted:#5a7080;--radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOP */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+.logo-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#070b0f;font-weight:800;}
+.top-badges{display:flex;gap:6px;}
+.badge{font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;padding:3px 10px;border-radius:20px;}
+.badge-phase{background:#00e5a020;border:1px solid #00e5a040;color:var(--green);}
+.badge-alert{background:#ff4d6d20;border:1px solid #ff4d6d40;color:var(--danger);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR ROADMAP */
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
+.sidebar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:14px 16px 6px;}
+.phase-item{padding:10px 14px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;}
+.phase-item:hover{background:var(--surface2);}
+.phase-item.active{background:#00e5a010;border-left-color:var(--green);}
+.phase-header{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.phase-num{font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;}
+.phase-name{font-family:'Syne',sans-serif;font-weight:600;font-size:.8rem;flex:1;}
+.phase-status{font-size:.7rem;font-weight:700;}
+.status-done{color:var(--green);}
+.status-wip{color:var(--gold);}
+.status-plan{color:var(--blue);}
+.status-future{color:var(--muted);}
+.phase-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;}
+.phase-progress-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.phase-period{font-size:.62rem;color:var(--muted);}
+
+/* CENTER PANEL */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.panel-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;}
+.panel-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:4px;}
+.panel-sub{font-size:.78rem;color:var(--muted);}
+.tasks-scroll{flex:1;overflow-y:auto;padding:16px 20px;}
+
+/* KPI BAR */
+.kpi-bar{display:flex;gap:10px;margin-bottom:16px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;flex:1;text-align:center;}
+.kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px;}
+.kpi-label{font-size:.62rem;color:var(--muted);}
+
+/* ALERTE */
+.alert-box{background:#ff4d6d10;border:1px solid #ff4d6d40;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;}
+.alert-icon{font-size:1rem;flex-shrink:0;}
+.alert-text{font-size:.8rem;line-height:1.6;}
+.alert-text strong{color:var(--danger);}
+
+.info-box{background:#00e5a010;border:1px solid #00e5a030;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:.8rem;line-height:1.6;color:#7ab89a;}
+.info-box strong{color:var(--green);}
+
+/* TASK GROUP */
+.task-group{margin-bottom:18px;}
+.task-group-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.task-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.task-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;transition:all .2s;cursor:pointer;}
+.task-item:hover{border-color:#00e5a030;}
+.task-item.done{opacity:.6;}
+.task-item.done .task-title{text-decoration:line-through;color:var(--muted);}
+.task-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;margin-top:1px;transition:all .2s;cursor:pointer;}
+.task-check.checked{background:var(--green);border-color:var(--green);color:#070b0f;font-weight:700;}
+.task-check.wip{background:#ffb83030;border-color:var(--gold);color:var(--gold);}
+.task-check.blocked{background:#ff4d6d20;border-color:var(--danger);color:var(--danger);}
+.task-content{flex:1;min-width:0;}
+.task-title{font-size:.83rem;font-weight:500;margin-bottom:3px;}
+.task-detail{font-size:.72rem;color:var(--muted);line-height:1.5;}
+.task-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;}
+.meta-tag{font-size:.6rem;font-family:'Syne',sans-serif;font-weight:700;padding:2px 7px;border-radius:20px;}
+.p0{background:#ff4d6d20;color:var(--danger);}
+.p1{background:#ffb83020;color:var(--gold);}
+.p2{background:#4da6ff20;color:var(--blue);}
+.p3{background:#a78bfa20;color:var(--purple);}
+
+/* CHAT */
+.chat-panel{width:300px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.chat-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.chat-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;}
+.chat-sub{font-size:.68rem;color:var(--muted);}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.msg{max-width:90%;padding:9px 12px;border-radius:10px;font-size:.78rem;line-height:1.6;}
+.msg-bot{background:var(--surface2);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;}
+.msg-bot strong{color:var(--green);}
+.msg-bot code{font-family:'JetBrains Mono',monospace;background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.72rem;color:var(--blue);}
+.msg-user{background:#00e5a020;border:1px solid #00e5a040;color:var(--text);align-self:flex-end;border-bottom-right-radius:2px;}
+.msg-time{font-size:.6rem;color:var(--muted);margin-top:2px;text-align:right;}
+.chat-input-wrap{padding:10px 12px;border-top:1px solid var(--border);}
+.quick-actions{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.qa-btn{font-size:.62rem;font-family:'Syne',sans-serif;font-weight:700;padding:4px 8px;border-radius:20px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);color:var(--muted);transition:all .2s;}
+.qa-btn:hover{border-color:var(--green);color:var(--green);}
+.chat-form{display:flex;gap:6px;}
+.chat-input{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.78rem;outline:none;font-family:'DM Sans',sans-serif;}
+.chat-input:focus{border-color:var(--green);}
+.chat-send{background:var(--green);color:#070b0f;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:.75rem;font-family:'Syne',sans-serif;transition:all .2s;}
+.chat-send:hover{background:#00f5b0;}
+
+/* NEXT ACTION */
+.next-action{background:linear-gradient(135deg,#030807,#071a0f);border:1px solid #00e5a030;border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+.next-action-label{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:6px;}
+.next-action-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:4px;}
+.next-action-desc{font-size:.75rem;color:var(--muted);line-height:1.5;}
+.next-action-btn{margin-top:8px;background:var(--green);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;}
+
+@media(max-width:900px){.chat-panel{display:none;}.sidebar{width:200px;}}
+@media(max-width:600px){.sidebar{display:none;}.kpi-bar{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-mark">FA</div>Assistant Technique — FunnelAfrica</div>
+  <div class="top-badges">
+    <div class="badge badge-phase" id="currentPhaseBadge">🔄 Phase 2 en cours</div>
+    <div class="badge badge-alert" id="alertBadge">⚠️ 1 bloquant P0</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR PHASES -->
+  <div class="sidebar">
+    <div class="sidebar-title">Phases Roadmap</div>
+    <div id="phasesList"></div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="panel-header">
+      <div class="panel-title" id="panelTitle">📋 Phase 2 — Optimisation & Bugs</div>
+      <div class="panel-sub" id="panelSub">Mois 4-5 · 🔄 En cours · Priorité : corriger les bloquants avant lancement</div>
+    </div>
+    <div class="tasks-scroll" id="tasksArea">
+      <div id="kpiBar" class="kpi-bar"></div>
+      <div id="alertArea"></div>
+      <div id="nextActionArea"></div>
+      <div id="taskGroups"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-title">🤖 Assistant</div>
+      <div class="chat-sub">Pose tes questions · Signale les tâches terminées</div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-wrap">
+      <div class="quick-actions" id="quickActions"></div>
+      <div class="chat-form">
+        <input class="chat-input" id="chatInput" placeholder="Ex: IFU validé ✅" onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="chat-send" onclick="sendMsg()">→</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  DATA — ROADMAP COMPLÈTE
+// ══════════════════════════════════════════════════════
+var ROADMAP = [
+  {
+    id:0, num:'0', name:'Fondations & Infrastructure', period:'Mois 1-2',
+    status:'done', color:'#00e5a0',
+    groups:[
+      {title:'Environnement & Outils', tasks:[
+        {id:'env1',title:'Créer compte Supabase',detail:'crfmdpvxiabwlhgrwcro.supabase.co',status:'done',p:'P0'},
+        {id:'env2',title:'GitHub + Vercel connectés',detail:'Auto-deploy sur push main',status:'done',p:'P0'},
+        {id:'env3',title:'vercel.json configuré',detail:'Routes + cron job 8h quotidien',status:'done',p:'P0'},
+      ]},
+      {title:'Base de données', tasks:[
+        {id:'db1',title:'Tables principales créées',detail:'profiles · tunnels · orders · contacts',status:'done',p:'P0'},
+        {id:'db2',title:'RLS policies activées',detail:'Isolation données multi-tenant',status:'done',p:'P0'},
+        {id:'db3',title:'Tables affiliation',detail:'affiliates · affiliate_clicks · commissions',status:'done',p:'P1'},
+        {id:'db4',title:'Supabase Storage',detail:'Bucket funnelafrica-files + 3 policies',status:'done',p:'P1'},
+      ]},
+      {title:'Auth & Onboarding', tasks:[
+        {id:'auth1',title:'funnelafrica-auth.html',detail:'Login · Register · Forgot password',status:'done',p:'P0'},
+        {id:'auth2',title:'onboarding.html 4 étapes',detail:'Pays · produit · objectif · paiement',status:'done',p:'P1'},
+        {id:'auth3',title:'js/config.js centralisé',detail:'window.__FA_SUPABASE_ANON_KEY unique',status:'done',p:'P0'},
+      ]},
+    ]
+  },
+  {
+    id:1, num:'1', name:'Produit Core — Tunnels & Paiements', period:'Mois 2-4',
+    status:'done', color:'#00e5a0',
+    groups:[
+      {title:'Éditeur de tunnel', tasks:[
+        {id:'ed1',title:'funnelafrica-templates.html',detail:'6 templates optimisés marché africain',status:'done',p:'P0'},
+        {id:'ed2',title:'funnelafrica-editor.html',detail:'Layout 3 colonnes · toutes sections · save/publish',status:'done',p:'P0'},
+        {id:'ed3',title:'Aperçu live iframe',detail:'Rebuild srcdoc debounce 280ms',status:'done',p:'P1'},
+        {id:'ed4',title:'Upload PDF Supabase Storage',detail:'Bouton ⬆️ dans section Avancé',status:'done',p:'P1'},
+      ]},
+      {title:'Page publique & Paiement', tasks:[
+        {id:'pub1',title:'funnelafrica-tunnel-public.html',detail:'Lit page_config depuis Supabase par slug',status:'done',p:'P0'},
+        {id:'pub2',title:'funnelafrica-checkout.html',detail:'Formulaire acheteur + initiation FedaPay',status:'done',p:'P0'},
+        {id:'pub3',title:'api/payment/initiate.js',detail:'Crée transaction FedaPay → retourne URL',status:'done',p:'P0'},
+        {id:'pub4',title:'api/payment/webhook.js',detail:'Confirme paiement · update orders · email',status:'done',p:'P0'},
+        {id:'pub5',title:'merci.html + upsell.html',detail:'Page confirmation + téléchargement + upsell',status:'done',p:'P0'},
+        {id:'pub6',title:'espace-membre.html',detail:'Modules · vidéos · progression · certificat',status:'done',p:'P1'},
+      ]},
+      {title:'Dashboard & Admin', tasks:[
+        {id:'dash1',title:'funnelafrica-dashboard.html',detail:'KPIs · tunnels · commandes · quick actions',status:'done',p:'P0'},
+        {id:'dash2',title:'admin.html (CEO)',detail:'MRR · vendeurs · tunnels globaux · broadcast',status:'done',p:'P0'},
+        {id:'dash3',title:'29 pages HTML complètes',detail:'Toutes les pages du SaaS déployées',status:'done',p:'P0'},
+      ]},
+    ]
+  },
+  {
+    id:2, num:'2', name:'Optimisation & Bugs Android', period:'Mois 4-5',
+    status:'wip', color:'#ffb830',
+    groups:[
+      {title:'🔴 Bloquants P0 — À finir AVANT lancement', tasks:[
+        {id:'b1',title:'Valider compte FedaPay (IFU)',detail:'Soumettre IFU Bénin → paiements live',status:'todo',p:'P0'},
+        {id:'b2',title:'Tester flow paiement end-to-end',detail:'Créer → payer → merci.html → télécharger',status:'todo',p:'P0'},
+        {id:'b3',title:'Tester email confirmation acheteur',detail:'Webhook → Brevo → email reçu',status:'todo',p:'P0'},
+      ]},
+      {title:'✅ Bugs résolus', tasks:[
+        {id:'fix1',title:'Fix ordre scripts Supabase/config.js',detail:'config.js après supabase.min.js dans 23 fichiers',status:'done',p:'P0'},
+        {id:'fix2',title:'Fix RLS tunnels INSERT',detail:'4 policies séparées avec WITH CHECK',status:'done',p:'P0'},
+        {id:'fix3',title:'Fix templates.html ES Module',detail:'async/await → .then() · script normal',status:'done',p:'P0'},
+        {id:'fix4',title:'Fix éditeur mobile layout',detail:'overflow:hidden → auto · boutons topbar',status:'done',p:'P0'},
+        {id:'fix5',title:'Fix hamburger sidebar Android',detail:'z-index + border + touch-action',status:'done',p:'P1'},
+        {id:'fix6',title:'Fix landing page sections noires',detail:'Animation reveal → opacity:1 direct',status:'done',p:'P1'},
+        {id:'fix7',title:'Fix accordion éditeur Android',detail:'display:none → toutes sections visibles mobile',status:'done',p:'P0'},
+      ]},
+      {title:'⏳ À faire — Phase 2', tasks:[
+        {id:'todo1',title:'Activer Google OAuth',detail:'Google Console → Client ID + Secret → Supabase',status:'todo',p:'P2'},
+        {id:'todo2',title:'Vérification HMAC webhooks FedaPay',detail:'Sécurité : valider signature des webhooks',status:'todo',p:'P1'},
+        {id:'todo3',title:'Installer Pixel Facebook CEO',detail:'business.facebook.com → Gestionnaire événements',status:'todo',p:'P0'},
+        {id:'todo4',title:'Créer compte Ads Manager',detail:'Devise XOF · méthode paiement · lier page',status:'todo',p:'P0'},
+      ]},
+    ]
+  },
+  {
+    id:3, num:'3', name:'Croissance & Facebook Ads', period:'Mois 5-7',
+    status:'planned', color:'#4da6ff',
+    groups:[
+      {title:'Facebook Ads (CEO → recruter vendeurs)', tasks:[
+        {id:'ads1',title:'Campagne 1 — Notoriété',detail:'3 000 FCFA/jour · Visuel 1 · 5 pays · Texte A',status:'todo',p:'P0'},
+        {id:'ads2',title:'Campagne 2 — Acquisition',detail:'8 000 FCFA/jour · 3 A/B tests · objectif inscription',status:'todo',p:'P1'},
+        {id:'ads3',title:'Campagne 3 — Retargeting',detail:'5 000 FCFA/jour · visiteurs via Pixel · exclus inscrits',status:'todo',p:'P1'},
+        {id:'ads4',title:'Audience Lookalike 1%',detail:'Après 50 inscrits · CI + SN + BJ',status:'todo',p:'P2'},
+      ]},
+      {title:'Marketing email vendeurs', tasks:[
+        {id:'em1',title:'Tester séquences email',detail:'Bienvenue J+0 · relance J+3 · upgrade J+7',status:'todo',p:'P1'},
+        {id:'em2',title:'Campagne newsletter mensuelle',detail:'Email manuel à tous les vendeurs via admin.html',status:'todo',p:'P2'},
+      ]},
+    ]
+  },
+  {
+    id:4, num:'4', name:'Monétisation Avancée', period:'Mois 7-9',
+    status:'future', color:'#a78bfa',
+    groups:[
+      {title:'Fonctionnalités premium', tasks:[
+        {id:'adv1',title:'Système payout automatique',detail:'FedaPay Payout API → Mobile Money vendeur',status:'future',p:'P1'},
+        {id:'adv2',title:'API publique FunnelAfrica',detail:'Endpoints REST + documentation OpenAPI',status:'future',p:'P2'},
+        {id:'adv3',title:'Domaine personnalisé (Scale)',detail:'CNAME vendeur → proxy Vercel + SSL auto',status:'future',p:'P2'},
+        {id:'adv4',title:'A/B testing tunnels',detail:'2 variantes · traffic split · winner auto',status:'future',p:'P2'},
+      ]},
+    ]
+  },
+  {
+    id:5, num:'5', name:'Scalabilité & Expansion', period:'Mois 9-12',
+    status:'future', color:'#6b7e93',
+    groups:[
+      {title:'Expansion', tasks:[
+        {id:'sc1',title:'App mobile native React Native',detail:'Expo · éditeur tactile · push notifications',status:'future',p:'P1'},
+        {id:'sc2',title:'Expansion Nigeria / Kenya',detail:'Paystack · M-Pesa · NGN / KES',status:'future',p:'P2'},
+        {id:'sc3',title:'White-label pour agences',detail:'Sous-domaine · marque custom · tableau revendeur',status:'future',p:'P2'},
+        {id:'sc4',title:'IA génération contenu tunnel',detail:'LLaMA/GPT → titre · bénéfices · FAQ',status:'future',p:'P3'},
+      ]},
+    ]
+  },
+];
+
+// State
+var currentPhase = 2;
+var taskStates = JSON.parse(localStorage.getItem('fa_task_states')||'{}');
+
+// ══ RENDER ══
+function getStatus(task) {
+  if (taskStates[task.id] !== undefined) return taskStates[task.id];
+  return task.status;
+}
+
+function countPhase(phase) {
+  var total=0, done=0;
+  phase.groups.forEach(function(g){g.tasks.forEach(function(t){
+    total++;
+    var s=getStatus(t);
+    if(s==='done')done++;
+  });});
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+
+function renderSidebar() {
+  var html='';
+  ROADMAP.forEach(function(phase) {
+    var stats=countPhase(phase);
+    var statusText = phase.status==='done'?'✅ Terminé':phase.status==='wip'?'🔄 En cours':phase.status==='planned'?'⏳ Planifiée':'🔮 Futur';
+    var statusClass = 'status-'+({done:'done',wip:'wip',planned:'plan',future:'future'}[phase.status]);
+    html += `<div class="phase-item${currentPhase===phase.id?' active':''}" onclick="selectPhase(${phase.id})">
+      <div class="phase-header">
+        <span class="phase-num" style="color:${phase.color}">P${phase.num}</span>
+        <span class="phase-name">${phase.name.split('—')[0].trim()}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span class="phase-period">${phase.period}</span>
+        <span class="phase-status ${statusClass}">${statusText}</span>
+      </div>
+      <div class="phase-progress"><div class="phase-progress-fill" style="width:${stats.pct}%;background:${phase.color};"></div></div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:2px;">${stats.done}/${stats.total} tâches</div>
+    </div>`;
+  });
+  document.getElementById('phasesList').innerHTML=html;
+}
+
+function renderPhase(phaseId) {
+  var phase=ROADMAP[phaseId];
+  var stats=countPhase(phase);
+  document.getElementById('panelTitle').textContent = `📋 Phase ${phase.num} — ${phase.name}`;
+  document.getElementById('panelSub').textContent = `${phase.period} · ${stats.done}/${stats.total} tâches · ${stats.pct}% complété`;
+
+  // KPIs
+  var blockers = countBlockers();
+  document.getElementById('kpiBar').innerHTML = `
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${stats.pct}%</div><div class="kpi-label">Progression phase</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:${blockers>0?'var(--danger)':'var(--green)'}">${blockers}</div><div class="kpi-label">Bloquants P0</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--gold)">${stats.total-stats.done}</div><div class="kpi-label">Tâches restantes</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--blue)">${countAllDone()}</div><div class="kpi-label">Total terminées</div></div>
+  `;
+
+  // Alertes
+  var alertHtml='';
+  if(phaseId===2 && getStatus({id:'b1',status:'todo'})==='todo') {
+    alertHtml += `<div class="alert-box"><div class="alert-icon">🚨</div><div class="alert-text"><strong>BLOQUANT P0 : IFU FedaPay manquant</strong><br>Sans validation IFU Bénin, AUCUN paiement live n'est possible. Toutes les ventes sont bloquées. Priorité absolue.</div></div>`;
+  }
+  if(phaseId===2 && getStatus({id:'todo3',status:'todo'})==='todo') {
+    alertHtml += `<div class="alert-box"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>Pixel Facebook non installé</strong><br>Sans Pixel, tes campagnes Ads ne peuvent pas mesurer les conversions ni créer des audiences Lookalike.</div></div>`;
+  }
+  document.getElementById('alertArea').innerHTML=alertHtml;
+
+  // Next action
+  var next=getNextAction(phaseId);
+  if(next) {
+    document.getElementById('nextActionArea').innerHTML = `
+      <div class="next-action">
+        <div class="next-action-label">⚡ Prochaine action recommandée</div>
+        <div class="next-action-title">${next.title}</div>
+        <div class="next-action-desc">${next.detail}</div>
+        <button class="next-action-btn" onclick="markDone('${next.id}')">Marquer comme fait ✓</button>
+      </div>
+    `;
+  } else {
+    document.getElementById('nextActionArea').innerHTML = `<div class="info-box"><strong>🎉 Phase ${phase.num} complète !</strong> Passe à la phase suivante.</div>`;
+  }
+
+  // Task groups
+  var html='';
+  phase.groups.forEach(function(group) {
+    html += `<div class="task-group"><div class="task-group-title">${group.title}</div>`;
+    group.tasks.forEach(function(task) {
+      var s=getStatus(task);
+      var checkClass=s==='done'?'checked':s==='wip'?'wip':s==='future'?'':'' ;
+      var checkText=s==='done'?'✓':s==='wip'?'~':s==='future'?'·':'○';
+      html += `<div class="task-item${s==='done'?' done':''}" onclick="toggleTask('${task.id}','${task.status}')">
+        <div class="task-check ${checkClass}">${checkText}</div>
+        <div class="task-content">
+          <div class="task-title">${task.title}</div>
+          <div class="task-detail">${task.detail}</div>
+          <div class="task-meta"><span class="meta-tag ${task.p.toLowerCase()}">${task.p}</span></div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('taskGroups').innerHTML=html;
+}
+
+function getNextAction(phaseId) {
+  var phase=ROADMAP[phaseId];
+  // P0 d'abord
+  for(var g=0;g<phase.groups.length;g++){
+    for(var t=0;t<phase.groups[g].tasks.length;t++){
+      var task=phase.groups[g].tasks[t];
+      if(task.p==='P0' && getStatus(task)!=='done' && task.status!=='future'){return task;}
+    }
+  }
+  // P1
+  for(var g=0;g<phase.groups.length;g++){
+    for(var t=0;t<phase.groups[g].tasks.length;t++){
+      var task=phase.groups[g].tasks[t];
+      if(task.p==='P1' && getStatus(task)!=='done' && task.status!=='future'){return task;}
+    }
+  }
+  return null;
+}
+
+function countBlockers() {
+  var count=0;
+  ROADMAP[currentPhase].groups.forEach(function(g){g.tasks.forEach(function(t){
+    if(t.p==='P0' && getStatus(t)!=='done' && t.status!=='future') count++;
+  });});
+  return count;
+}
+
+function countAllDone() {
+  var count=0;
+  ROADMAP.forEach(function(ph){ph.groups.forEach(function(g){g.tasks.forEach(function(t){
+    if(getStatus(t)==='done')count++;
+  });});});
+  return count;
+}
+
+function selectPhase(id) {
+  currentPhase=id;
+  renderSidebar();
+  renderPhase(id);
+}
+
+function toggleTask(taskId, originalStatus) {
+  if(originalStatus==='future') return;
+  var current=taskStates[taskId]||originalStatus;
+  if(current==='done') {
+    taskStates[taskId]='todo';
+  } else {
+    taskStates[taskId]='done';
+    addBotMsg('✅ Super ! <strong>'+findTaskTitle(taskId)+'</strong> marqué comme terminé. Je mets à jour la roadmap...');
+  }
+  localStorage.setItem('fa_task_states',JSON.stringify(taskStates));
+  updateBadges();
+  renderSidebar();
+  renderPhase(currentPhase);
+}
+
+function markDone(taskId) {
+  taskStates[taskId]='done';
+  localStorage.setItem('fa_task_states',JSON.stringify(taskStates));
+  addBotMsg('✅ <strong>'+findTaskTitle(taskId)+'</strong> terminé ! Quelle est la prochaine étape ?');
+  updateBadges();
+  renderSidebar();
+  renderPhase(currentPhase);
+}
+
+function findTaskTitle(id) {
+  var title='';
+  ROADMAP.forEach(function(ph){ph.groups.forEach(function(g){g.tasks.forEach(function(t){
+    if(t.id===id)title=t.title;
+  });});});
+  return title;
+}
+
+function updateBadges() {
+  var blockers=countBlockers();
+  document.getElementById('currentPhaseBadge').textContent='🔄 Phase '+currentPhase+' en cours';
+  var alertBadge=document.getElementById('alertBadge');
+  if(blockers>0){alertBadge.textContent='⚠️ '+blockers+' bloquant(s) P0';alertBadge.style.display='block';}
+  else{alertBadge.style.display='none';}
+}
+
+// ══ CHAT ══
+var QUICK = ['IFU validé ✅','Pixel créé ✅','Ads lancées ✅','Que faire maintenant ?','Quelle est la priorité ?','Status phase 2','Blockers P0 ?'];
+
+function renderQuickActions() {
+  var html='';
+  QUICK.forEach(function(q){html+=`<button class="qa-btn" onclick="handleQuick('${q}')">${q}</button>`;});
+  document.getElementById('quickActions').innerHTML=html;
+}
+
+function handleQuick(q) {
+  addUserMsg(q);
+  processMsg(q);
+}
+
+function sendMsg() {
+  var input=document.getElementById('chatInput');
+  var msg=input.value.trim();
+  if(!msg)return;
+  addUserMsg(msg);
+  input.value='';
+  processMsg(msg);
+}
+
+function processMsg(msg) {
+  var lower=msg.toLowerCase();
+  setTimeout(function(){
+    if(lower.includes('ifu') && (lower.includes('validé')||lower.includes('fait')||lower.includes('ok'))) {
+      taskStates['b1']='done';
+      localStorage.setItem('fa_task_states',JSON.stringify(taskStates));
+      renderSidebar(); renderPhase(currentPhase); updateBadges();
+      addBotMsg('🎉 Excellent ! IFU FedaPay validé. Les paiements live sont maintenant possibles.<br><br><strong>Prochaine étape P0 :</strong> Tester le flow paiement complet end-to-end. Crée un tunnel test → paie → vérifie merci.html + email de confirmation.');
+    }
+    else if(lower.includes('pixel') && (lower.includes('créé')||lower.includes('fait')||lower.includes('ok')||lower.includes('installé'))) {
+      taskStates['todo3']='done';
+      localStorage.setItem('fa_task_states',JSON.stringify(taskStates));
+      renderSidebar(); renderPhase(currentPhase); updateBadges();
+      addBotMsg('📡 Pixel Facebook installé ! <br><br>Maintenant :<br>1. Ouvre <code>guide-pixel.html</code> → entre ton Pixel ID<br>2. Installe le code dans <code>landing.html</code>, <code>funnelafrica-auth.html</code>, <code>merci.html</code><br>3. Vérifie dans Gestionnaire d\'événements que les PageView arrivent.');
+    }
+    else if(lower.includes('ads') && (lower.includes('lancé')||lower.includes('fait')||lower.includes('ok'))) {
+      taskStates['ads1']='done';
+      selectPhase(3);
+      localStorage.setItem('fa_task_states',JSON.stringify(taskStates));
+      renderSidebar(); renderPhase(3); updateBadges();
+      addBotMsg('📢 Campagne 1 lancée ! Bravo !<br><br>Dans 24h vérifie :<br>• CPM : entre 500-2000 FCFA → bon<br>• CTR : > 1.5% → bon<br>• Si CTR < 1% → change le visuel d\'abord');
+    }
+    else if(lower.includes('priorité')||lower.includes('quoi faire')||lower.includes('maintenant')||lower.includes('suite')) {
+      var next=getNextAction(currentPhase);
+      var blockers=countBlockers();
+      if(blockers>0) {
+        addBotMsg('🚨 Tu as <strong>'+blockers+' bloquant(s) P0</strong> à régler avant tout :<br><br>'+getBlockersList()+'<br>Ces tâches doivent être finies AVANT de lancer les Ads ou passer à la phase suivante.');
+      } else if(next) {
+        addBotMsg('⚡ Prochaine action recommandée :<br><br><strong>'+next.title+'</strong><br>'+next.detail+'<br><br>Dis-moi quand c\'est fait !');
+      } else {
+        addBotMsg('🎉 Phase '+currentPhase+' complète ! Tu peux passer à la Phase '+(currentPhase+1)+'.');
+      }
+    }
+    else if(lower.includes('status')||lower.includes('statut')||lower.includes('avancement')) {
+      var stats=countPhase(ROADMAP[currentPhase]);
+      var blockers=countBlockers();
+      addBotMsg('📊 <strong>Status Phase '+currentPhase+'</strong><br><br>• Progression : <strong>'+stats.pct+'%</strong> ('+stats.done+'/'+stats.total+' tâches)<br>• Bloquants P0 : <strong>'+(blockers>0?'⚠️ '+blockers:'✅ 0')+'</strong><br>• Total terminées : <strong>'+countAllDone()+'</strong> tâches sur toute la roadmap');
+    }
+    else if(lower.includes('blocker')||lower.includes('bloquant')||lower.includes('p0')) {
+      var blockers=countBlockers();
+      if(blockers===0){addBotMsg('✅ Aucun bloquant P0 en cours ! Bonne progression.');}
+      else{addBotMsg('🚨 '+blockers+' bloquant(s) P0 actuellement :<br><br>'+getBlockersList());}
+    }
+    else if(lower.includes('phase')) {
+      var nums=['0','1','2','3','4','5'];
+      for(var i=0;i<nums.length;i++){
+        if(lower.includes('phase '+nums[i])||lower.includes('phase'+nums[i])){
+          selectPhase(parseInt(nums[i]));
+          var stats=countPhase(ROADMAP[parseInt(nums[i])]);
+          addBotMsg('📋 Phase '+nums[i]+' sélectionnée. Progression : '+stats.pct+'% ('+stats.done+'/'+stats.total+' tâches).');
+          return;
+        }
+      }
+      addBotMsg('Quelle phase veux-tu voir ? Dis "Phase 0", "Phase 1", etc.');
+    }
+    else if(lower.includes('test') && lower.includes('paiement')) {
+      addBotMsg('🧪 <strong>Checklist test paiement :</strong><br><br>1. Crée un tunnel test avec prix : 100 FCFA<br>2. Publie le tunnel → copie le lien<br>3. Ouvre le lien → clique Acheter<br>4. Remplis le formulaire avec ton propre numéro Mobile Money<br>5. Paie → vérifie merci.html → vérifie email reçu<br>6. Vérifie dans Supabase → orders : payment_status = "paid"<br>7. Vérifie dans FedaPay → transaction confirmée');
+    }
+    else if(lower.includes('fedapay')||lower.includes('ifu')) {
+      addBotMsg('💳 <strong>Valider FedaPay :</strong><br><br>1. Va sur <code>live.fedapay.com</code><br>2. Mon compte → Vérification<br>3. Soumet ton <strong>IFU Bénin</strong> + pièce d\'identité<br>4. Délai : 24-72h en général<br><br>Sans ça, <strong>0 paiement live possible</strong>.');
+    }
+    else {
+      addBotMsg('Je note ! Pour signaler une tâche terminée, dis-moi par exemple :<br>• "IFU validé ✅"<br>• "Pixel créé ✅"<br>• "Ads lancées ✅"<br><br>Ou pose-moi une question sur la roadmap, les fichiers à créer, ou les endpoints API.');
+    }
+  }, 400);
+}
+
+function getBlockersList() {
+  var list='';
+  ROADMAP[currentPhase].groups.forEach(function(g){g.tasks.forEach(function(t){
+    if(t.p==='P0' && getStatus(t)!=='done' && t.status!=='future'){
+      list += '• <strong>'+t.title+'</strong> — '+t.detail+'<br>';
+    }
+  });});
+  return list;
+}
+
+function addBotMsg(html) {
+  var msgs=document.getElementById('chatMessages');
+  var now=new Date().toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
+  msgs.innerHTML += `<div class="msg msg-bot">${html}<div class="msg-time">${now}</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addUserMsg(text) {
+  var msgs=document.getElementById('chatMessages');
+  var now=new Date().toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
+  msgs.innerHTML += `<div class="msg msg-user">${text}<div class="msg-time">${now}</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ══ INIT ══
+renderSidebar();
+renderPhase(currentPhase);
+renderQuickActions();
+updateBadges();
+
+// Message de bienvenue
+setTimeout(function(){
+  addBotMsg('👋 Bonjour ! Je suis ton assistant technique FunnelAfrica.<br><br>📍 <strong>Tu es en Phase 2</strong> — Optimisation & Bugs Android.<br><br>🚨 <strong>1 bloquant critique P0 :</strong> IFU FedaPay manquant → paiements bloqués.<br><br>Dis-moi "IFU validé ✅" quand c\'est fait, ou pose moi une question !');
+},500);
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--danger:#ff4d6d;--blue:#4da6ff;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;}
+  .logo{padding:20px 16px;border-bottom:1px solid var(--border);}
+  .logo-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-mark span{width:28px;height:28px;background:linear-gradient(135deg,var(--green),#00a87a);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#070b0f;font-weight:800;}
+  .nav{padding:10px;flex:1;}
+  .nav-section{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 4px;font-family:'Syne',sans-serif;}
+  .nav-item{padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:.8rem;transition:all .2s;margin-bottom:2px;}
+  .nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+  .nav-item.active{color:var(--green);}
+  .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+  .content{padding:24px;max-width:900px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:12px;}
+  .key-display{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--green);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+  .copy-key-btn{background:var(--green);color:#070b0f;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;padding:5px 12px;border-radius:7px;border:none;cursor:pointer;flex-shrink:0;}
+  .endpoint{background:var(--surface2);border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:hidden;}
+  .endpoint-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .endpoint-header:hover{background:rgba(255,255,255,.03);}
+  .method-badge{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;padding:3px 9px;border-radius:5px;flex-shrink:0;}
+  .get{background:#00e5a020;color:var(--green);}
+  .post{background:#ffb83020;color:var(--gold);}
+  .del{background:#ff4d6d20;color:var(--danger);}
+  .endpoint-path{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);}
+  .endpoint-desc{font-size:.78rem;color:var(--muted);margin-left:auto;}
+  .endpoint-body{padding:0 16px 14px;display:none;}
+  .endpoint-body.open{display:block;}
+  .code-block{background:#050810;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#7aa5c0;line-height:1.8;overflow-x:auto;position:relative;margin-top:8px;}
+  .copy-block-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.62rem;padding:3px 9px;border-radius:5px;cursor:pointer;}
+  .copy-block-btn:hover{background:var(--green);color:#070b0f;}
+  .param-table{width:100%;border-collapse:collapse;margin-top:8px;}
+  .param-table th{background:var(--surface);padding:7px 10px;text-align:left;font-size:.68rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;border:1px solid var(--border);}
+  .param-table td{padding:7px 10px;border:1px solid var(--border);font-size:.75rem;}
+  .param-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:.72rem;}
+  .badge-req{background:#ff4d6d20;color:var(--danger);font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;padding:1px 6px;border-radius:20px;}
+  .badge-opt{background:#00e5a015;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;padding:1px 6px;border-radius:20px;}
+  .form-group{margin-bottom:12px;}
+  .form-label{font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;display:block;margin-bottom:4px;}
+  .form-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.85rem;outline:none;}
+  .form-input:focus{border-color:var(--green);}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn-primary{background:var(--green);color:#070b0f;}
+  .btn-danger{background:#ff4d6d20;border:1px solid #ff4d6d40;color:var(--danger);}
+  .key-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+  .key-item:last-child{border-bottom:none;}
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;display:none;}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+<aside class="sidebar">
+  <div class="logo"><div class="logo-mark"><span>FA</span>API FunnelAfrica</div></div>
+  <nav class="nav">
+    <div class="nav-section">Documentation</div>
+    <div class="nav-item active" onclick="showSection('keys')">🔑 Mes clés API</div>
+    <div class="nav-item" onclick="showSection('auth')">🔐 Authentification</div>
+    <div class="nav-item" onclick="showSection('tunnels')">🚀 Tunnels</div>
+    <div class="nav-item" onclick="showSection('orders')">📋 Commandes</div>
+    <div class="nav-item" onclick="showSection('stats')">📊 Statistiques</div>
+    <div class="nav-section">Ressources</div>
+    <div class="nav-item" onclick="window.location.href='/funnelafrica-dashboard.html'">← Dashboard</div>
+  </nav>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <span class="page-title">🔌 API Publique FunnelAfrica</span>
+    <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;background:#00e5a020;border:1px solid #00e5a040;color:var(--green);padding:4px 12px;border-radius:20px;">v1.0</span>
+  </div>
+  <div class="content">
+
+    <!-- SECTION CLÉS API -->
+    <div id="section-keys">
+      <div class="card">
+        <div class="card-title">🔑 Mes clés API</div>
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:14px;">Tes clés API permettent d'accéder à tes données FunnelAfrica depuis des outils tiers (Zapier, Make, scripts personnels...).</div>
+        <div id="keysList"></div>
+        <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+        <div class="card-title">Créer une nouvelle clé</div>
+        <div class="form-group">
+          <label class="form-label">Nom de la clé</label>
+          <input class="form-input" id="newKeyName" placeholder="Ex: Zapier Integration">
+        </div>
+        <button class="btn btn-primary" onclick="createApiKey()">➕ Créer la clé</button>
+        <div id="newKeyDisplay" style="display:none;margin-top:14px;">
+          <div style="background:#00e5a010;border:1px solid #00e5a030;border-radius:9px;padding:12px;font-size:.8rem;color:var(--green);margin-bottom:8px;">⚠️ Copie cette clé maintenant — elle ne sera plus affichée !</div>
+          <div class="key-display"><span id="newKeyValue"></span><button class="copy-key-btn" onclick="copyNewKey()">📋 Copier</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION AUTH -->
+    <div id="section-auth" style="display:none;">
+      <div class="card">
+        <div class="card-title">🔐 Authentification</div>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px;">Toutes les requêtes API doivent inclure ta clé API dans le header Authorization :</p>
+        <div class="code-block">
+          <button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>
+Authorization: Bearer fa_xxxxxxxxxxxxxxxxxxxx
+
+# Ou via paramètre URL (moins sécurisé)
+GET /api/public/tunnels?api_key=fa_xxxxxxxxxxxx</div>
+        <div style="margin-top:14px;font-size:.82rem;color:var(--muted);">Base URL : <span style="color:var(--blue);font-family:'JetBrains Mono',monospace;">https://funnelafrica.vercel.app</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 Format des réponses</div>
+        <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>// Succès
+{ "tunnels": [...], "total": 5, "limit": 10, "offset": 0 }
+
+// Erreur
+{ "error": "Clé API invalide ou expirée" }</div>
+      </div>
+    </div>
+
+    <!-- SECTION TUNNELS -->
+    <div id="section-tunnels" style="display:none;">
+      <div class="card">
+        <div class="card-title">🚀 Endpoints Tunnels</div>
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method-badge get">GET</span>
+            <span class="endpoint-path">/api/public/tunnels</span>
+            <span class="endpoint-desc">Liste tes tunnels</span>
+          </div>
+          <div class="endpoint-body">
+            <table class="param-table">
+              <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
+              <tr><td>status</td><td>string</td><td><span class="badge-opt">optionnel</span></td><td>Filtrer : "live" ou "draft"</td></tr>
+              <tr><td>limit</td><td>integer</td><td><span class="badge-opt">optionnel</span></td><td>Nombre max de résultats (défaut: 10)</td></tr>
+              <tr><td>offset</td><td>integer</td><td><span class="badge-opt">optionnel</span></td><td>Pagination (défaut: 0)</td></tr>
+            </table>
+            <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
+  "https://funnelafrica.vercel.app/api/public/tunnels?status=live" \
+  -H "Authorization: Bearer fa_VOTRE_CLE"
+
+// Réponse
+{
+  "tunnels": [
+    {
+      "id": "uuid",
+      "name": "Ma Formation Excel",
+      "slug": "formation-excel-pro",
+      "status": "live",
+      "price": 9900,
+      "views": 245,
+      "revenue": 98010,
+      "orders": 10,
+      "created_at": "2026-03-01T..."
+    }
+  ],
+  "total": 1
+}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION ORDERS -->
+    <div id="section-orders" style="display:none;">
+      <div class="card">
+        <div class="card-title">📋 Endpoints Commandes</div>
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method-badge get">GET</span>
+            <span class="endpoint-path">/api/public/orders</span>
+            <span class="endpoint-desc">Liste tes commandes</span>
+          </div>
+          <div class="endpoint-body">
+            <table class="param-table">
+              <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
+              <tr><td>tunnel_id</td><td>uuid</td><td><span class="badge-opt">optionnel</span></td><td>Filtrer par tunnel</td></tr>
+              <tr><td>status</td><td>string</td><td><span class="badge-opt">optionnel</span></td><td>"paid" | "pending" | "failed"</td></tr>
+              <tr><td>limit</td><td>integer</td><td><span class="badge-opt">optionnel</span></td><td>Max 100 (défaut: 20)</td></tr>
+            </table>
+            <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
+  "https://funnelafrica.vercel.app/api/public/orders?status=paid" \
+  -H "Authorization: Bearer fa_VOTRE_CLE"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION STATS -->
+    <div id="section-stats" style="display:none;">
+      <div class="card">
+        <div class="card-title">📊 Endpoint Statistiques</div>
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method-badge get">GET</span>
+            <span class="endpoint-path">/api/public/stats</span>
+            <span class="endpoint-desc">Vue globale de tes performances</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-block-btn" onclick="copyCode(this)">📋 Copier</button>curl -X GET \
+  "https://funnelafrica.vercel.app/api/public/stats" \
+  -H "Authorization: Bearer fa_VOTRE_CLE"
+
+// Réponse
+{
+  "revenue_total":  245000,
+  "orders_total":   25,
+  "tunnels_live":   3,
+  "tunnels_total":  5,
+  "contacts_total": 142,
+  "currency":       "XOF",
+  "generated_at":   "2026-03-22T..."
+}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+  var newKeyRaw = '';
+
+  sb.auth.getUser().then(function(r){
+    if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
+    currentUser=r.data.user;
+    loadKeys();
+  });
+
+  function loadKeys() {
+    sb.from('api_keys').select('id,name,key_prefix,scopes,last_used_at,created_at,is_active').eq('user_id',currentUser.id).order('created_at',{ascending:false}).then(function(r){
+      var keys=r.data||[];
+      if(!keys.length){document.getElementById('keysList').innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem;">Aucune clé API créée</div>';return;}
+      document.getElementById('keysList').innerHTML=keys.map(function(k){
+        return '<div class="key-item"><div><div style="font-size:.85rem;font-weight:600;">'+k.name+'</div><div style="font-family:JetBrains Mono,monospace;font-size:.75rem;color:var(--blue);">'+k.key_prefix+'••••••••</div><div style="font-size:.68rem;color:var(--muted);">Créée le '+new Date(k.created_at).toLocaleDateString('fr')+(k.last_used_at?' · Dernière utilisation : '+new Date(k.last_used_at).toLocaleDateString('fr'):' · Jamais utilisée')+'</div></div><button class="btn btn-danger" style="font-size:.7rem;padding:5px 10px;" onclick="revokeKey(\''+k.id+'\')">Révoquer</button></div>';
+      }).join('');
+    });
+  }
+
+  function createApiKey() {
+    var name=document.getElementById('newKeyName').value.trim();
+    if(!name){showToast('Entrez un nom pour la clé','error');return;}
+    var crypto_key='fa_'+Array.from({length:32},function(){return Math.random().toString(36)[2]||'a';}).join('');
+    var prefix=crypto_key.substring(0,8)+'...';
+    // Hash simple côté client pour l'affichage (le vrai hash est côté serveur)
+    sb.from('api_keys').insert({
+      user_id:currentUser.id,
+      name:name,
+      key_hash:btoa(crypto_key).substring(0,64),
+      key_prefix:prefix,
+      scopes:['read'],
+      is_active:true
+    }).then(function(r){
+      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+      newKeyRaw=crypto_key;
+      document.getElementById('newKeyValue').textContent=crypto_key;
+      document.getElementById('newKeyDisplay').style.display='block';
+      document.getElementById('newKeyName').value='';
+      loadKeys();
+      showToast('✓ Clé créée ! Copiez-la maintenant.','success');
+    });
+  }
+
+  function revokeKey(id) {
+    if(!confirm('Révoquer cette clé ? Les intégrations utilisant cette clé cesseront de fonctionner.'))return;
+    sb.from('api_keys').update({is_active:false}).eq('id',id).then(function(){loadKeys();showToast('Clé révoquée','success');});
+  }
+
+  function copyNewKey(){navigator.clipboard.writeText(newKeyRaw).then(function(){showToast('✓ Clé copiée !','success');});}
+  function showSection(s){document.querySelectorAll('[id^="section-"]').forEach(function(el){el.style.display='none';});document.getElementById('section-'+s).style.display='block';document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});}
+  function toggleEndpoint(header){var body=header.nextElementSibling;body.classList.toggle('open');}
+  function copyCode(btn){var text=btn.parentElement.textContent.replace('📋 Copier','').trim();navigator.clipboard.writeText(text).then(function(){btn.textContent='✓ Copié !';setTimeout(function(){btn.textContent='📋 Copier';},2000);});}
+  function showToast(msg,type){var c=type==='error'?{bg:'#ff4d6d18',border:'#ff4d6d40',color:'#ff4d6d'}:{bg:'#00e5a018',border:'#00e5a040',color:'#00e5a0'};var t=document.getElementById('__toast');t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:'+c.bg+';border:1px solid '+c.border+';color:'+c.color+';display:block;opacity:0;';t.textContent=msg;setTimeout(function(){t.style.opacity='1';},10);setTimeout(function(){t.style.opacity='0';},3500);}
+</script>
+</body>
+</html>
