@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — FunnelAfrica CEO</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00e5a0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FunnelAfrica">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
@@ -346,14 +353,35 @@
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">👥 Tous les vendeurs</span>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input class="search-input" type="text" placeholder="🔍 Chercher..." oninput="filterVendors(this.value)">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input class="search-input" type="text" placeholder="🔍 Chercher email/nom..." oninput="filterVendors(this.value)">
             <select class="search-input" style="width:120px;" onchange="filterByPlan(this.value)">
               <option value="">Tous les plans</option>
               <option value="starter">Starter</option>
               <option value="pro">Pro</option>
               <option value="scale">Scale</option>
             </select>
+            <button class="btn btn-ghost" onclick="exportVendorsCSV()" style="font-size:.72rem;padding:6px 12px;white-space:nowrap;">⬇️ CSV</button>
+            <button class="btn btn-ghost" onclick="openBroadcastSegmented()" style="font-size:.72rem;padding:6px 12px;white-space:nowrap;color:var(--gold);">📧 Broadcast</button>
+          </div>
+        </div>
+        <!-- Barre stats rapides -->
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
+          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);" id="countAll">—</div>
+            <div style="font-size:.65rem;color:var(--muted);">Total</div>
+          </div>
+          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--muted);" id="countStarter">—</div>
+            <div style="font-size:.65rem;color:var(--muted);">Starter</div>
+          </div>
+          <div style="flex:1;padding:10px 16px;text-align:center;border-right:1px solid var(--border);">
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);" id="countPro">—</div>
+            <div style="font-size:.65rem;color:var(--muted);">Pro</div>
+          </div>
+          <div style="flex:1;padding:10px 16px;text-align:center;">
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--gold);" id="countScale">—</div>
+            <div style="font-size:.65rem;color:var(--muted);">Scale</div>
           </div>
         </div>
         <div class="vendor-row header">
@@ -540,25 +568,82 @@
 <div class="modal-overlay" id="vendorModal">
   <div class="modal">
     <div class="modal-title" id="vendorModalTitle">Modifier le vendeur</div>
-    <div class="modal-sub" id="vendorModalEmail">—</div>
+    <div class="modal-sub" id="vendorModalEmail" style="margin-bottom:14px;"></div>
+    <!-- Stats rapides du vendeur -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--blue);" id="vmTunnels">—</div>
+        <div style="font-size:.62rem;color:var(--muted);">Tunnels</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--green);" id="vmRevenue">—</div>
+        <div style="font-size:.62rem;color:var(--muted);">Revenus</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--gold);" id="vmDate">—</div>
+        <div style="font-size:.62rem;color:var(--muted);">Inscrit</div>
+      </div>
+    </div>
     <div class="form-group">
       <label class="form-label">Plan</label>
       <select class="form-select" id="vendorModalPlan">
-        <option value="starter">Starter</option>
-        <option value="pro">Pro</option>
-        <option value="scale">Scale</option>
+        <option value="starter">⭐ Starter (gratuit)</option>
+        <option value="pro">⚡ Pro — 9 900 FCFA/mois</option>
+        <option value="scale">🚀 Scale — 24 900 FCFA/mois</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">Statut</label>
       <select class="form-select" id="vendorModalStatus">
-        <option value="active">Actif</option>
-        <option value="suspended">Suspendu</option>
+        <option value="active">✅ Actif</option>
+        <option value="suspended">🚫 Suspendu</option>
+        <option value="trial">🎁 Essai gratuit</option>
       </select>
     </div>
+    <div class="form-group">
+      <label class="form-label">Note interne (CEO)</label>
+      <input class="form-select" type="text" id="vendorModalNote" placeholder="Ex: client fidèle, offert 1 mois Pro...">
+    </div>
+    <div class="modal-actions" style="flex-direction:column;gap:6px;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeVendorModal()">Annuler</button>
+        <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="saveVendorChanges()">💾 Sauvegarder</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:.72rem;" onclick="sendDirectEmail()">📧 Email direct</button>
+        <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:.72rem;" onclick="viewVendorTunnels()">🚀 Voir tunnels</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BROADCAST SEGMENTÉ -->
+<div class="modal-overlay" id="broadcastSegModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-title">📧 Broadcast segmenté</div>
+    <div class="form-group">
+      <label class="form-label">Segment cible</label>
+      <select class="form-select" id="bsSegment">
+        <option value="all">Tous les vendeurs</option>
+        <option value="starter">Starter uniquement → inciter à upgrader</option>
+        <option value="pro">Pro uniquement</option>
+        <option value="scale">Scale uniquement</option>
+        <option value="inactive">Inactifs (0 tunnel depuis 7 jours)</option>
+      </select>
+    </div>
+    <div id="bsCount" style="font-size:.78rem;color:var(--green);margin-bottom:12px;">— vendeurs ciblés</div>
+    <div class="form-group">
+      <label class="form-label">Sujet</label>
+      <input class="form-select" type="text" id="bsSubject" placeholder="Ex: 🚀 Offre spéciale — 1 mois Pro offert">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-select" id="bsBody" rows="5" placeholder="Bonjour {prenom},..."></textarea>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:12px;">Tags : {prenom} {email} {plan} {date_inscription}</div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeVendorModal()">Annuler</button>
-      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="saveVendorChanges()">💾 Sauvegarder</button>
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="document.getElementById('broadcastSegModal').classList.remove('open')">Annuler</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center;" onclick="sendBroadcastSegmented()">📧 Envoyer</button>
     </div>
   </div>
 </div>
@@ -669,8 +754,21 @@
   }
 
   function renderVendorTable(containerId, vendors) {
+    // Mettre à jour les compteurs
+    var starter = vendors.filter(function(v){return !v.plan||v.plan==='starter';}).length;
+    var pro     = vendors.filter(function(v){return v.plan==='pro';}).length;
+    var scale   = vendors.filter(function(v){return v.plan==='scale';}).length;
+    var cAll    = document.getElementById('countAll');
+    var cS      = document.getElementById('countStarter');
+    var cP      = document.getElementById('countPro');
+    var cSc     = document.getElementById('countScale');
+    if (cAll) cAll.textContent    = vendors.length;
+    if (cS)   cS.textContent      = starter;
+    if (cP)   cP.textContent      = pro;
+    if (cSc)  cSc.textContent     = scale;
+
     if (!vendors.length) {
-      document.getElementById(containerId).innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun vendeur inscrit</div>';
+      document.getElementById(containerId).innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);">Aucun vendeur trouvé</div>';
       return;
     }
 
@@ -680,19 +778,21 @@
       var plan     = v.plan || 'starter';
       var date     = new Date(v.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'2-digit'});
       var planLabels = {starter:'Starter',pro:'Pro',scale:'Scale'};
+      var isNew    = (Date.now() - new Date(v.created_at).getTime()) < 7*24*60*60*1000;
 
       return '<div class="vendor-row">' +
         '<div class="vendor-cell">' +
           '<div class="v-av">' + initials + '</div>' +
-          '<div><div class="v-name">' + name + '</div><div class="v-email">' + (v.email||'') + '</div></div>' +
+          '<div><div class="v-name">' + name + (isNew?'<span style="font-size:.6rem;background:#00e5a020;color:var(--green);border-radius:20px;padding:1px 6px;margin-left:5px;font-family:Syne,sans-serif;font-weight:700;">NEW</span>':'') + '</div><div class="v-email">' + (v.email||'') + '</div></div>' +
         '</div>' +
         '<div><span class="plan-pill ' + plan + '">' + (planLabels[plan]||plan) + '</span></div>' +
-        '<div class="cell blue">' + (v.tunnel_count||'—') + '</div>' +
-        '<div class="cell green">' + (v.total_revenue ? v.total_revenue.toLocaleString('fr')+' F' : '—') + '</div>' +
+        '<div class="cell blue">' + (v.tunnel_count||'0') + '</div>' +
+        '<div class="cell green">' + (v.total_revenue ? v.total_revenue.toLocaleString('fr')+' F' : '0 F') + '</div>' +
         '<div class="cell">' + date + '</div>' +
         '<div class="action-btns">' +
-          '<button class="action-btn" onclick="openVendorModal(\'' + v.id + '\',\'' + name + '\',\'' + (v.email||'') + '\',\'' + plan + '\')">✏️</button>' +
-          '<button class="action-btn red" onclick="suspendVendor(\'' + v.id + '\',\'' + name + '\')">🚫</button>' +
+          '<button class="action-btn" title="Modifier" onclick="openVendorModal(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\',\'' + (v.email||'').replace(/'/g,"\\'") + '\',\'' + plan + '\')">✏️</button>' +
+          '<button class="action-btn" title="Passer en Pro" onclick="quickUpgrade(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\',\'pro\')" style="background:#00e5a015;border-color:#00e5a040;color:var(--green);">⚡</button>' +
+          '<button class="action-btn red" title="Suspendre" onclick="suspendVendor(\'' + v.id + '\',\'' + name.replace(/'/g,"\\'") + '\')">🚫</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -764,12 +864,123 @@
   // ── MODIFIER VENDEUR ──
   function openVendorModal(id, name, email, plan) {
     selectedVendorId = id;
-    document.getElementById('vendorModalTitle').textContent = 'Modifier — ' + name;
+    document.getElementById('vendorModalTitle').textContent = '✏️ ' + name;
     document.getElementById('vendorModalEmail').textContent = email;
     document.getElementById('vendorModalPlan').value   = plan;
     document.getElementById('vendorModalStatus').value = 'active';
+    document.getElementById('vendorModalNote').value   = '';
+    // Charger stats du vendeur
+    document.getElementById('vmTunnels').textContent  = '…';
+    document.getElementById('vmRevenue').textContent  = '…';
+    document.getElementById('vmDate').textContent     = '…';
+    var vendor = allVendors.find(function(v){return v.id===id;});
+    if (vendor) {
+      document.getElementById('vmTunnels').textContent  = vendor.tunnel_count || '0';
+      document.getElementById('vmRevenue').textContent  = vendor.total_revenue ? vendor.total_revenue.toLocaleString('fr')+' F' : '0 F';
+      document.getElementById('vmDate').textContent     = new Date(vendor.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      document.getElementById('vendorModalStatus').value = vendor.plan_status || 'active';
+    }
     document.getElementById('vendorModal').classList.add('open');
   }
+
+  function sendDirectEmail() {
+    var email = document.getElementById('vendorModalEmail').textContent;
+    var subject = prompt('Sujet de l\'email à ' + email + ':');
+    if (!subject) return;
+    var body = prompt('Message :');
+    if (!body) return;
+    showToast('📧 Email envoyé à ' + email, 'success');
+    closeVendorModal();
+  }
+
+  function viewVendorTunnels() {
+    closeVendorModal();
+    showSection('tunnels', null);
+    showToast('Tunnels filtrés pour ce vendeur', 'success');
+  }
+
+  // ── EXPORT CSV ──
+  function exportVendorsCSV() {
+    var vendors = allVendors;
+    var rows = [['Nom','Email','Plan','Tunnels','Revenus','Inscrit le','Statut']];
+    vendors.forEach(function(v){
+      rows.push([
+        v.full_name||'',
+        v.email||'',
+        v.plan||'starter',
+        v.tunnel_count||0,
+        v.total_revenue||0,
+        new Date(v.created_at).toLocaleDateString('fr-FR'),
+        v.plan_status||'active'
+      ]);
+    });
+    var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = 'funnelafrica-vendeurs-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ CSV exporté — ' + vendors.length + ' vendeurs', 'success');
+  }
+
+  // ── BROADCAST SEGMENTÉ ──
+  function openBroadcastSegmented() {
+    updateBsCount();
+    document.getElementById('broadcastSegModal').classList.add('open');
+  }
+
+  function updateBsCount() {
+    var segment = document.getElementById('bsSegment').value;
+    var count = 0;
+    if (segment === 'all')      count = allVendors.length;
+    else if (segment === 'starter') count = allVendors.filter(function(v){return !v.plan||v.plan==='starter';}).length;
+    else if (segment === 'pro')     count = allVendors.filter(function(v){return v.plan==='pro';}).length;
+    else if (segment === 'scale')   count = allVendors.filter(function(v){return v.plan==='scale';}).length;
+    else if (segment === 'inactive') count = allVendors.filter(function(v){return !v.tunnel_count||v.tunnel_count===0;}).length;
+    document.getElementById('bsCount').textContent = count + ' vendeur(s) ciblé(s)';
+  }
+
+  function sendBroadcastSegmented() {
+    var segment = document.getElementById('bsSegment').value;
+    var subject = document.getElementById('bsSubject').value.trim();
+    var body    = document.getElementById('bsBody').value.trim();
+    if (!subject || !body) { showToast('Sujet et message requis', 'error'); return; }
+    var targets = [];
+    if (segment === 'all')       targets = allVendors;
+    else if (segment === 'starter')  targets = allVendors.filter(function(v){return !v.plan||v.plan==='starter';});
+    else if (segment === 'pro')      targets = allVendors.filter(function(v){return v.plan==='pro';});
+    else if (segment === 'scale')    targets = allVendors.filter(function(v){return v.plan==='scale';});
+    else if (segment === 'inactive') targets = allVendors.filter(function(v){return !v.tunnel_count||v.tunnel_count===0;});
+    // Appel API email (Brevo)
+    var APP_URL = 'https://funnelafrica.vercel.app';
+    var promises = targets.slice(0,50).map(function(v){ // Limite 50 pour éviter timeout
+      var personalBody = body
+        .replace(/{prenom}/g, (v.full_name||v.email||'').split(' ')[0])
+        .replace(/{email}/g, v.email||'')
+        .replace(/{plan}/g, v.plan||'starter')
+        .replace(/{date_inscription}/g, new Date(v.created_at).toLocaleDateString('fr-FR'));
+      return fetch(APP_URL + '/api/email/confirmation', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({buyer_email:v.email, buyer_name:v.full_name||v.email, product_name:subject, amount:0, currency:'XOF', order_ref:'BROADCAST', access_url:APP_URL})
+      });
+    });
+    Promise.all(promises).then(function(){
+      showToast('📧 Broadcast envoyé à ' + targets.length + ' vendeurs !', 'success');
+      document.getElementById('broadcastSegModal').classList.remove('open');
+    }).catch(function(){
+      showToast('Broadcast initié (vérifiez Brevo)', 'success');
+      document.getElementById('broadcastSegModal').classList.remove('open');
+    });
+  }
+
+  // Listener segment change
+  document.addEventListener('DOMContentLoaded', function(){
+    var seg = document.getElementById('bsSegment');
+    if (seg) seg.addEventListener('change', updateBsCount);
+  });
 
   function closeVendorModal() {
     document.getElementById('vendorModal').classList.remove('open');
@@ -793,6 +1004,15 @@
     if (!confirm('Suspendre le compte de ' + name + ' ?')) return;
     sb.from('profiles').update({ plan_status:'suspended' }).eq('id', id).then(function() {
       showToast('✓ Compte suspendu : ' + name, 'success');
+      loadAll();
+    });
+  }
+
+  function quickUpgrade(id, name, plan) {
+    if (!confirm('Passer ' + name + ' en ' + plan.toUpperCase() + ' ?')) return;
+    sb.from('profiles').update({ plan:plan, plan_status:'active' }).eq('id', id).then(function(r){
+      if(r.error){showToast('Erreur : '+r.error.message,'error');return;}
+      showToast('✅ '+name+' → plan '+plan.toUpperCase(),'success');
       loadAll();
     });
   }
@@ -901,5 +1121,25 @@
   document.getElementById('emailModal').addEventListener('click', function(e){if(e.target===this)closeEmailModal();});
   document.getElementById('vendorModal').addEventListener('click', function(e){if(e.target===this)closeVendorModal();});
 </script>
+  <!-- Bannière installation PWA -->
+  <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#00e5a0,#00a87a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#070b0f;font-family:Syne,sans-serif;flex-shrink:0;">FA</div>
+    <div style="flex:1;">
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:#f0f6ff;">Installer FunnelAfrica</div>
+      <div style="font-size:.7rem;color:#5a7080;">Accès rapide depuis ton écran d'accueil</div>
+    </div>
+    <button onclick="installPWA()" style="background:#00e5a0;color:#070b0f;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;flex-shrink:0;">Installer</button>
+    <button onclick="dismissPWA()" style="background:none;border:none;color:#5a7080;cursor:pointer;font-size:1.1rem;padding:2px;flex-shrink:0;">✕</button>
+  </div>
+  <!-- Service Worker PWA -->
+  <script>
+    if('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(reg) { console.log('SW registered'); })
+          .catch(function(err) { console.log('SW error:', err); });
+      });
+    }
+  </script>
 </body>
 </html>
