@@ -46,7 +46,7 @@
   .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
   .topbar-right{display:flex;align-items:center;gap:10px;}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,229,160,.15);}
   .btn-danger{background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);}
   .btn-danger:hover{background:var(--danger);color:white;}
   .btn-primary{background:var(--green);color:#080c10;}
@@ -102,7 +102,7 @@
 
   /* ACTIONS */
   .action-btns{display:flex;gap:6px;}
-  .action-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;}
+  .action-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:600;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,229,160,.15);}
   .action-btn:hover{background:var(--green);color:#080c10;border-color:var(--green);}
   .action-btn.red:hover{background:var(--danger);color:white;border-color:var(--danger);}
 
@@ -1120,6 +1120,27 @@
   // Fermer modals
   document.getElementById('emailModal').addEventListener('click', function(e){if(e.target===this)closeEmailModal();});
   document.getElementById('vendorModal').addEventListener('click', function(e){if(e.target===this)closeVendorModal();});
+
+  // ── PWA (fonctions requises par les boutons) ──
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwaInstallBanner').style.display = 'flex';
+  });
+  function installPWA() {
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+    document.getElementById('pwaInstallBanner').style.display = 'none';
+  }
+  function dismissPWA() {
+    document.getElementById('pwaInstallBanner').style.display = 'none';
+    localStorage.setItem('pwa_dismissed', '1');
+  }
+  // Cacher la bannière si déjà dismissé
+  if (localStorage.getItem('pwa_dismissed')) {
+    var b = document.getElementById('pwaInstallBanner');
+    if (b) b.style.display = 'none';
+  }
 </script>
   <!-- Bannière installation PWA -->
   <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
