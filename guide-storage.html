@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Hébergement Fichiers — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#070b0f;--surface:#0d1318;--surface2:#121a22;--border:#1a2530;--green:#00e5a0;--gold:#ffb830;--text:#f0f6ff;--muted:#5a7080;--blue:#4da6ff;--radius:12px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:680px;margin:0 auto;}
+  .title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:6px;}
+  .sub{font-size:.85rem;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+  .part{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+  .part-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .part-num{width:26px;height:26px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:#070b0f;flex-shrink:0;}
+  .part-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
+  .part-body{padding:16px 18px;}
+  .step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .step:last-child{border-bottom:none;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:7px;}
+  .step-text{font-size:.83rem;color:#a0b8c8;line-height:1.6;flex:1;}
+  .step-text strong{color:var(--text);}
+  .step-text em{font-style:normal;background:#00e5a010;border:1px solid #00e5a025;color:var(--green);padding:1px 7px;border-radius:5px;font-size:.75rem;font-family:'Syne',sans-serif;font-weight:600;}
+  .code{background:#050810;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.75rem;color:#7aa5c0;line-height:1.8;margin-top:8px;position:relative;overflow-x:auto;}
+  .copy-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.62rem;padding:3px 9px;border-radius:5px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;}
+  .copy-btn:hover{background:var(--green);color:#070b0f;border-color:var(--green);}
+  .tip{background:#00e5a008;border-left:3px solid var(--green);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:.77rem;color:#7ab89a;line-height:1.6;}
+  .tip strong{color:var(--green);}
+  .warn{background:#ffb83008;border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:.77rem;color:#a08030;line-height:1.6;}
+  .check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .check-item:last-child{border-bottom:none;}
+  .check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;transition:all .2s;}
+  .check-box.done{background:var(--green);border-color:var(--green);color:#070b0f;font-weight:700;}
+  .check-label{font-size:.82rem;transition:color .2s;}
+  .check-label.done{color:var(--muted);text-decoration:line-through;}
+  .flow{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+  .flow-step{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.8rem;display:flex;align-items:center;gap:10px;}
+  .flow-arrow{text-align:center;color:var(--green);font-size:.8rem;}
+  #__toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:.8rem;font-weight:500;max-width:280px;opacity:0;display:none;}
+</style>
+</head>
+<body>
+<div id="__toast"></div>
+
+<div class="title">☁️ Guide Hébergement Fichiers</div>
+<div class="sub">Comment héberger vos PDFs, ebooks et fichiers directement dans FunnelAfrica via Supabase Storage.</div>
+
+<!-- PARTIE 1 : ACTIVER SUPABASE STORAGE -->
+<div class="part">
+  <div class="part-header"><div class="part-num">1</div><div class="part-title">Activer Supabase Storage</div></div>
+  <div class="part-body">
+    <div class="step"><div class="dot"></div><div class="step-text">Va sur <strong>supabase.com</strong> → ton projet <strong>funnelafrica</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Menu gauche → <em>Storage</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Clique <strong>New bucket</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Nom du bucket : <em>funnelafrica-files</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Active <strong>Public bucket</strong> → les fichiers sont accessibles via URL</div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Clique <strong>Save</strong></div></div>
+    <div class="tip"><strong>💡 Gratuit :</strong> Supabase offre 1 Go de stockage sur le plan gratuit. Largement suffisant pour démarrer.</div>
+  </div>
+</div>
+
+<!-- PARTIE 2 : POLITIQUE D'ACCÈS -->
+<div class="part">
+  <div class="part-header"><div class="part-num">2</div><div class="part-title">Configurer les permissions d'accès</div></div>
+  <div class="part-body">
+    <div class="step"><div class="dot"></div><div class="step-text">Dans Storage → ton bucket <em>funnelafrica-files</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Onglet <strong>Policies</strong> → <strong>New policy</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Choisir <em>For full customization</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Copie ce SQL dans <strong>Supabase SQL Editor</strong> :</div></div>
+    <div class="code">
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copier</button>
+-- Permettre aux vendeurs connectés d'uploader leurs fichiers
+CREATE POLICY "vendors_upload" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'funnelafrica-files');
+
+-- Permettre à tout le monde de lire les fichiers (pour les acheteurs)
+CREATE POLICY "public_read" ON storage.objects
+  FOR SELECT TO public
+  USING (bucket_id = 'funnelafrica-files');
+
+-- Permettre aux vendeurs de supprimer leurs propres fichiers
+CREATE POLICY "vendors_delete" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (bucket_id = 'funnelafrica-files' AND auth.uid()::text = (storage.foldername(name))[2]);
+    </div>
+    <div class="warn">⚠️ Sans ces policies, l'upload échouera avec une erreur "Unauthorized".</div>
+  </div>
+</div>
+
+<!-- PARTIE 3 : UTILISER DANS L'ÉDITEUR -->
+<div class="part">
+  <div class="part-header"><div class="part-num">3</div><div class="part-title">Uploader un fichier dans l'éditeur</div></div>
+  <div class="part-body">
+    <div class="step"><div class="dot"></div><div class="step-text">Ouvre un tunnel dans l'éditeur FunnelAfrica</div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Panel droit → section <strong>⚙️ Avancé</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Champ <strong>Fichier produit</strong> → clique <em>⬆️ Upload</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Sélectionne ton fichier PDF (max 50 Mo)</div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Attends la barre de progression → <strong>✓ Fichier uploadé</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">L'URL est automatiquement copiée dans le champ</div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Clique <strong>💾 Sauvegarder</strong></div></div>
+    <div class="tip"><strong>💡 Formats supportés :</strong> PDF · EPUB · ZIP · MP4 · MP3 · DOCX</div>
+  </div>
+</div>
+
+<!-- PARTIE 4 : FLOW AUTOMATIQUE -->
+<div class="part">
+  <div class="part-header"><div class="part-num">4</div><div class="part-title">Comment ça fonctionne automatiquement</div></div>
+  <div class="part-body">
+    <div class="flow">
+      <div class="flow-step">📢 <strong>Acheteur</strong> clique "Acheter" sur ta page de vente</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">💳 <strong>Paiement</strong> via Wave / MTN MoMo / Orange Money</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">✅ <strong>FedaPay confirme</strong> → webhook déclenché</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">🎉 <strong>Page merci</strong> → bouton ⬇️ "Télécharger mon produit" apparaît</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">📚 <strong>Espace membre</strong> → bannière bleue avec bouton Télécharger</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">📄 <strong>Fichier téléchargé</strong> depuis Supabase Storage</div>
+    </div>
+    <div class="tip" style="margin-top:12px;"><strong>💡 Sécurité :</strong> Le lien est dans le page_config du tunnel — accessible uniquement depuis la page merci et l'espace membre après paiement confirmé.</div>
+  </div>
+</div>
+
+<!-- PARTIE 5 : ALTERNATIVES -->
+<div class="part">
+  <div class="part-header"><div class="part-num">5</div><div class="part-title">Alternative gratuite — Google Drive</div></div>
+  <div class="part-body">
+    <div class="step"><div class="dot"></div><div class="step-text">Upload ton PDF sur <strong>Google Drive</strong></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Clic droit → <strong>Obtenir le lien</strong> → <em>Tout le monde avec le lien peut afficher</em></div></div>
+    <div class="step"><div class="dot"></div><div class="step-text">Copie le lien → colle dans l'éditeur → champ <strong>Fichier produit</strong></div></div>
+    <div class="tip"><strong>💡 Quand utiliser Drive vs Supabase ?</strong><br>Drive → tu démarres, fichiers volumineux, vidéos<br>Supabase → intégration native, fichiers &lt; 50 Mo, plus propre</div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="part">
+  <div class="part-header"><div class="part-num">✓</div><div class="part-title">Checklist configuration</div></div>
+  <div class="part-body">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Bucket "funnelafrica-files" créé sur Supabase</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Bucket configuré en Public</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Policies SQL exécutées dans SQL Editor</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Test upload depuis l'éditeur — succès</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Bouton téléchargement visible sur merci.html</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">○</div><div class="check-label">Test téléchargement côté acheteur</div></div>
+  </div>
+</div>
+
+<script>
+  function toggleCheck(el) {
+    var box   = el.querySelector('.check-box');
+    var label = el.querySelector('.check-label');
+    var done  = box.classList.contains('done');
+    box.classList.toggle('done', !done);
+    box.textContent = done ? '○' : '✓';
+    label.classList.toggle('done', !done);
+  }
+  function copyCode(btn) {
+    var text = btn.parentElement.textContent.replace('📋 Copier','').trim();
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='✓ Copié !';
+      btn.style.background='var(--green)';btn.style.color='#070b0f';
+      setTimeout(function(){btn.textContent='📋 Copier';btn.style.background='';btn.style.color='';},2500);
+    });
+  }
+</script>
+</body>
+</html>

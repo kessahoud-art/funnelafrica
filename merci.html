@@ -143,6 +143,9 @@ fbq("track","PageView");
         <button class="btn btn-primary" id="accessBtn" onclick="goToAccess()">
           🚀 Accéder à ma formation maintenant
         </button>
+        <button class="btn btn-primary" id="downloadBtn" onclick="downloadProduct()" style="display:none;background:linear-gradient(135deg,#4da6ff,#2a7fd4);">
+          ⬇️ Télécharger mon produit
+        </button>
         <button class="btn btn-whatsapp" onclick="joinWhatsApp()">
           📱 Rejoindre le groupe WhatsApp
         </button>
@@ -174,7 +177,7 @@ fbq("track","PageView");
   //  SEUL ENDROIT À MODIFIER — ta clé anon
   // ══════════════════════════════════════════
   var SUPABASE_URL      = 'https://crfmdpvxiabwlhgrwcro.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm1kcHZ4aWFid2xoZ3J3Y3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDkxODgsImV4cCI6MjA4OTYyNTE4OH0.oHb2qnCArSkY_YNatrWuHLeWDS3WqvV0gpsnZuQmZRw';
+  var SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
   // ══════════════════════════════════════════
 
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -207,7 +210,7 @@ fbq("track","PageView");
   // ── VÉRIFIER LE PAIEMENT ──
   function verifyPayment(ref) {
     sb.from('orders')
-      .select('*, tunnels(name,slug)')
+      .select('*, tunnels(name,slug,page_config)')
       .eq('payment_ref', ref)
       .single()
       .then(function(r) {
@@ -217,7 +220,7 @@ fbq("track","PageView");
           // Réessayer après 3 secondes (webhook peut être en retard)
           setTimeout(function() {
             sb.from('orders')
-              .select('*, tunnels(name,slug)')
+              .select('*, tunnels(name,slug,page_config)')
               .eq('payment_ref', ref)
               .single()
               .then(function(r2) {
@@ -253,7 +256,32 @@ fbq("track","PageView");
     document.getElementById('paymentMethod').textContent = METHODS[order.payment_method] || order.payment_method || '—';
     document.getElementById('orderRef').textContent     = order.payment_ref || '—';
 
+    // Vérifier si le tunnel a un lien de téléchargement
+    if (order.tunnels && order.tunnels.page_config) {
+      var cfg = order.tunnels.page_config;
+      if (cfg.download_url) {
+        // Afficher le bouton de téléchargement
+        var dlBtn = document.getElementById('downloadBtn');
+        if (dlBtn) {
+          dlBtn.style.display = 'block';
+          dlBtn.setAttribute('data-url', cfg.download_url);
+        }
+        // Changer le texte du bouton accès
+        var accessBtn = document.getElementById('accessBtn');
+        if (accessBtn) accessBtn.textContent = '📚 Accéder à l\'espace membre';
+      }
+    }
+
     launchConfetti();
+  }
+
+  // ── TÉLÉCHARGER LE PRODUIT ──
+  function downloadProduct() {
+    var btn = document.getElementById('downloadBtn');
+    var url = btn ? btn.getAttribute('data-url') : '';
+    if (!url) { showToast('Lien de téléchargement non disponible', 'error'); return; }
+    window.open(url, '_blank');
+    showToast('✓ Téléchargement lancé !', 'success');
   }
 
   // ── AFFICHER ERREUR ──
