@@ -26,11 +26,15 @@
   .topbar-right{display:flex;align-items:center;gap:8px;}
   @media(max-width:800px){
     .topbar-right .btn-ghost{display:none !important;}
+    .topbar-right .btn-primary{display:none !important;}
+    .topbar-right .btn-publish{display:none !important;}
     .topbar-right .save-status span{display:none;}
     .topbar-right{gap:4px !important;}
     body,html{height:auto !important;overflow:auto !important;}
     .editor-wrap{height:auto !important;overflow:visible !important;}
-    #floatPreviewBtn{display:block !important;}
+    #floatPreviewBtn{display:none !important;}
+    #mobileFloatBtns{display:flex !important;}
+    .right-panel{padding-bottom:80px !important;}
   }
   .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
   .btn-primary{background:var(--green);color:#0a0f14;}
@@ -146,7 +150,12 @@
   </div>
 </div>
 
-<!-- BOUTON FLOTTANT APERÇU MOBILE -->
+<!-- BOUTONS FLOTTANTS MOBILE -->
+<div id="mobileFloatBtns" style="position:fixed;bottom:0;left:0;right:0;z-index:998;background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;gap:8px;display:none;">
+  <button onclick="saveTunnel(false)" style="flex:1;padding:12px;border-radius:11px;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">💾 Sauvegarder</button>
+  <button id="publishBtnMobile" onclick="togglePublish()" style="flex:1;padding:12px;border-radius:11px;background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#0a0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">🚀 Publier</button>
+  <button onclick="previewPublic()" style="padding:12px 14px;border-radius:11px;background:var(--surface2);border:1.5px solid var(--border);color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;touch-action:manipulation;">👁</button>
+</div>
 <div id="floatPreviewBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:999;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;padding:12px 18px;border-radius:30px;box-shadow:0 6px 20px #00e5a040;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="previewPublic()">
   👁 Voir l'aperçu
 </div>
@@ -356,6 +365,11 @@
   sb.auth.getUser().then(function(r) {
     if (!r.data.user) { window.location.href = '/funnelafrica-auth.html'; return; }
     if (!tunnelId) { window.location.href = '/funnelafrica-dashboard.html'; return; }
+    // Afficher la barre mobile si petit écran
+    if (window.innerWidth <= 800) {
+      var bar = document.getElementById('mobileFloatBtns');
+      if (bar) bar.style.display = 'flex';
+    }
     loadTunnel();
   });
 
@@ -522,9 +536,20 @@
   }
 
   function updateStatusUI() {
-    var pill=document.getElementById('statusPill'),btn=document.getElementById('publishBtn');
-    if(isPublished){pill.className='status-pill live';pill.textContent='🟢 En ligne';btn.textContent='⚫ Dépublier';btn.style.cssText='background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);';}
-    else{pill.className='status-pill draft';pill.textContent='Brouillon';btn.textContent='🚀 Publier';btn.style.cssText='background:linear-gradient(135deg,#00c896,#00a87a);color:#0a0f14;border:none;';}
+    var pill    = document.getElementById('statusPill');
+    var btn     = document.getElementById('publishBtn');
+    var btnMob  = document.getElementById('publishBtnMobile');
+    if (isPublished) {
+      pill.className = 'status-pill live';
+      pill.textContent = '🟢 En ligne';
+      if (btn) { btn.textContent = '⚫ Dépublier'; btn.style.cssText = 'background:#ff4d6d18;border:1px solid #ff4d6d40;color:var(--danger);'; }
+      if (btnMob) { btnMob.textContent = '⚫ Dépublier'; btnMob.style.background = '#ff4d6d30'; btnMob.style.color = 'var(--danger)'; btnMob.style.border = '1.5px solid #ff4d6d40'; }
+    } else {
+      pill.className = 'status-pill draft';
+      pill.textContent = 'Brouillon';
+      if (btn) { btn.textContent = '🚀 Publier'; btn.style.cssText = 'background:linear-gradient(135deg,#00c896,#00a87a);color:#0a0f14;border:none;'; }
+      if (btnMob) { btnMob.textContent = '🚀 Publier'; btnMob.style.background = 'linear-gradient(135deg,var(--green),var(--green2))'; btnMob.style.color = '#0a0f14'; btnMob.style.border = 'none'; }
+    }
   }
 
   function activateSection(id,el) {
