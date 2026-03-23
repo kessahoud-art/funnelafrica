@@ -1,4 +1,4 @@
-// ============================================================
+    // ============================================================
 //  api/payment/initiate.js
 //  Vercel Serverless Function — Initier un paiement FedaPay
 //  Supporte : paiement tunnel, upsell, abonnement plan
@@ -89,27 +89,28 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
 
+    // DEBUG TEMPORAIRE — retourner la réponse brute pour voir le format exact
     if (!response.ok) {
-      console.error('FedaPay error:', JSON.stringify(data));
-      const errMsg = data.message || (data.errors && JSON.stringify(data.errors)) || 'Erreur FedaPay';
-      return res.status(400).json({ error: errMsg, details: data });
+      return res.status(400).json({ error: 'FedaPay erreur', raw: data });
     }
 
-    // FedaPay v1 retourne { v1: { transaction: { id: ... } } }
-    const transactionId = data?.v1?.transaction?.id
-                       || data?.transaction?.id
-                       || data?.id;
+    // Retourner le raw pour voir la structure exacte
+    return res.status(200).json({
+      debug: true,
+      raw_response: data,
+      keys: Object.keys(data)
+    });
 
     if (!transactionId) {
       console.error('No transaction ID in:', JSON.stringify(data));
       return res.status(500).json({ error: 'ID de transaction manquant', raw: data });
     }
 
-    // ── Générer le token de paiement ──
+    // ── Générer le token — POST (pas GET) ──
     const tokenResponse = await fetch(
       `https://api.fedapay.com/v1/transactions/${transactionId}/token`,
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
           'Content-Type':  'application/json'
@@ -124,16 +125,19 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Erreur génération token', details: tokenData });
     }
 
-    // URL de paiement FedaPay
-    const token      = tokenData?.v1?.token?.token || tokenData?.token;
-    const paymentUrl = token ? `https://pay.fedapay.com/${token}` : tokenData?.url;
+    // FedaPay retourne { "v1/token": { "token": "xxxx" } }
+    const tokenObj   = tokenData['v1/token'] || tokenData;
+    const token      = tokenObj?.token;
+    const paymentUrl = token
+      ? `https://pay.fedapay.com/${token}`
+      : tokenData?.url;
 
     if (!paymentUrl) {
       console.error('No payment URL in:', JSON.stringify(tokenData));
       return res.status(500).json({ error: 'URL de paiement manquante' });
     }
 
-    console.log(`✅ Transaction créée : ${transactionId} — ${amount} XOF`);
+    console.log(`✅ Transaction créée : ${transactionId} — ${amount} XOF → ${paymentUrl}`);
 
     return res.status(200).json({
       success:        true,
