@@ -760,26 +760,33 @@ fbq("track","PageView");
   document.getElementById('upgradePhase4Modal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('open');
   });
-</script>
-  <!-- Bannière installation PWA -->
-  <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
-    <div style="width:40px;height:40px;background:linear-gradient(135deg,#00e5a0,#00a87a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#070b0f;font-family:Syne,sans-serif;flex-shrink:0;">FA</div>
-    <div style="flex:1;">
-      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:#f0f6ff;">Installer FunnelAfrica</div>
-      <div style="font-size:.7rem;color:#5a7080;">Accès rapide depuis ton écran d'accueil</div>
-    </div>
-    <button onclick="installPWA()" style="background:#00e5a0;color:#070b0f;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;flex-shrink:0;">Installer</button>
-    <button onclick="dismissPWA()" style="background:none;border:none;color:#5a7080;cursor:pointer;font-size:1.1rem;padding:2px;flex-shrink:0;">✕</button>
-  </div>
-  <!-- Service Worker PWA -->
-  <script>
-    if('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-          .then(function(reg) { console.log('SW registered'); })
-          .catch(function(err) { console.log('SW error:', err); });
-      });
+
+  // ── PWA Install Banner ──
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var banner = document.getElementById('pwaInstallBanner');
+    if (banner && !localStorage.getItem('pwa_dismissed')) {
+      banner.style.display = 'flex';
     }
-  </script>
+  });
+  function installPWA() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+    }
+    document.getElementById('pwaInstallBanner').style.display = 'none';
+  }
+  function dismissPWA() {
+    document.getElementById('pwaInstallBanner').style.display = 'none';
+    localStorage.setItem('pwa_dismissed', '1');
+  }
+  // Cacher si déjà refusé
+  if (localStorage.getItem('pwa_dismissed')) {
+    var b = document.getElementById('pwaInstallBanner');
+    if (b) b.style.display = 'none';
+  }
+</script>
 </body>
 </html>
