@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choisir votre plan — FunnelAfrica</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00e5a0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FunnelAfrica">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;--danger:#ff4d6d;--radius:14px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);display:flex;align-items:center;gap:8px;}
+  .logo-dot{width:28px;height:28px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#0a0f14;font-weight:800;}
+  .back-btn{color:var(--muted);font-size:.82rem;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);transition:all .2s;}
+  .back-btn:hover{background:var(--surface2);color:var(--text);}
+  .hero{text-align:center;padding:52px 20px 40px;position:relative;}
+  .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,#00c89610 0%,transparent 70%);pointer-events:none;}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#00c89615;border:1px solid #00c89630;color:var(--green);padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:16px;}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:10px;}
+  .hero-sub{color:var(--muted);font-size:.92rem;max-width:480px;margin:0 auto 16px;}
+  .billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:40px;}
+  .billing-label{font-size:.85rem;color:var(--muted);}
+  .billing-label.active{color:var(--text);font-weight:600;}
+  .toggle-switch{width:44px;height:24px;background:var(--green);border-radius:12px;cursor:pointer;position:relative;transition:background .2s;}
+  .toggle-switch::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;}
+  .toggle-switch.yearly::after{left:23px;}
+  .save-badge{background:#f5a62320;border:1px solid #f5a62340;color:var(--gold);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Syne',sans-serif;}
+  .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;margin:0 auto;padding:0 20px 60px;}
+  .plan-card{background:var(--surface);border:2px solid var(--border);border-radius:18px;padding:28px;position:relative;transition:all .3s;animation:fadeUp .5s ease both;}
+  .plan-card:nth-child(1){animation-delay:.05s;}.plan-card:nth-child(2){animation-delay:.10s;}.plan-card:nth-child(3){animation-delay:.15s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .plan-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px #00000050;}
+  .plan-card.popular{border-color:var(--green);box-shadow:0 0 40px #00c89620;}
+  .popular-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;padding:5px 18px;border-radius:20px;white-space:nowrap;}
+  .plan-icon{font-size:1.8rem;margin-bottom:12px;}
+  .plan-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:4px;}
+  .plan-desc{font-size:.78rem;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+  .plan-price-wrap{margin-bottom:6px;}
+  .plan-price-old{font-size:.8rem;color:var(--muted);text-decoration:line-through;height:18px;}
+  .plan-price{font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;line-height:1;}
+  .plan-period{font-size:.75rem;color:var(--muted);margin-bottom:24px;}
+  .plan-features{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:8px;}
+  .plan-features li{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;line-height:1.4;}
+  .plan-features li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px;}
+  .plan-features li.no::before{content:'✕';color:var(--muted);}
+  .plan-features li.no{color:var(--muted);}
+  .plan-btn{width:100%;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;border:none;cursor:pointer;transition:all .2s;}
+  .plan-btn.primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#0a0f14;box-shadow:0 6px 20px #00c89630;}
+  .plan-btn.primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px #00c89650;}
+  .plan-btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+  .plan-btn.ghost:hover{background:var(--surface2);border-color:var(--green);}
+  .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .plan-btn.current{background:var(--surface2);color:var(--muted);border:1.5px solid var(--border);cursor:default;}
+  .features-section{max-width:1000px;margin:0 auto;padding:0 20px 60px;}
+  .features-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;text-align:center;margin-bottom:28px;}
+  .features-table{width:100%;border-collapse:collapse;}
+  .features-table th{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:12px 16px;text-align:center;border-bottom:2px solid var(--border);color:var(--muted);}
+  .features-table th:first-child{text-align:left;}
+  .features-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.82rem;text-align:center;}
+  .features-table td:first-child{text-align:left;color:var(--muted);}
+  .features-table tr:hover td{background:var(--surface2);}
+  .check{color:var(--green);font-weight:800;}.cross{color:var(--muted);}
+  .faq-section{max-width:680px;margin:0 auto;padding:0 20px 60px;}
+  .faq-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;text-align:center;margin-bottom:24px;}
+  .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+  .faq-q{padding:16px 20px;cursor:pointer;font-weight:500;font-size:.88rem;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:background .2s;}
+  .faq-q:hover{background:var(--surface2);}
+  .faq-arrow{color:var(--green);font-size:.8rem;transition:transform .2s;flex-shrink:0;}
+  .faq-item.open .faq-arrow{transform:rotate(180deg);}
+  .faq-a{display:none;padding:14px 20px 16px;font-size:.83rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);}
+  .faq-item.open .faq-a{display:block;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:#000000a0;z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;padding:28px;animation:fadeUp .3s ease;}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:6px;}
+  .modal-sub{color:var(--muted);font-size:.83rem;margin-bottom:20px;}
+  .modal-plan-recap{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px;}
+  .modal-plan-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:4px;}
+  .modal-plan-price{font-size:1.4rem;font-weight:800;color:var(--green);font-family:'Syne',sans-serif;}
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:block;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+  .form-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--green);}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+  .btn-primary{background:var(--green);color:#0a0f14;}
+  .btn-primary:hover{background:#00dea8;}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+  .spinner{display:none;width:16px;height:16px;border:2px solid #0a0f1450;border-top-color:#0a0f14;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #__toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;opacity:0;transform:translateY(10px);display:none;}
+  @media(max-width:760px){.plans-grid{grid-template-columns:1fr;max-width:400px;}.features-table{display:none;}}
+  @media(max-width:480px){.plans-grid{padding:0 16px 40px;}}
+</style>
+<link rel="stylesheet" href="/mobile.css"> <button onclick="window.location.href='/ab-testing.html'" style="color:var(--muted);font-size:.78rem;cursor:pointer;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;margin-left:6px;">🧪 A/B</button><button onclick="window.location.href='/api-docs.html'" style="color:var(--muted);font-size:.78rem;cursor:pointer;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;margin-left:4px;">🔌 API</button><button onclick="window.location.href='/payout.html'" style="color:var(--muted);font-size:.78rem;cursor:pointer;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;margin-left:4px;">💸 Retrait</button>
+<!-- Pixel Facebook -->
+<!-- Pixel Facebook — à configurer avec ton vrai Pixel ID -->
+<!-- <script>!function(f,b,e,v,n,t,s){...}fbq("init","TON_PIXEL_ID");fbq("track","PageView");</script> -->
+</head>
+<body>
+
+<div id="__toast"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot">FA</div>FunnelAfrica</div>
+  <div class="back-btn" onclick="window.location.href='/funnelafrica-dashboard.html'">← Dashboard</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">⚡ Choisissez votre plan</div>
+  <h1 class="hero-title">Investissez dans votre croissance</h1>
+  <p class="hero-sub">Commencez gratuitement, évoluez quand vous êtes prêt. Annulez à tout moment.</p>
+  <div class="billing-toggle">
+    <span class="billing-label active" id="labelMonthly">Mensuel</span>
+    <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
+    <span class="billing-label" id="labelYearly">Annuel</span>
+    <span class="save-badge">-20%</span>
+  </div>
+</div>
+
+<!-- PLANS -->
+<div class="plans-grid">
+
+  <!-- STARTER -->
+  <div class="plan-card" id="card-starter">
+    <div class="plan-icon">🌱</div>
+    <div class="plan-name">Starter</div>
+    <div class="plan-desc">Pour tester et lancer votre première vente en ligne rapidement.</div>
+    <div class="plan-price-wrap">
+      <div class="plan-price-old" id="old-starter"></div>
+      <div class="plan-price"><span id="price-starter">3 000</span></div>
+    </div>
+    <div class="plan-period" id="period-starter">FCFA / mois</div>
+    <ul class="plan-features">
+      <li>1 tunnel de vente</li>
+      <li>500 contacts max</li>
+      <li>Paiement MTN, Moov, Wave</li>
+      <li>Page de vente personnalisable</li>
+      <li>Statistiques basiques</li>
+      <li class="no">Email marketing</li>
+      <li class="no">Tunnels illimités</li>
+      <li class="no">Support prioritaire</li>
+    </ul>
+    <button class="plan-btn ghost" id="btn-starter" onclick="selectPlan('starter', 3000)">
+      Commencer avec Starter
+    </button>
+  </div>
+
+  <!-- PRO -->
+  <div class="plan-card popular" id="card-pro">
+    <div class="popular-badge">⚡ Le plus populaire</div>
+    <div class="plan-icon">🚀</div>
+    <div class="plan-name">Pro</div>
+    <div class="plan-desc">Pour les vendeurs sérieux qui veulent scaler leurs ventes.</div>
+    <div class="plan-price-wrap">
+      <div class="plan-price-old" id="old-pro"></div>
+      <div class="plan-price"><span id="price-pro">9 900</span></div>
+    </div>
+    <div class="plan-period" id="period-pro">FCFA / mois</div>
+    <ul class="plan-features">
+      <li>Tunnels illimités</li>
+      <li>5 000 contacts max</li>
+      <li>Tous les modes de paiement</li>
+      <li>Email marketing (Brevo)</li>
+      <li>Statistiques avancées</li>
+      <li>Upsell &amp; Order bump</li>
+      <li>Support WhatsApp prioritaire</li>
+      <li class="no">Espace membre cours</li>
+    </ul>
+    <button class="plan-btn primary" id="btn-pro" onclick="selectPlan('pro', 9900)">
+      Passer au plan Pro →
+    </button>
+  </div>
+
+  <!-- SCALE -->
+  <div class="plan-card" id="card-scale">
+    <div class="plan-icon">🏆</div>
+    <div class="plan-name">Scale</div>
+    <div class="plan-desc">Pour les business établis qui veulent tout automatiser.</div>
+    <div class="plan-price-wrap">
+      <div class="plan-price-old" id="old-scale"></div>
+      <div class="plan-price"><span id="price-scale">24 900</span></div>
+    </div>
+    <div class="plan-period" id="period-scale">FCFA / mois</div>
+    <ul class="plan-features">
+      <li>Tout du plan Pro</li>
+      <li>Contacts illimités</li>
+      <li>Espace membre / cours</li>
+      <li>Programme d'affiliation</li>
+      <li>WhatsApp automation</li>
+      <li>API accès développeur</li>
+      <li>Support dédié 24h/24</li>
+      <li>Onboarding personnalisé</li>
+    </ul>
+    <button class="plan-btn ghost" id="btn-scale" onclick="selectPlan('scale', 24900)">
+      Passer au plan Scale
+    </button>
+  </div>
+
+</div>
+
+<!-- FEATURES TABLE -->
+<div class="features-section">
+  <div class="features-title">Comparaison détaillée</div>
+  <table class="features-table">
+    <thead>
+      <tr>
+        <th>Fonctionnalité</th><th>Starter</th><th>Pro</th><th>Scale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Tunnels de vente</td><td>1</td><td class="check">Illimité</td><td class="check">Illimité</td></tr>
+      <tr><td>Contacts</td><td>500</td><td>5 000</td><td class="check">Illimité</td></tr>
+      <tr><td>Paiement Mobile Money</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>Email marketing</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>Upsell / Order bump</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>Espace membre</td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>Affiliation</td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>Support WhatsApp</td><td>Standard</td><td>Prioritaire</td><td>Dédié 24h</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-title">Questions fréquentes</div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Comment fonctionne le paiement ? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Vous payez via MTN MoMo, Moov Money, Wave ou carte bancaire. Le paiement est mensuel et vous pouvez annuler à tout moment.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Puis-je changer de plan à tout moment ? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Oui. Vous pouvez upgrader ou downgrader votre plan à tout moment. Le changement est effectif immédiatement.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Y a-t-il une période d'essai ? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Oui. Créez un compte et testez gratuitement. Le plan Starter est disponible dès 3 000 FCFA/mois.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Que se passe-t-il si j'annule ? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Vos tunnels et données sont conservés pendant 30 jours après l'annulation.</div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Activer le plan Pro</div>
+    <div class="modal-sub">Entrez vos informations pour procéder au paiement</div>
+    <div class="modal-plan-recap">
+      <div class="modal-plan-name" id="modalPlanName">Plan Pro</div>
+      <div class="modal-plan-price" id="modalPlanPrice">9 900 FCFA/mois</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nom complet</label>
+      <input class="form-input" type="text" id="payName" placeholder="Kessahou Delphin">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="payEmail" placeholder="vous@gmail.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone Mobile Money</label>
+      <input class="form-input" type="tel" id="payPhone" placeholder="229 XX XX XX XX">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" style="flex:2;" id="payBtn" onclick="processPlanPayment()">
+        <span id="payBtnText">💳 Payer maintenant</span>
+        <div class="spinner" id="paySpinner"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  CONFIG — remplace par tes vraies clés
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var PLANS = {
+    starter: { name:'Starter', monthly:3000,  yearly:2400  },
+    pro:     { name:'Pro',     monthly:9900,  yearly:7900  },
+    scale:   { name:'Scale',   monthly:24900, yearly:19900 }
+  };
+
+  var isYearly       = false;
+  var selectedPlan   = null;
+  var selectedAmount = 0;
+  var currentUser    = null;
+
+  // ── INIT au chargement ──
+  sb.auth.getUser().then(function(result) {
+    var user = result.data.user;
+    if (!user) {
+      window.location.href = '/funnelafrica-auth.html';
+      return;
+    }
+    currentUser = user;
+
+    // Pré-remplir email
+    document.getElementById('payEmail').value = user.email || '';
+
+    // Charger le profil
+    sb.from('profiles').select('*').eq('id', user.id).single().then(function(r) {
+      if (r.data) {
+        document.getElementById('payName').value = r.data.full_name || '';
+        highlightCurrentPlan(r.data.plan);
+      }
+    });
+  });
+
+  // ── HIGHLIGHT PLAN ACTUEL ──
+  function highlightCurrentPlan(plan) {
+    if (!plan) return;
+    var btn = document.getElementById('btn-' + plan);
+    if (btn) {
+      btn.className   = 'plan-btn current';
+      btn.textContent = '✓ Plan actuel';
+      btn.disabled    = true;
+    }
+  }
+
+  // ── TOGGLE BILLING ──
+  function toggleBilling() {
+    isYearly = !isYearly;
+    document.getElementById('billingToggle').classList.toggle('yearly', isYearly);
+    document.getElementById('labelMonthly').classList.toggle('active', !isYearly);
+    document.getElementById('labelYearly').classList.toggle('active', isYearly);
+
+    Object.keys(PLANS).forEach(function(key) {
+      var p     = PLANS[key];
+      var price = isYearly ? p.yearly : p.monthly;
+      var period = isYearly ? 'FCFA / mois (annuel)' : 'FCFA / mois';
+      document.getElementById('price-' + key).textContent  = price.toLocaleString('fr');
+      document.getElementById('period-' + key).textContent = period;
+      document.getElementById('old-' + key).textContent    = isYearly ? p.monthly.toLocaleString('fr') + ' FCFA' : '';
+    });
+  }
+
+  // ── SÉLECTIONNER UN PLAN — ouvre le modal ──
+  function selectPlan(plan, baseAmount) {
+    selectedPlan   = plan;
+    selectedAmount = isYearly ? PLANS[plan].yearly * 12 : baseAmount;
+
+    var planData = PLANS[plan];
+    var priceStr = isYearly
+      ? PLANS[plan].yearly.toLocaleString('fr') + ' FCFA/mois (annuel)'
+      : baseAmount.toLocaleString('fr') + ' FCFA/mois';
+
+    document.getElementById('modalTitle').textContent     = 'Activer le plan ' + planData.name;
+    document.getElementById('modalPlanName').textContent  = 'Plan ' + planData.name;
+    document.getElementById('modalPlanPrice').textContent = priceStr;
+
+    document.getElementById('payModal').classList.add('open');
+  }
+
+  // ── FERMER MODAL ──
+  function closeModal() {
+    document.getElementById('payModal').classList.remove('open');
+  }
+
+  // ── PAIEMENT DU PLAN ──
+  function processPlanPayment() {
+    var name  = document.getElementById('payName').value.trim();
+    var email = document.getElementById('payEmail').value.trim();
+    var phone = document.getElementById('payPhone').value.trim();
+
+    if (!name || !email) {
+      showToast('Nom et email requis', 'error');
+      return;
+    }
+
+    var btn     = document.getElementById('payBtn');
+    var spinner = document.getElementById('paySpinner');
+    var text    = document.getElementById('payBtnText');
+
+    btn.disabled          = true;
+    spinner.style.display = 'block';
+    text.textContent      = 'Redirection...';
+
+    var orderId = 'SUB-' + selectedPlan.toUpperCase() + '-' + Date.now() + '-' +
+      Math.random().toString(36).substring(2, 5).toUpperCase();
+
+    // Créer la commande dans Supabase
+    // Initier le paiement FedaPay directement (sans INSERT orders d'abord)
+    fetch('/api/payment/initiate', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount:      selectedAmount,
+        currency:    'XOF',
+        buyer_name:  name,
+        buyer_email: email,
+        buyer_phone: phone,
+        order_id:    orderId,
+        description: 'Abonnement FunnelAfrica Plan ' + PLANS[selectedPlan].name
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success) throw new Error(data.error || 'Erreur paiement');
+      window.location.href = data.payment_url;
+    })
+    .catch(function(err) {
+      showToast(err.message || 'Erreur paiement. Réessayez.', 'error');
+      btn.disabled          = false;
+      spinner.style.display = 'none';
+      text.textContent      = '💳 Payer maintenant';
+    });
+
+
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type) {
+    var c = type === 'error'
+      ? { bg:'#ff4d6d18', border:'#ff4d6d40', color:'#ff4d6d' }
+      : { bg:'#00c89618', border:'#00c89640', color:'#00c896' };
+    var t = document.getElementById('__toast');
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:.83rem;font-weight:500;max-width:320px;box-shadow:0 8px 24px #00000040;transition:all .3s;background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.color + ';display:block;opacity:0;transform:translateY(10px);';
+    t.textContent = msg;
+    setTimeout(function() { t.style.opacity='1'; t.style.transform='translateY(0)'; }, 10);
+    setTimeout(function() { t.style.opacity='0'; t.style.transform='translateY(10px)'; }, 3500);
+  }
+
+  // Fermer modal en cliquant dehors
+  document.getElementById('payModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  function navPhase4(page,req){
+    var plan=localStorage.getItem('fa_plan')||'starter';
+    var email=localStorage.getItem('fa_email')||'';
+    var isCEO=email==='kessahoud@gmail.com';
+    var isPro=plan==='pro'||plan==='scale';
+    if(req==='all'||isCEO||isPro){window.location.href='/'+page;return;}
+    if(confirm('Fonctionnalité Pro
+
+L'A/B Testing et l'API sont disponibles à partir du plan Pro (9 900 FCFA/mois).
+
+Voir les plans ?')){window.location.href='/abonnement.html';}
+  }
+</script>
+</body>
+</html>
