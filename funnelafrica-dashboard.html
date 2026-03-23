@@ -234,9 +234,9 @@ fbq("track","PageView");
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       🤖 IA Générateur
     </div>
-    <div class="nav-item" onclick="window.location.href='/expansion.html'">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-      🌍 Expansion
+    <div class="nav-item" id="navExpansion" style="display:none;" onclick="window.location.href='/expansion.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 014-10z"/></svg>
+      🌍 Expansion <span style="font-size:.58rem;background:#ff4d6d20;color:#ff4d6d;padding:1px 6px;border-radius:20px;margin-left:auto;font-family:Syne,sans-serif;font-weight:700;">CEO</span>
     </div>
     <div class="nav-item" id="navAbTest" onclick="goPhase4('ab-testing.html','pro')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
@@ -556,7 +556,10 @@ fbq("track","PageView");
       if (isCEO) {
         var adminEl = document.getElementById('adminLink');
         if (adminEl) adminEl.style.display = 'flex';
-        // Ajouter aussi un bouton flottant CEO discret
+        // Afficher Expansion — CEO uniquement
+        var expansionEl = document.getElementById('navExpansion');
+        if (expansionEl) expansionEl.style.display = 'flex';
+        // Bouton flottant CEO
         var fab = document.createElement('div');
         fab.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:999;background:var(--danger);color:white;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:8px 14px;border-radius:20px;cursor:pointer;box-shadow:0 4px 14px #ff4d6d40;';
         fab.textContent = '👑 Admin CEO';

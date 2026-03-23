@@ -133,7 +133,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   sb.auth.getUser().then(function(r){
     if(!r.data.user){window.location.href='/funnelafrica-auth.html';return;}
     currentUser=r.data.user;
-    renderCountries();
+    // Protection CEO uniquement
+    var isCEO = currentUser.email === 'kessahoud@gmail.com';
+    if (!isCEO) {
+      sb.from('profiles').select('role').eq('id',currentUser.id).single().then(function(pr){
+        if (!pr.data || pr.data.role !== 'admin') {
+          window.location.href='/funnelafrica-dashboard.html';
+          return;
+        }
+        renderCountries();
+      });
+    } else {
+      renderCountries();
+    }
   });
 
   function renderCountries(){
