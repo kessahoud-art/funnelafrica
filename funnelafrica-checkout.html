@@ -424,15 +424,13 @@ fbq("track","PageView");
       buyer_name:     firstName + ' ' + lastName,
       buyer_email:    email,
       buyer_phone:    phone,
-      buyer_country:  'BJ',
       amount:         tunnelData.price,
-      currency:       tunnelData.currency || 'XOF',
-      payment_method: 'fedapay',
       payment_status: 'pending',
       payment_ref:    orderId
     }).then(function(r) {
       if (r.error) {
-        showError('Erreur création commande. Réessayez.');
+        console.log('ORDER ERROR:', r.error.message, r.error.code);
+        showError('Erreur : ' + (r.error.message || 'Réessayez'));
         resetBtn();
         return;
       }
