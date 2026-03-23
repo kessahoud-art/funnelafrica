@@ -1,0 +1,149 @@
+// ============================================================
+//  api/payment/initiate.js
+//  Vercel Serverless Function — Initier un paiement FedaPay
+//  Supporte : paiement tunnel, upsell, abonnement plan
+//
+//  Variables Vercel :
+//  FEDAPAY_SECRET_KEY = sk_live_xxxx
+//  APP_URL            = https://funnelafrica.vercel.app
+// ============================================================
+
+module.exports = async function handler(req, res) {
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
+
+  try {
+    const {
+      amount,
+      currency      = 'XOF',
+      buyer_name,
+      buyer_email,
+      buyer_phone,
+      order_id,
+      tunnel_slug,
+      description   = 'Achat sur FunnelAfrica',
+      has_upsell    = false   // ← true si le tunnel a un upsell configuré
+    } = req.body;
+
+    if (!amount || !buyer_name || !buyer_email || !order_id) {
+      return res.status(400).json({
+        error: 'Champs manquants : amount, buyer_name, buyer_email, order_id'
+      });
+    }
+
+    if (amount < 100) {
+      return res.status(400).json({ error: 'Montant minimum : 100 XOF' });
+    }
+
+    const APP_URL   = process.env.APP_URL || 'https://funnelafrica.vercel.app';
+    const nameParts = buyer_name.trim().split(' ');
+    const firstName = nameParts[0] || buyer_name;
+    const lastName  = nameParts.slice(1).join(' ') || firstName;
+
+    // ── Construire l'URL de retour ──
+    // Si upsell → rediriger vers upsell.html après paiement
+    // Sinon → rediriger vers merci.html
+    let callbackUrl;
+
+    if (has_upsell && tunnel_slug && !order_id.startsWith('UP-')) {
+      // Après paiement principal → page upsell
+      callbackUrl = `${APP_URL}/upsell.html?order=${order_id}&tunnel=${tunnel_slug}&email=${encodeURIComponent(buyer_email)}&name=${encodeURIComponent(buyer_name)}`;
+    } else if (tunnel_slug) {
+      // Après upsell ou pas d'upsell → merci avec tunnel
+      callbackUrl = `${APP_URL}/merci.html?order=${order_id}&tunnel=${tunnel_slug}`;
+    } else {
+      // Abonnement plan → merci sans tunnel
+      callbackUrl = `${APP_URL}/merci.html?order=${order_id}`;
+    }
+
+    // ── Créer la transaction FedaPay ──
+    // FedaPay v1 : currency = string "XOF" (pas un objet)
+    const response = await fetch('https://api.fedapay.com/v1/transactions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify({
+        description:   description,
+        amount:        parseInt(amount),
+        currency:      { iso: 'XOF' },
+        callback_url:  callbackUrl,
+        cancel_url:    `${APP_URL}/funnelafrica-checkout.html?cancelled=1`,
+        customer: {
+          firstname:    firstName,
+          lastname:     lastName,
+          email:        buyer_email,
+          phone_number: { number: String(buyer_phone || '').replace(/\s/g,''), country: 'BJ' }
+        },
+        metadata: {
+          order_id:    order_id,
+          tunnel_slug: tunnel_slug || ''
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('FedaPay error:', JSON.stringify(data));
+      const errMsg = data.message || (data.errors && JSON.stringify(data.errors)) || 'Erreur FedaPay';
+      return res.status(400).json({ error: errMsg, details: data });
+    }
+
+    // FedaPay v1 retourne { v1: { transaction: { id: ... } } }
+    const transactionId = data?.v1?.transaction?.id
+                       || data?.transaction?.id
+                       || data?.id;
+
+    if (!transactionId) {
+      console.error('No transaction ID in:', JSON.stringify(data));
+      return res.status(500).json({ error: 'ID de transaction manquant', raw: data });
+    }
+
+    // ── Générer le token de paiement ──
+    const tokenResponse = await fetch(
+      `https://api.fedapay.com/v1/transactions/${transactionId}/token`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+          'Content-Type':  'application/json'
+        }
+      }
+    );
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      console.error('Token error:', JSON.stringify(tokenData));
+      return res.status(500).json({ error: 'Erreur génération token', details: tokenData });
+    }
+
+    // URL de paiement FedaPay
+    const token      = tokenData?.v1?.token?.token || tokenData?.token;
+    const paymentUrl = token ? `https://pay.fedapay.com/${token}` : tokenData?.url;
+
+    if (!paymentUrl) {
+      console.error('No payment URL in:', JSON.stringify(tokenData));
+      return res.status(500).json({ error: 'URL de paiement manquante' });
+    }
+
+    console.log(`✅ Transaction créée : ${transactionId} — ${amount} XOF`);
+
+    return res.status(200).json({
+      success:        true,
+      payment_url:    paymentUrl,
+      transaction_id: transactionId,
+      order_id:       order_id
+    });
+
+  } catch (err) {
+    console.error('Initiate error:', err);
+    return res.status(500).json({ error: 'Erreur serveur. Réessayez.' });
+  }
+}
