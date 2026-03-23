@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Choisir votre plan — FunnelAfrica</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00e5a0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FunnelAfrica">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
@@ -398,51 +405,33 @@ fbq("track","PageView");
       Math.random().toString(36).substring(2, 5).toUpperCase();
 
     // Créer la commande dans Supabase
-    sb.from('orders').insert({
-      user_id:        currentUser ? currentUser.id : null,
-      buyer_name:     name,
-      buyer_email:    email,
-      buyer_phone:    phone,
-      amount:         selectedAmount,
-      currency:       'XOF',
-      payment_method: 'fedapay',
-      payment_status: 'pending',
-      payment_ref:    orderId,
-      tunnel_id:      null
-    }).then(function() {
-
-      // Initier le paiement FedaPay
-      fetch('/api/payment/initiate', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount:      selectedAmount,
-          currency:    'XOF',
-          buyer_name:  name,
-          buyer_email: email,
-          buyer_phone: phone,
-          order_id:    orderId,
-          description: 'Abonnement FunnelAfrica Plan ' + PLANS[selectedPlan].name
-        })
+    // Initier le paiement FedaPay directement (sans INSERT orders d'abord)
+    fetch('/api/payment/initiate', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount:      selectedAmount,
+        currency:    'XOF',
+        buyer_name:  name,
+        buyer_email: email,
+        buyer_phone: phone,
+        order_id:    orderId,
+        description: 'Abonnement FunnelAfrica Plan ' + PLANS[selectedPlan].name
       })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (!data.success) throw new Error(data.error || 'Erreur paiement');
-        window.location.href = data.payment_url;
-      })
-      .catch(function(err) {
-        showToast(err.message || 'Erreur. Réessayez.', 'error');
-        btn.disabled          = false;
-        spinner.style.display = 'none';
-        text.textContent      = '💳 Payer maintenant';
-      });
-
-    }).catch(function(err) {
-      showToast('Erreur création commande', 'error');
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success) throw new Error(data.error || 'Erreur paiement');
+      window.location.href = data.payment_url;
+    })
+    .catch(function(err) {
+      showToast(err.message || 'Erreur paiement. Réessayez.', 'error');
       btn.disabled          = false;
       spinner.style.display = 'none';
       text.textContent      = '💳 Payer maintenant';
     });
+
+
   }
 
   // ── TOAST ──
@@ -461,6 +450,39 @@ fbq("track","PageView");
   document.getElementById('payModal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
   });
+
+  function navPhase4(page,req){
+    var plan=localStorage.getItem('fa_plan')||'starter';
+    var email=localStorage.getItem('fa_email')||'';
+    var isCEO=email==='kessahoud@gmail.com';
+    var isPro=plan==='pro'||plan==='scale';
+    if(req==='all'||isCEO||isPro){window.location.href='/'+page;return;}
+    if(confirm('Fonctionnalité Pro
+
+L'A/B Testing et l'API sont disponibles à partir du plan Pro (9 900 FCFA/mois).
+
+Voir les plans ?')){window.location.href='/abonnement.html';}
+  }
 </script>
+  <!-- Bannière installation PWA -->
+  <div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:16px;right:16px;z-index:9998;background:linear-gradient(135deg,#071a0f,#0a2015);border:1px solid #00e5a040;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px #00000060;">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#00e5a0,#00a87a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#070b0f;font-family:Syne,sans-serif;flex-shrink:0;">FA</div>
+    <div style="flex:1;">
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.82rem;color:#f0f6ff;">Installer FunnelAfrica</div>
+      <div style="font-size:.7rem;color:#5a7080;">Accès rapide depuis ton écran d'accueil</div>
+    </div>
+    <button onclick="installPWA()" style="background:#00e5a0;color:#070b0f;font-family:Syne,sans-serif;font-weight:700;font-size:.72rem;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;flex-shrink:0;">Installer</button>
+    <button onclick="dismissPWA()" style="background:none;border:none;color:#5a7080;cursor:pointer;font-size:1.1rem;padding:2px;flex-shrink:0;">✕</button>
+  </div>
+  <!-- Service Worker PWA -->
+  <script>
+    if('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(reg) { console.log('SW registered'); })
+          .catch(function(err) { console.log('SW error:', err); });
+      });
+    }
+  </script>
 </body>
 </html>
