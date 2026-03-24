@@ -1,0 +1,420 @@
+<p id="errorMsg" style="color:var(--muted);font-size:.85rem;margin-bottom:12px;line-height:1.6;">Une erreur est survenue. Si vous avez bien payé, vérifiez vos emails.</p><button id="retryBtn" onclick="retryVerification()" style="display:none;width:100%;margin-bottom:8px;padding:12px;border-radius:10px;background:var(--green);color:#0a0f14;font-family:Syne,sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;touch-action:manipulation;">🔄 Vérifier à nouveau</button><!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paiement confirmé — FunnelAfrica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script>
+<style>
+  :root{--bg:#0a0f14;--surface:#111820;--surface2:#182030;--border:#1e2a38;--green:#00c896;--green2:#00a87a;--gold:#f5a623;--text:#e8f0f8;--muted:#6b7e93;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,#00c89612 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,#f5a62310 0%,transparent 50%);pointer-events:none;}
+
+  /* PARTICLES */
+  .particle{position:fixed;border-radius:2px;opacity:0;animation:fall linear infinite;pointer-events:none;}
+  @keyframes fall{0%{opacity:1;transform:translateY(-20px) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;overflow:hidden;position:relative;z-index:1;animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+  /* HEADER */
+  .card-header{background:linear-gradient(135deg,#0d2a1a,#0a1f2e);padding:36px 32px 28px;text-align:center;border-bottom:1px solid var(--border);}
+  .success-ring{width:90px;height:90px;border-radius:50%;background:#00c89615;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2.2rem;animation:ringPop .6s cubic-bezier(.34,1.56,.64,1) .2s both;box-shadow:0 0 40px #00c89640;}
+  @keyframes ringPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--green);margin-bottom:6px;animation:fadeUp .4s ease .3s both;}
+  .success-sub{font-size:.88rem;color:#8fa5bc;animation:fadeUp .4s ease .4s both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* BODY */
+  .card-body{padding:24px 28px;}
+  .order-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;animation:fadeUp .4s ease .45s both;}
+  .order-box-title{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+  .order-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+  .order-row:last-child{border-bottom:none;}
+  .order-row .label{color:var(--muted);}
+  .order-row .value{font-weight:600;}
+  .order-row .value.green{color:var(--green);}
+  .order-row .value.gold{color:var(--gold);}
+
+  /* NEXT STEPS */
+  .next-steps{margin-bottom:20px;animation:fadeUp .4s ease .5s both;}
+  .next-steps-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .step-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:border-color .2s;}
+  .step-item:hover{border-color:#00c89640;}
+  .step-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-text{font-size:.82rem;line-height:1.5;}
+  .step-text strong{color:var(--text);display:block;margin-bottom:2px;}
+  .step-text span{color:var(--muted);}
+
+  /* BUTTONS */
+  .btn-stack{display:flex;flex-direction:column;gap:10px;animation:fadeUp .4s ease .55s both;}
+  .btn{width:100%;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;text-decoration:none;}
+  .btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#0a0f14;box-shadow:0 6px 20px #00c89635;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px #00c89650;}
+  .btn-whatsapp{background:#25d36618;border:1px solid #25d36640;color:#25d366;}
+  .btn-whatsapp:hover{background:#25d36628;}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+
+  /* FOOTER */
+  .card-footer{padding:16px 28px;border-top:1px solid var(--border);text-align:center;font-size:.75rem;color:var(--muted);background:#0d1520;animation:fadeUp .4s ease .6s both;}
+
+  /* LOADING */
+  .loading-state{text-align:center;padding:60px 32px;}
+  .loader{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loader-text{color:var(--muted);font-size:.85rem;}
+
+  /* ERROR */
+  .error-state{display:none;text-align:center;padding:40px 32px;}
+  .error-icon{font-size:2.5rem;margin-bottom:12px;}
+  .error-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#ff4d6d;margin-bottom:8px;}
+  .error-sub{font-size:.83rem;color:var(--muted);margin-bottom:20px;}
+</style>
+<!-- Pixel Facebook désactivé — à configurer -->
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="card" id="mainCard">
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loader"></div>
+    <div class="loader-text" id="loadingMsg">Vérification du paiement...</div>
+  </div>
+
+  <!-- SUCCÈS -->
+  <div id="successState" style="display:none;">
+    <div class="card-header">
+      <div class="success-ring">✅</div>
+      <div class="success-title">Paiement confirmé !</div>
+      <div class="success-sub">Merci <strong id="buyerName">—</strong>, votre accès est activé 🎉</div>
+    </div>
+
+    <div class="card-body">
+      <div class="order-box">
+        <div class="order-box-title">Récapitulatif</div>
+        <div class="order-row"><span class="label">Produit</span><span class="value" id="productName">—</span></div>
+        <div class="order-row"><span class="label">Montant payé</span><span class="value green" id="orderAmount">—</span></div>
+        <div class="order-row"><span class="label">Méthode</span><span class="value" id="paymentMethod">—</span></div>
+        <div class="order-row"><span class="label">Référence</span><span class="value" style="font-size:.75rem;font-family:monospace;" id="orderRef">—</span></div>
+        <div class="order-row"><span class="label">Email envoyé à</span><span class="value gold" id="buyerEmail">—</span></div>
+      </div>
+
+      <div class="next-steps">
+        <div class="next-steps-title">Prochaines étapes</div>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Accédez à votre contenu</strong>
+            <span>Cliquez sur le bouton ci-dessous pour accéder immédiatement</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Vérifiez votre email</strong>
+            <span>Un email de confirmation a été envoyé avec vos accès</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Rejoignez le groupe WhatsApp</strong>
+            <span>Communauté d'entraide exclusive</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-stack">
+        <button class="btn btn-primary" id="accessBtn" onclick="goToAccess()">
+          🚀 Accéder à ma formation maintenant
+        </button>
+        <button class="btn btn-primary" id="downloadBtn" onclick="downloadProduct()" style="display:none;background:linear-gradient(135deg,#4da6ff,#2a7fd4);">
+          ⬇️ Télécharger mon produit
+        </button>
+        <button class="btn btn-whatsapp" onclick="joinWhatsApp()">
+          📱 Rejoindre le groupe WhatsApp
+        </button>
+        <button class="btn btn-ghost" onclick="downloadReceipt()">
+          🧾 Télécharger mon reçu
+        </button>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      Besoin d'aide ? Contactez-nous sur WhatsApp · <strong style="color:var(--green)">FunnelAfrica</strong>
+    </div>
+  </div>
+
+  <!-- ERREUR -->
+  <div class="error-state" id="errorState">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Paiement introuvable</div>
+    <div class="error-sub">Nous n'avons pas pu vérifier votre paiement.<br>Si vous avez été débité, contactez-nous immédiatement.</div>
+    <button class="btn btn-whatsapp" style="max-width:300px;margin:0 auto;" onclick="contactSupport()">
+      📱 Contacter le support
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  SEUL ENDROIT À MODIFIER — ta clé anon
+  // ══════════════════════════════════════════
+  var SUPABASE_URL      = window.__FA_SUPABASE_URL      || 'https://crfmdpvxiabwlhgrwcro.supabase.co';
+  var SUPABASE_ANON_KEY = window.__FA_SUPABASE_ANON_KEY || 'VOTRE_ANON_KEY';
+  // ══════════════════════════════════════════
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var WHATSAPP_GROUP = 'https://chat.whatsapp.com/VOTRE_LIEN_GROUPE';
+  var WHATSAPP_SUPPORT = 'https://wa.me/VOTRE_NUMERO';
+
+  // Récupérer les paramètres URL
+  var params      = new URLSearchParams(window.location.search);
+  var orderId     = params.get('order') || '';
+  var tunnelSlug  = params.get('tunnel') || '';
+
+  // URL d'accès dynamique selon le tunnel
+  var MEMBER_AREA_URL = tunnelSlug
+    ? '/espace-membre.html?tunnel=' + tunnelSlug
+    : '/espace-membre.html';
+
+  var METHODS = {
+    wave:'🌊 Wave', orange:'🟠 Orange Money',
+    mtn:'💛 MTN MoMo', cinetpay:'💚 CinetPay',
+    card:'💳 Carte', fedapay:'📱 FedaPay'
+  };
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!orderId) { showError(); return; }
+    verifyPayment(orderId);
+  });
+
+  // ── VÉRIFIER LE PAIEMENT — Polling robuste ──
+  var pollCount    = 0;
+  var MAX_POLLS    = 10;   // 10 tentatives max
+  var POLL_DELAY   = 3000; // 3 secondes entre chaque
+  var pollTimer    = null;
+
+  function verifyPayment(ref) {
+    pollCount = 0;
+    pollOnce(ref);
+  }
+
+  function pollOnce(ref) {
+    pollCount++;
+    console.log('[FunnelAfrica] Vérification paiement — tentative ' + pollCount + '/' + MAX_POLLS + ' (ref: ' + ref + ')');
+
+    // Mise à jour message de chargement
+    var loadMsg = document.getElementById('loadingMsg');
+    if (loadMsg) {
+      if (pollCount <= 2) loadMsg.textContent = 'Vérification du paiement...';
+      else if (pollCount <= 5) loadMsg.textContent = 'Confirmation en cours (' + pollCount + ')...';
+      else loadMsg.textContent = 'Finalisation... encore quelques secondes';
+    }
+
+    sb.from('orders')
+      .select('*, tunnels(name,slug,page_config)')
+      .eq('payment_ref', ref)
+      .then(function(r) {
+        // Log pour debug futur
+        console.log('[FunnelAfrica] Résultat Supabase:', r.error ? 'ERREUR: ' + r.error.message : 'OK — ' + (r.data ? r.data.length : 0) + ' ligne(s)');
+
+        if (r.error) {
+          // Erreur RLS ou réseau — retry silencieux
+          console.error('[FunnelAfrica] Erreur Supabase:', r.error.message, r.error.code);
+          scheduleRetry(ref);
+          return;
+        }
+
+        // Chercher l'ordre payé parmi les résultats
+        var paidOrder = null;
+        if (r.data && r.data.length > 0) {
+          paidOrder = r.data.find(function(o) { return o.payment_status === 'paid'; });
+          if (!paidOrder && r.data[0]) paidOrder = r.data[0]; // fallback : prendre le premier
+        }
+
+        if (paidOrder && paidOrder.payment_status === 'paid') {
+          console.log('[FunnelAfrica] ✅ Paiement confirmé — order:', paidOrder.id);
+          if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+          showSuccess(paidOrder);
+        } else if (paidOrder && paidOrder.payment_status === 'pending') {
+          // Order existe mais pas encore confirmé → retry
+          console.log('[FunnelAfrica] Order en attente de confirmation webhook...');
+          scheduleRetry(ref);
+        } else {
+          // Order pas encore inséré → retry
+          console.log('[FunnelAfrica] Order non trouvé encore...');
+          scheduleRetry(ref);
+        }
+      })
+      .catch(function(err) {
+        console.error('[FunnelAfrica] Erreur fetch:', err);
+        scheduleRetry(ref);
+      });
+  }
+
+  function scheduleRetry(ref) {
+    if (pollCount >= MAX_POLLS) {
+      console.warn('[FunnelAfrica] Nombre max de tentatives atteint. Affichage erreur.');
+      showError('timeout');
+      return;
+    }
+    var delay = pollCount <= 3 ? 3000 : pollCount <= 6 ? 5000 : 8000;
+    console.log('[FunnelAfrica] Prochain essai dans ' + (delay/1000) + 's...');
+    pollTimer = setTimeout(function() { pollOnce(ref); }, delay);
+  }
+
+  // ── AFFICHER SUCCÈS ──
+  function showSuccess(order) {
+    document.getElementById('loadingState').style.display  = 'none';
+    document.getElementById('successState').style.display  = 'block';
+    document.getElementById('errorState').style.display    = 'none';
+
+    // Si le tunnel a un slug, utiliser celui de la commande
+    if (order.tunnels && order.tunnels.slug && !tunnelSlug) {
+      tunnelSlug = order.tunnels.slug;
+      MEMBER_AREA_URL = '/espace-membre.html?tunnel=' + tunnelSlug;
+    }
+
+    document.getElementById('buyerName').textContent    = order.buyer_name || 'Client';
+    document.getElementById('buyerEmail').textContent   = order.buyer_email || '—';
+    document.getElementById('productName').textContent  = (order.tunnels && order.tunnels.name) || 'Votre achat';
+    document.getElementById('orderAmount').textContent  = (order.amount || 0).toLocaleString('fr') + ' ' + (order.currency || 'FCFA');
+    document.getElementById('paymentMethod').textContent = METHODS[order.payment_method] || order.payment_method || '—';
+    document.getElementById('orderRef').textContent     = order.payment_ref || '—';
+
+    // Vérifier si le tunnel a un lien de téléchargement
+    if (order.tunnels && order.tunnels.page_config) {
+      var cfg = order.tunnels.page_config;
+      if (cfg.download_url) {
+        // Afficher le bouton de téléchargement
+        var dlBtn = document.getElementById('downloadBtn');
+        if (dlBtn) {
+          dlBtn.style.display = 'block';
+          dlBtn.setAttribute('data-url', cfg.download_url);
+        }
+        // Changer le texte du bouton accès
+        var accessBtn = document.getElementById('accessBtn');
+        if (accessBtn) accessBtn.textContent = '📚 Accéder à l\'espace membre';
+      }
+    }
+
+    launchConfetti();
+  }
+
+  // ── TÉLÉCHARGER LE PRODUIT ──
+  function downloadProduct() {
+    var btn = document.getElementById('downloadBtn');
+    var url = btn ? btn.getAttribute('data-url') : '';
+    if (!url) { showToast('Lien de téléchargement non disponible', 'error'); return; }
+    window.open(url, '_blank');
+    showToast('✓ Téléchargement lancé !', 'success');
+  }
+
+  // ── AFFICHER ERREUR — messages clairs ──
+  function showError(reason) {
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    document.getElementById('loadingState').style.display  = 'none';
+    document.getElementById('successState').style.display = 'none';
+    document.getElementById('errorState').style.display   = 'block';
+
+    var msgEl = document.getElementById('errorMsg');
+    if (msgEl) {
+      if (reason === 'timeout') {
+        msgEl.innerHTML = 'Votre paiement est en cours de confirmation. Si vous avez bien payé, attendez 2 minutes et <strong><a href="' + window.location.href + '" style="color:var(--green);">rechargez cette page</a></strong>.';
+      } else if (reason === 'no_order') {
+        msgEl.innerHTML = 'Aucune commande trouvée pour cette référence. Vérifiez votre email de confirmation ou contactez le support.';
+      } else {
+        msgEl.innerHTML = 'Une erreur est survenue. Si vous avez bien payé, <strong>vérifiez vos emails</strong> — la confirmation est peut-être déjà arrivée.';
+      }
+    }
+
+    // Ajouter bouton retry si timeout
+    var retryEl = document.getElementById('retryBtn');
+    if (retryEl && reason === 'timeout') {
+      retryEl.style.display = 'block';
+    }
+
+    // Log pour debug
+    console.warn('[FunnelAfrica] showError appelé. Raison:', reason, '| orderId:', orderId, '| Polls effectués:', pollCount);
+  }
+
+  function retryVerification() {
+    if (!orderId) return;
+    document.getElementById('errorState').style.display   = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    verifyPayment(orderId);
+  }
+
+  // ── ACTIONS ──
+  function goToAccess() {
+    window.location.href = MEMBER_AREA_URL;
+  }
+
+  function joinWhatsApp() {
+    window.open(WHATSAPP_GROUP, '_blank');
+  }
+
+  function contactSupport() {
+    window.open(WHATSAPP_SUPPORT, '_blank');
+  }
+
+  function downloadReceipt() {
+    var ref     = document.getElementById('orderRef').textContent;
+    var amount  = document.getElementById('orderAmount').textContent;
+    var name    = document.getElementById('buyerName').textContent;
+    var product = document.getElementById('productName').textContent;
+    var date    = new Date().toLocaleDateString('fr-FR');
+
+    var receipt =
+      'REÇU DE PAIEMENT — FunnelAfrica\n' +
+      '================================\n' +
+      'Date     : ' + date + '\n' +
+      'Client   : ' + name + '\n' +
+      'Produit  : ' + product + '\n' +
+      'Montant  : ' + amount + '\n' +
+      'Référence: ' + ref + '\n' +
+      '================================\n' +
+      'FunnelAfrica · funnelafrica.vercel.app';
+
+    var blob = new Blob([receipt], {type:'text/plain'});
+    var a    = document.createElement('a');
+    a.href   = URL.createObjectURL(blob);
+    a.download = 'recu-' + ref + '.txt';
+    a.click();
+  }
+
+  // ── CONFETTI ──
+  function launchConfetti() {
+    var colors  = ['#00c896','#f5a623','#4da6ff','#ff6b9d','#a78bfa'];
+    var container = document.getElementById('particles');
+    for (var i = 0; i < 60; i++) {
+      (function() {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left              = Math.random() * 100 + 'vw';
+        p.style.background        = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width             = (Math.random() * 8 + 4) + 'px';
+        p.style.height            = (Math.random() * 8 + 4) + 'px';
+        p.style.animationDelay    = Math.random() * 3 + 's';
+        p.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        p.style.borderRadius      = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(p);
+        setTimeout(function() { p.remove(); }, 6000);
+      })();
+    }
+  }
+</script>
+</body>
+</html>
