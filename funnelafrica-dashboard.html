@@ -15,7 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script>
 <style>
-  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2a3342;--green:#00c896;--green-dim:#00c89620;--gold:#f5a623;--gold-dim:#f5a62320;--text:#e6edf3;--muted:#7d8fa3;--danger:#ff4d6d;--radius:14px;}
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2a3342;--green:#96bf48;--green-dim:#00c89620;--gold:#f5a623;--gold-dim:#f5a62320;--text:#e6edf3;--muted:#7d8fa3;--danger:#ff4d6d;--radius:14px;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;}
 
@@ -54,6 +54,68 @@
   .content{padding:28px;flex:1;}
 
   /* UPGRADE BANNER */
+  /* ── DÉMARRAGE RAPIDE ── */
+  .quick-start-banner{background:linear-gradient(135deg,#0d2010,#0a1a18);border:2px solid #00c89650;border-radius:14px;padding:18px 20px;margin-bottom:20px;animation:fadeUp .4s ease;position:relative;overflow:hidden;}
+  .quick-start-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,#00c89620,transparent);border-radius:50%;}
+  .qs-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:4px;}
+  .qs-sub{font-size:.78rem;color:var(--muted);margin-bottom:14px;}
+  .qs-steps{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .qs-step{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:.72rem;color:var(--muted);transition:all .2s;}
+  .qs-step.done{border-color:#00c89640;color:var(--green);background:#00c89610;}
+  .qs-step.active{border-color:var(--green);color:var(--text);background:#00c89618;}
+  .qs-step-num{width:18px;height:18px;border-radius:50%;background:var(--border);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .qs-step.done .qs-step-num{background:var(--green);color:#0a0f14;}
+  .qs-step.active .qs-step-num{background:var(--green);color:#0a0f14;}
+  .qs-progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;}
+  .qs-progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#00dea8);border-radius:2px;transition:width .6s ease;}
+  .qs-cta{display:flex;gap:8px;align-items:center;}
+  .btn-quick{background:linear-gradient(135deg,var(--green),#00a87a);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:7px;transition:all .2s;}
+  .btn-quick:hover{transform:translateY(-1px);box-shadow:0 8px 24px #00c89640;}
+  .btn-quick-timer{background:#00c89615;border:1px solid #00c89630;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:4px 10px;border-radius:20px;}
+
+  /* ── MODE RAPIDE MODAL ── */
+  .quick-modal-overlay{display:none;position:fixed;inset:0;background:#00000095;z-index:300;align-items:center;justify-content:center;padding:20px;}
+  .quick-modal-overlay.open{display:flex;}
+  .quick-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:480px;overflow:hidden;}
+  .qm-header{background:linear-gradient(135deg,#0d2010,#0a1a18);padding:22px 24px;border-bottom:1px solid var(--border);}
+  .qm-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);margin-bottom:4px;}
+  .qm-sub{font-size:.78rem;color:var(--muted);}
+  .qm-timer{float:right;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;padding:4px 12px;border-radius:20px;}
+  .qm-body{padding:24px;}
+  .qm-label{font-size:.7rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px;}
+  .qm-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.92rem;outline:none;margin-bottom:14px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+  .qm-input:focus{border-color:var(--green);}
+  .qm-ia-btn{background:none;border:1px solid #a78bfa40;color:#a78bfa;font-size:.72rem;font-family:'Syne',sans-serif;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;margin-bottom:14px;touch-action:manipulation;}
+  .qm-ia-btn:hover{background:#a78bfa15;}
+  .qm-types{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;}
+  .qm-type{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;touch-action:manipulation;}
+  .qm-type:hover,.qm-type.selected{border-color:var(--green);background:#00c89610;}
+  .qm-type-icon{font-size:1.2rem;margin-bottom:3px;}
+  .qm-type-label{font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--muted);}
+  .qm-type.selected .qm-type-label{color:var(--green);}
+  .qm-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;}
+
+  /* ── WHATSAPP STICKY ── */
+  .wa-sticky{position:fixed;bottom:24px;right:20px;z-index:199;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .wa-fab{width:52px;height:52px;border-radius:50%;background:#25d366;color:white;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;box-shadow:0 4px 18px #25d36640;transition:all .2s;border:none;touch-action:manipulation;}
+  .wa-fab:hover{transform:scale(1.08);box-shadow:0 6px 24px #25d36660;}
+  .wa-menu{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;display:none;flex-direction:column;gap:4px;min-width:200px;box-shadow:0 8px 32px #00000060;}
+  .wa-menu.open{display:flex;}
+  .wa-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s;border:none;background:transparent;color:var(--text);text-align:left;width:100%;touch-action:manipulation;}
+  .wa-menu-item:hover{background:var(--surface2);}
+  .wa-pulse{animation:waPulse 2s infinite;}
+  @keyframes waPulse{0%,100%{box-shadow:0 4px 18px #25d36640;}50%{box-shadow:0 4px 28px #25d36680;}}
+
+  /* ── GAMIFICATION ── */
+  .progress-xp{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;}
+  .xp-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--green),#00a87a);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .xp-info{flex:1;}
+  .xp-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;}
+  .xp-level{font-size:.7rem;color:var(--muted);margin-bottom:6px;}
+  .xp-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .xp-fill{height:100%;background:linear-gradient(90deg,var(--green),#00dea8);border-radius:3px;transition:width .8s ease;}
+  .xp-badge{background:#00c89618;border:1px solid #00c89640;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;padding:3px 10px;border-radius:20px;}
+
   .upgrade-banner{background:linear-gradient(135deg,#1a1000,#201800);border:1px solid #f5a62340;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;animation:fadeUp .4s ease;}
   .upgrade-banner-text{font-size:.83rem;color:#d4a843;}
   .upgrade-banner-text strong{color:var(--gold);}
@@ -313,12 +375,47 @@ fbq("track","PageView");
       </button>
     </div>
 
+    <!-- BARRE PROGRESSION VENDEUR (Gamification) -->
+    <div class="progress-xp" id="progressXP">
+      <div class="xp-avatar" id="xpAvatar">?</div>
+      <div class="xp-info">
+        <div class="xp-name" id="xpName">Chargement...</div>
+        <div class="xp-level" id="xpLevel">Niveau 1 · Débutant</div>
+        <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:10%"></div></div>
+      </div>
+      <div class="xp-badge" id="xpBadge">🌱 Débutant</div>
+    </div>
+
+    <!-- DÉMARRAGE RAPIDE -->
+    <div class="quick-start-banner" id="quickStartBanner">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div class="qs-title">🚀 Commence ici — 3 étapes pour ta première vente</div>
+          <div class="qs-sub">Suis ces étapes et fais ta première vente en moins de 30 minutes</div>
+          <div class="qs-steps" id="qsSteps">
+            <div class="qs-step" id="qs1"><div class="qs-step-num" id="qs1n">1</div>Créer un tunnel</div>
+            <div class="qs-step" id="qs2"><div class="qs-step-num" id="qs2n">2</div>Publier</div>
+            <div class="qs-step" id="qs3"><div class="qs-step-num" id="qs3n">3</div>Partager sur WhatsApp</div>
+            <div class="qs-step" id="qs4"><div class="qs-step-num" id="qs4n">4</div>Première vente 🎉</div>
+          </div>
+          <div class="qs-progress"><div class="qs-progress-fill" id="qsProgress" style="width:0%"></div></div>
+        </div>
+        <button onclick="document.getElementById('quickStartBanner').style.display='none';localStorage.setItem('qs_dismissed','1');" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;flex-shrink:0;padding:0;">✕</button>
+      </div>
+      <div class="qs-cta">
+        <button class="btn-quick" onclick="openQuickModal()">
+          ⚡ Créer mon tunnel en 30s
+        </button>
+        <span class="btn-quick-timer" id="qsTimer">⏱ ~30 secondes</span>
+      </div>
+    </div>
+
     <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card green">
-        <div class="stat-label">Revenus ce mois</div>
+        <div class="stat-label">Revenus nets ce mois</div>
         <div class="stat-value" id="statRevenue">—</div>
-        <div class="stat-trend" id="statRevenueSub">FCFA</div>
+        <div class="stat-trend" id="statRevenueSub">FCFA nets</div>
       </div>
       <div class="stat-card gold">
         <div class="stat-label">Commandes</div>
@@ -431,6 +528,11 @@ fbq("track","PageView");
           </div>
         </div>
 
+        <!-- WIDGET GAINS NETS -->
+        <div class="card" id="netWidget" style="display:none;">
+          <!-- rempli dynamiquement par showNetWidget() -->
+        </div>
+
         <div class="card" style="flex:1;">
           <div class="card-header">
             <span class="card-title">Dernières commandes</span>
@@ -519,6 +621,82 @@ fbq("track","PageView");
   </div>
 </div>
 
+<!-- ── MODAL ONBOARDING (Première connexion) ── -->
+<div class="modal-overlay" id="onboardingModal" style="z-index:400;">
+  <div class="modal" style="max-width:500px;padding:0;overflow:hidden;">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0d2010,#0a1a18);padding:28px 28px 20px;border-bottom:1px solid var(--border);position:relative;">
+      <div style="font-size:2.5rem;margin-bottom:10px;" id="obIcon">🚀</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text);" id="obTitle">Bienvenue sur FunnelAfrica !</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-top:4px;" id="obSub">Tu es à 3 étapes de ta première vente</div>
+      <!-- Progress dots -->
+      <div style="display:flex;gap:6px;margin-top:16px;">
+        <div class="ob-dot active" id="obDot0"></div>
+        <div class="ob-dot" id="obDot1"></div>
+        <div class="ob-dot" id="obDot2"></div>
+      </div>
+    </div>
+    <!-- Steps -->
+    <div style="padding:24px 28px;" id="obContent">
+      <!-- Step 0 -->
+      <div id="obStep0">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;">
+            <div style="font-size:1.4rem;">📱</div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;">100% Mobile Money</div><div style="font-size:.75rem;color:var(--muted);">Wave · MTN · Orange acceptés automatiquement</div></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;">
+            <div style="font-size:1.4rem;">⚡</div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;">Tunnel en 30 secondes</div><div style="font-size:.75rem;color:var(--muted);">3 champs + l'IA s'occupe du reste</div></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;">
+            <div style="font-size:1.4rem;">🌍</div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;">9 pays africains</div><div style="font-size:.75rem;color:var(--muted);">Bénin · CI · Sénégal · Mali · Togo et plus</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Step 1 -->
+      <div id="obStep1" style="display:none;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:3rem;margin-bottom:12px;">🎯</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:8px;">Comment ça marche ?</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div><div style="font-size:.85rem;padding-top:3px;">Crée ton tunnel (page de vente) avec ton produit et ton prix</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div><div style="font-size:.85rem;padding-top:3px;">Publie et partage le lien sur WhatsApp et Facebook</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div><div style="font-size:.85rem;padding-top:3px;">Ton client paie avec Wave/MTN → tu reçois l'argent</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--gold);color:#0a0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div><div style="font-size:.85rem;padding-top:3px;">Tu retires ton argent sur Mobile Money quand tu veux 💰</div></div>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div id="obStep2" style="display:none;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:3rem;margin-bottom:10px;">🎁</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:6px;">Un exemple de tunnel t'attend !</div>
+          <div style="font-size:.82rem;color:var(--muted);">On a pré-créé un tunnel de démo pour que tu voies comment ça marche.</div>
+        </div>
+        <div style="background:#00c89615;border:1px solid #00c89640;border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--green);margin-bottom:4px;">📘 Formation Exemple</div>
+          <div style="font-size:.78rem;color:var(--muted);">Tunnel de démonstration · 4 900 FCFA · Prêt à modifier</div>
+        </div>
+        <div style="font-size:.8rem;color:var(--muted);text-align:center;">Tu peux le modifier ou en créer un nouveau en 30 secondes.</div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:16px 28px;border-top:1px solid var(--border);display:flex;gap:8px;" id="obFooter">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:.8rem;" onclick="skipOnboarding()">Passer</button>
+      <button class="btn btn-primary" id="obNextBtn" style="flex:2;justify-content:center;" onclick="nextOnboardingStep()">
+        Suivant →
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s;}
+  .ob-dot.active{background:var(--green);width:20px;border-radius:4px;}
+</style>
+
 <script>
   // ══════════════════════════════════════════
   //  CONFIG — remplace par tes vraies clés
@@ -543,6 +721,7 @@ fbq("track","PageView");
     loadStats(user.id);
     loadTunnels(user.id);
     loadOrders(user.id);
+    checkOnboarding(user);
   });
 
   // ── PROFIL ──
@@ -551,6 +730,7 @@ fbq("track","PageView");
       var p = r.data;
       if (!p) return;
       currentProfile = p;
+      _profileData   = p; // Pour gamification
       // Afficher le lien Admin CEO : vérifie email OU role admin
       var isCEO = user.email === 'kessahoud@gmail.com' || p.role === 'admin';
       if (isCEO) {
@@ -570,10 +750,11 @@ fbq("track","PageView");
       var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
       document.getElementById('userAvatar').textContent = initials;
       document.getElementById('userName').textContent   = name;
-      document.getElementById('userPlan').textContent   = 'Plan ' + (p.plan||'starter') + ' · Actif';
+      document.getElementById('userPlan').textContent   = 'Accès gratuit · Commission 15%';
       var planName = (p.plan||'starter');
       planName = planName.charAt(0).toUpperCase() + planName.slice(1);
-      document.getElementById('planBadge').textContent  = '⚡ Plan ' + planName;
+      document.getElementById('planBadge').textContent  = '✅ Gratuit · 15% commission';
+      tryUpdateGamification();
 
       // ── LOCKS PHASE 4 ──
       var isPro   = p.plan === 'pro'   || p.plan === 'scale';
@@ -597,25 +778,86 @@ fbq("track","PageView");
   function loadStats(userId) {
     var start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
 
-    sb.from('orders').select('amount').eq('user_id', userId).eq('payment_status','paid').gte('created_at', start.toISOString()).then(function(r) {
-      var orders  = r.data || [];
-      var revenue = orders.reduce(function(s,o){return s+(o.amount||0);},0);
-      var count   = orders.length;
+    // Charger les orders avec net_amount + commission_amount
+    sb.from('orders')
+      .select('amount, net_amount, commission_amount, commission_rate')
+      .eq('user_id', userId)
+      .eq('payment_status','paid')
+      .gte('created_at', start.toISOString())
+      .then(function(r) {
+        var orders     = r.data || [];
+        var gross      = orders.reduce(function(s,o){return s+(o.amount||0);},0);
+        var net        = orders.reduce(function(s,o){return s+(o.net_amount || Math.round((o.amount||0)*0.85));},0);
+        var commission = orders.reduce(function(s,o){return s+(o.commission_amount || Math.round((o.amount||0)*0.15));},0);
+        var count      = orders.length;
 
-      sb.from('tunnels').select('views,orders').eq('user_id', userId).then(function(r2) {
-        var tunnels     = r2.data || [];
-        var totalViews  = tunnels.reduce(function(s,t){return s+(t.views||0);},0);
-        var totalOrders = tunnels.reduce(function(s,t){return s+(t.orders||0);},0);
-        var conv        = totalViews > 0 ? ((totalOrders/totalViews)*100).toFixed(1) : '0';
+        sb.from('tunnels').select('views,orders').eq('user_id', userId).then(function(r2) {
+          var tunnels     = r2.data || [];
+          var totalViews  = tunnels.reduce(function(s,t){return s+(t.views||0);},0);
+          var totalOrders = tunnels.reduce(function(s,t){return s+(t.orders||0);},0);
+          var conv        = totalViews > 0 ? ((totalOrders/totalViews)*100).toFixed(1) : '0';
 
-        document.getElementById('statRevenue').textContent = revenue > 999 ? (revenue/1000).toFixed(0)+'K' : revenue.toLocaleString('fr');
-        document.getElementById('statOrders').textContent  = count;
-        document.getElementById('statViews').textContent   = totalViews > 999 ? (totalViews/1000).toFixed(1)+'K' : totalViews;
-        document.getElementById('statConv').textContent    = conv + '%';
-        document.getElementById('chartTotal').textContent  = revenue.toLocaleString('fr') + ' FCFA';
-        document.getElementById('chartBadge').textContent  = count > 0 ? '+' + count + ' ventes' : 'Aucune vente';
+          // KPI principal → montrer le NET (ce que le vendeur garde)
+          var netFmt = net > 999 ? (net/1000).toFixed(0)+'K' : net.toLocaleString('fr');
+          document.getElementById('statRevenue').textContent  = netFmt;
+          document.getElementById('statOrders').textContent   = count;
+          document.getElementById('statViews').textContent    = totalViews > 999 ? (totalViews/1000).toFixed(1)+'K' : totalViews;
+          document.getElementById('statConv').textContent     = conv + '%';
+          document.getElementById('chartTotal').textContent   = net.toLocaleString('fr') + ' FCFA net';
+          document.getElementById('chartBadge').textContent   = count > 0 ? '+' + count + ' ventes' : 'Aucune vente';
+
+          // Sous-label : explication net vs brut
+          var subEl = document.getElementById('statRevenueSub');
+          if (subEl) {
+            if (commission > 0) {
+              subEl.innerHTML = '<span style="color:var(--green);font-weight:600;">FCFA nets</span> <span style="font-size:.65rem;color:var(--muted);">(brut: '+gross.toLocaleString('fr')+' — 15% comm.)</span>';
+            } else {
+              subEl.textContent = 'FCFA nets ce mois';
+            }
+          }
+        });
+
+        // Charger le solde disponible pour retrait
+        sb.from('profiles').select('payout_balance,total_gross,total_commission,total_net,commission_rate').eq('id', userId).single().then(function(pr) {
+          if (!pr.data) return;
+          var solde = pr.data.payout_balance || 0;
+          var rate  = pr.data.commission_rate || 10;
+          showNetWidget(solde, rate, pr.data);
+        });
       });
-    });
+  }
+
+  // ── Widget gains nets ──
+  function showNetWidget(solde, rate, profile) {
+    var widgetEl = document.getElementById('netWidget');
+    if (!widgetEl) return;
+    var gross = profile.total_gross || 0;
+    var net   = profile.total_net   || 0;
+    var comm  = profile.total_commission || 0;
+    widgetEl.innerHTML =
+      '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:10px;">💰 Mes gains</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        '<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:6px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="color:var(--muted);">Total brut</span>' +
+          '<span style="font-weight:600;">' + gross.toLocaleString('fr') + ' FCFA</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:6px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="color:var(--muted);">Commission FA (' + rate + '%)</span>' +
+          '<span style="color:var(--danger);">- ' + comm.toLocaleString('fr') + ' FCFA</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:.88rem;padding:8px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="font-weight:700;">Total net</span>' +
+          '<span style="font-weight:800;color:var(--green);">' + net.toLocaleString('fr') + ' FCFA</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">' +
+          '<span style="font-size:.82rem;color:var(--muted);">Solde disponible</span>' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<span style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);">' + solde.toLocaleString('fr') + ' FCFA</span>' +
+            '<button onclick="window.location.href=\'/payout.html\'" style="background:var(--green);color:#0a0f14;font-family:\'Syne\',sans-serif;font-weight:700;font-size:.68rem;padding:5px 10px;border-radius:7px;border:none;cursor:pointer;touch-action:manipulation;">Retirer</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    widgetEl.style.display = 'block';
   }
 
   // ── TUNNELS ──
@@ -623,12 +865,12 @@ fbq("track","PageView");
     sb.from('tunnels').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(5).then(function(r) {
       var tunnels = r.data || [];
       tunnelCount = tunnels.length;
+      _tunnelsData = tunnels; // Pour gamification
       document.getElementById('tunnelCount').textContent = tunnelCount;
+      tryUpdateGamification();
 
       // Afficher la bannière upgrade si starter et tunnel existant
-      if (currentProfile && currentProfile.plan === 'starter' && tunnelCount >= 1) {
-        document.getElementById('upgradeBanner').style.display = 'flex';
-      }
+      // Pas de banner upgrade — modèle commission uniquement
 
       var el = document.getElementById('tunnelsList');
       if (!tunnels.length) {
@@ -688,15 +930,9 @@ fbq("track","PageView");
   }
 
   // ── NAVIGATION PHASE 4 avec vérification plan ──
-  function goPhase4(page, requiredPlan) {
-    var plan = currentProfile ? (currentProfile.plan || 'starter') : 'starter';
-    var isCEO = currentProfile && (currentProfile.role === 'admin');
-    var isPro = plan === 'pro' || plan === 'scale';
-    // Si accès libre (retrait) ou CEO ou plan suffisant → go
-    if (requiredPlan === 'all' || isCEO || isPro) {
-      window.location.href = '/' + page;
-      return;
-    }
+  function goPhase4(page, req) {
+    window.location.href = '/' + page;
+  }
     // Sinon → modal upgrade Phase 4
     var icons  = { 'ab-testing.html':'🧪', 'api-docs.html':'🔌' };
     var titles = { 'ab-testing.html':'A/B Testing — Fonctionnalité Pro', 'api-docs.html':'API Publique — Fonctionnalité Pro' };
@@ -753,6 +989,403 @@ fbq("track","PageView");
     });
   }
 
+  // ══════════════════════════════════════════
+  //  ONBOARDING — Première connexion
+  // ══════════════════════════════════════════
+  var obStep = 0;
+
+  function checkOnboarding(user) {
+    // Vérifier si déjà vu
+    var key = 'fa_onboarded_' + user.id;
+    if (localStorage.getItem(key)) return;
+
+    // Afficher le modal après 800ms (temps de chargement)
+    setTimeout(function() {
+      document.getElementById('onboardingModal').classList.add('open');
+    }, 800);
+  }
+
+  function nextOnboardingStep() {
+    obStep++;
+    var steps = [
+      { icon:'🚀', title:'Bienvenue sur FunnelAfrica !', sub:'Tu es à 3 étapes de ta première vente', btn:'Suivant →' },
+      { icon:'🎯', title:'Comment ça marche ?',           sub:'4 étapes simples pour vendre',         btn:'Suivant →' },
+      { icon:'🎁', title:'Ton tunnel de démo est prêt !', sub:'Explore et personnalise-le',           btn:'🚀 C\'est parti !' }
+    ];
+
+    if (obStep >= steps.length) {
+      closeOnboarding();
+      return;
+    }
+
+    var s = steps[obStep];
+    document.getElementById('obIcon').textContent  = s.icon;
+    document.getElementById('obTitle').textContent = s.title;
+    document.getElementById('obSub').textContent   = s.sub;
+    document.getElementById('obNextBtn').textContent = s.btn;
+
+    // Afficher la bonne step
+    [0,1,2].forEach(function(i) {
+      var el = document.getElementById('obStep' + i);
+      if (el) el.style.display = i === obStep ? 'block' : 'none';
+      var dot = document.getElementById('obDot' + i);
+      if (dot) dot.classList.toggle('active', i === obStep);
+    });
+
+    // Étape 2 → créer tunnel démo si besoin
+    if (obStep === 2) createDemoTunnel();
+  }
+
+  function skipOnboarding() {
+    closeOnboarding();
+  }
+
+  function closeOnboarding() {
+    document.getElementById('onboardingModal').classList.remove('open');
+    if (currentUser) localStorage.setItem('fa_onboarded_' + currentUser.id, '1');
+  }
+
+  // ══════════════════════════════════════════
+  //  TUNNEL PRÉ-CRÉÉ à l'inscription
+  // ══════════════════════════════════════════
+  function createDemoTunnel() {
+    if (!currentUser) return;
+    var demoKey = 'fa_demo_created_' + currentUser.id;
+    if (localStorage.getItem(demoKey)) return;
+
+    sb.from('tunnels').select('id').eq('user_id', currentUser.id).limit(1).then(function(r) {
+      // Ne créer que si 0 tunnel existant
+      if (r.data && r.data.length > 0) { localStorage.setItem(demoKey,'1'); return; }
+
+      var slug = 'formation-demo-' + currentUser.id.slice(0,6);
+      sb.from('tunnels').insert({
+        user_id:  currentUser.id,
+        name:     'Formation Exemple — Modifie-moi !',
+        slug:     slug,
+        price:    4900,
+        status:   'draft',
+        type:     'formation',
+        page_config: {
+          title:    'Ta Formation en Ligne',
+          subtitle: 'Accès immédiat · Paiement Mobile Money',
+          price:    4900,
+          badge:    'Formation · Accès immédiat',
+          btn_text: '🚀 Commander maintenant',
+          primary_color: '#00c896',
+          guarantee: 'Satisfait ou remboursé · 7 jours',
+          benefits: [
+            'Accès immédiat après paiement',
+            'Support disponible par WhatsApp',
+            'Contenu mis à jour régulièrement',
+            'Paiement sécurisé Mobile Money'
+          ],
+          faq: [
+            {q:'Comment accéder après le paiement ?', a:'Vous recevrez un email avec le lien d\'accès immédiatement.'},
+            {q:'Quels modes de paiement ?', a:'Wave, MTN MoMo, Orange Money, Moov Money.'},
+            {q:'Y a-t-il une garantie ?', a:'Oui, satisfait ou remboursé sous 7 jours.'}
+          ]
+        }
+      }).then(function(r2) {
+        if (!r2.error) {
+          localStorage.setItem(demoKey, '1');
+          loadTunnels(currentUser.id);
+          console.log('[FunnelAfrica] Tunnel démo créé !');
+        }
+      });
+    });
+  }
+
+  // Fermer onboarding en cliquant dehors
+  document.getElementById('onboardingModal').addEventListener('click', function(e) {
+    if (e.target === this) closeOnboarding();
+  });
+
+  // ══════════════════════════════════════════
+  //  HOOK commandes pour gamification
+  // ══════════════════════════════════════════
+  var _origLoadOrders = null;
+
+  // Override loadOrders pour capturer les données
+  function checkOnboarding(user) {
+    var key = 'fa_onboarded_' + user.id;
+    if (localStorage.getItem(key)) return;
+    setTimeout(function() {
+      if (document.getElementById('onboardingModal')) {
+        document.getElementById('onboardingModal').classList.add('open');
+      }
+    }, 800);
+  }
+  function updateGamification(profile, tunnels, orders) {
+    var name     = profile.full_name || (profile.email||'').split('@')[0] || 'Vendeur';
+    var initials = name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2);
+    var hasTunnel  = tunnels && tunnels.length > 0;
+    var hasLive    = tunnels && tunnels.some(function(t){return t.status==='live';});
+    var hasSale    = orders  && orders.some(function(o){return o.payment_status==='paid';});
+    var score = (hasTunnel?1:0) + (hasLive?1:0) + (hasSale?1:0);
+
+    var levels = [
+      {min:0, label:'🌱 Débutant', xp:0,  next:25},
+      {min:1, label:'🔥 Actif',    xp:25, next:60},
+      {min:2, label:'⚡ Vendeur',  xp:60, next:90},
+      {min:3, label:'🏆 Pro',      xp:90, next:100}
+    ];
+    var lv = levels[Math.min(score, levels.length-1)];
+
+    document.getElementById('xpAvatar').textContent  = initials;
+    document.getElementById('xpName').textContent    = name;
+    document.getElementById('xpLevel').textContent   = lv.label;
+    document.getElementById('xpFill').style.width    = lv.xp + '%';
+    document.getElementById('xpBadge').textContent   = lv.label;
+
+    // Mettre à jour les étapes démarrage rapide
+    updateQSSteps(hasTunnel, hasLive, hasSale);
+
+    // Masquer le bloc démarrage rapide si tout fait ou déjà dismissed
+    if (score >= 3 || localStorage.getItem('qs_dismissed')) {
+      document.getElementById('quickStartBanner').style.display = 'none';
+    }
+  }
+
+  // ══════════════════════════════════════════
+  //  DÉMARRAGE RAPIDE — Étapes
+  // ══════════════════════════════════════════
+  function updateQSSteps(hasTunnel, hasLive, hasSale) {
+    var steps  = [{id:'qs1',done:hasTunnel},{id:'qs2',done:hasLive},{id:'qs3',done:hasLive},{id:'qs4',done:hasSale}];
+    var doneCount = steps.filter(function(s){return s.done;}).length;
+    var pct    = Math.round(doneCount / steps.length * 100);
+
+    document.getElementById('qsProgress').style.width = pct + '%';
+
+    steps.forEach(function(s, i) {
+      var el = document.getElementById(s.id);
+      var numEl = document.getElementById(s.id + 'n');
+      if (!el) return;
+      el.classList.remove('done','active');
+      if (s.done) {
+        el.classList.add('done');
+        if (numEl) numEl.textContent = '✓';
+      } else if (i === doneCount) {
+        el.classList.add('active');
+      }
+    });
+
+    if (pct >= 100) {
+      var qsTitle = document.querySelector('.qs-title');
+      if (qsTitle) qsTitle.textContent = '🎉 Tu as fait ta première vente !';
+      setTimeout(function(){ document.getElementById('quickStartBanner').style.display='none'; }, 3000);
+    }
+  }
+
+  // ══════════════════════════════════════════
+  //  MODAL MODE RAPIDE
+  // ══════════════════════════════════════════
+  var qmType     = 'formation';
+  var qmStart    = null;
+  var qmInterval = null;
+
+  function openQuickModal() {
+    qmStart = Date.now();
+    document.getElementById('quickModal').classList.add('open');
+    // Démarrer le timer
+    qmInterval = setInterval(function() {
+      var elapsed = Math.round((Date.now() - qmStart) / 1000);
+      document.getElementById('qmTimer').textContent = '⏱ ' + elapsed + 's';
+    }, 1000);
+    document.getElementById('qmName').focus();
+  }
+
+  function closeQuickModal() {
+    document.getElementById('quickModal').classList.remove('open');
+    if (qmInterval) { clearInterval(qmInterval); qmInterval = null; }
+  }
+
+  function selectQMType(type, el) {
+    qmType = type;
+    document.querySelectorAll('.qm-type').forEach(function(t){t.classList.remove('selected');});
+    el.classList.add('selected');
+  }
+
+  function onQMInput() {
+    var name  = document.getElementById('qmName').value.trim();
+    var price = document.getElementById('qmPrice').value.trim();
+    var btn   = document.getElementById('qmSubmitBtn');
+    if (name && price) {
+      btn.disabled  = false;
+      btn.style.opacity = '1';
+    } else {
+      btn.disabled  = true;
+      btn.style.opacity = '.5';
+    }
+  }
+
+  function generateQMWithAI() {
+    var btn = document.getElementById('qmIABtn');
+    btn.textContent = '⏳ Génération...';
+    btn.disabled = true;
+    var type   = qmType;
+
+    // Suggestions IA basées sur le type (sans appel API pour rapidité)
+    var suggestions = {
+      formation: ['Formation Excel Pro en 30 jours','Formation Marketing Digital Afrique','Formation Entrepreneuriat Mobile'],
+      ebook:     ['Ebook 10 secrets des Tops Vendeurs africains','Guide Épargne et Investissement FCFA','Ebook : Lancer son Business en Afrique'],
+      coaching:  ['Coaching Business Performance 1-1','Coaching Mindset & Réussite Afrique','Accompagnement Création d\'Entreprise'],
+      service:   ['Création de CV Professionnel 24h','Gestion Réseaux Sociaux sur Mesure','Rédaction Contenu Marketing Afrique'],
+      produit:   ['Pack Starter Entrepreneur','Bundle Formation + Coaching','Kit Complet Business Digital'],
+      autre:     ['Produit Premium Afrique','Offre Exclusive Limitée','Service Sur Mesure']
+    };
+    var list = suggestions[type] || suggestions['formation'];
+    var pick = list[Math.floor(Math.random() * list.length)];
+
+    setTimeout(function() {
+      document.getElementById('qmName').value = pick;
+      if (!document.getElementById('qmPrice').value) {
+        document.getElementById('qmPrice').value = '9900';
+      }
+      btn.textContent = '🤖 Générer avec l\'IA →';
+      btn.disabled = false;
+      onQMInput();
+      showToast('✓ Suggestion IA appliquée !', 'success');
+    }, 800);
+  }
+
+  function submitQuickTunnel() {
+    var name  = document.getElementById('qmName').value.trim();
+    var price = parseInt(document.getElementById('qmPrice').value) || 4900;
+    var phone = document.getElementById('qmPhone').value.trim();
+    if (!name) { showToast('Entre le nom de ton produit','error'); return; }
+
+    var btn = document.getElementById('qmSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Création...';
+
+    if (!currentUser) { showToast('Connexion requise','error'); return; }
+
+    // Générer un slug unique
+    var slug = name.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+      .substring(0,30) + '-' + Date.now().toString(36);
+
+    var pageConfig = {
+      title:    name,
+      subtitle: 'Accès immédiat · Paiement Mobile Money',
+      price:    price,
+      badge:    qmType.charAt(0).toUpperCase() + qmType.slice(1) + ' · Accès immédiat',
+      btn_text: '🚀 Commander maintenant — ' + price.toLocaleString('fr') + ' FCFA',
+      primary_color: '#00c896',
+      whatsapp_number: phone || '',
+      guarantee: 'Satisfait ou remboursé · 7 jours',
+      benefits: [
+        'Accès immédiat après paiement',
+        'Support disponible par WhatsApp',
+        'Paiement sécurisé Mobile Money',
+        'Valeur garantie ou remboursé'
+      ]
+    };
+
+    sb.from('tunnels').insert({
+      user_id:     currentUser.id,
+      name:        name,
+      slug:        slug,
+      price:       price,
+      status:      'live',
+      type:        qmType,
+      page_config: pageConfig,
+      created_at:  new Date().toISOString()
+    }).then(function(r) {
+      if (r.error) {
+        showToast('Erreur: ' + r.error.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '🚀 Créer et publier →';
+        return;
+      }
+
+      var elapsed = Math.round((Date.now() - qmStart) / 1000);
+      closeQuickModal();
+      showToast('🎉 Tunnel créé en ' + elapsed + 's ! Partage le lien !', 'success');
+      loadTunnels();
+
+      // Proposer de partager sur WhatsApp
+      var tunnelUrl = 'https://funnelafrica.vercel.app/t/' + slug;
+      setTimeout(function() {
+        if (confirm('🎉 Tunnel créé !\n\nPartager maintenant sur WhatsApp ?')) {
+          var msg = '🚀 ' + name + '\n\nCommandez maintenant :\n' + tunnelUrl + '\n\nPaiement Wave · MTN · Orange Money';
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+        }
+      }, 500);
+    });
+  }
+
+  // Fermer modal rapide en cliquant dehors
+  document.getElementById('quickModal').addEventListener('click', function(e) {
+    if (e.target === this) closeQuickModal();
+  });
+
+  // ══════════════════════════════════════════
+  //  WHATSAPP STICKY
+  // ══════════════════════════════════════════
+  var waMenuOpen = false;
+
+  function toggleWAMenu() {
+    waMenuOpen = !waMenuOpen;
+    var menu = document.getElementById('waMenu');
+    if (waMenuOpen) {
+      menu.classList.add('open');
+    } else {
+      menu.classList.remove('open');
+    }
+  }
+
+  function shareLastTunnel() {
+    toggleWAMenu();
+    // Récupérer le dernier tunnel live
+    sb.from('tunnels').select('name,slug').eq('user_id', currentUser.id).eq('status','live')
+      .order('created_at', {ascending:false}).limit(1).then(function(r) {
+      if (!r.data || !r.data.length) {
+        showToast('Crée d\'abord un tunnel pour le partager', 'error');
+        return;
+      }
+      var t = r.data[0];
+      var url = 'https://funnelafrica.vercel.app/t/' + t.slug;
+      var msg = '🚀 ' + t.name + '\n\nCommandez maintenant :\n' + url + '\n\n✅ Paiement Wave · MTN · Orange Money';
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    });
+  }
+
+  function shareInvite() {
+    toggleWAMenu();
+    var msg = '💡 Tu vends des formations ou services ?\n\nFunnelAfrica te permet de créer ta page de vente et accepter Wave/MTN en 10 minutes.\n\nEssaie gratuitement :\nhttps://funnelafrica.vercel.app';
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  function openWASupport() {
+    toggleWAMenu();
+    window.open('https://wa.me/22996830775?text=Bonjour, j\'ai besoin d\'aide avec FunnelAfrica', '_blank');
+  }
+
+  // Fermer le menu WhatsApp si clic ailleurs
+  document.addEventListener('click', function(e) {
+    var sticky = document.getElementById('waSticky');
+    if (sticky && !sticky.contains(e.target)) {
+      document.getElementById('waMenu').classList.remove('open');
+      waMenuOpen = false;
+    }
+  });
+
+  // ══════════════════════════════════════════
+  //  HOOK : mise à jour gamification après chargement
+  // ══════════════════════════════════════════
+  // Appelé après loadProfile + loadTunnels
+  var _profileData  = null;
+  var _tunnelsData  = null;
+  var _ordersData   = null;
+
+  function tryUpdateGamification() {
+    if (_profileData && _tunnelsData !== null) {
+      updateGamification(_profileData, _tunnelsData, _ordersData || []);
+    }
+  }
+
   // Fermer modals en cliquant dehors
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
@@ -791,5 +1424,72 @@ fbq("track","PageView");
     if (b) b.style.display = 'none';
   }
 </script>
+<!-- ── WHATSAPP STICKY ── -->
+<div class="wa-sticky" id="waSticky">
+  <div class="wa-menu" id="waMenu">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;color:var(--muted);padding:4px 12px 8px;border-bottom:1px solid var(--border);margin-bottom:2px;">Partager sur WhatsApp</div>
+    <button class="wa-menu-item" onclick="shareLastTunnel()">
+      🚀 Partager mon tunnel
+    </button>
+    <button class="wa-menu-item" onclick="shareInvite()">
+      🤝 Inviter un partenaire
+    </button>
+    <button class="wa-menu-item" onclick="openWASupport()">
+      💬 Support WhatsApp
+    </button>
+    <button class="wa-menu-item" onclick="window.location.href='/whatsapp.html'">
+      ⚙️ Configurer WhatsApp
+    </button>
+  </div>
+  <button class="wa-fab wa-pulse" id="waFab" onclick="toggleWAMenu()" title="WhatsApp">
+    💬
+  </button>
+</div>
+
+<!-- ── MODAL MODE RAPIDE ── -->
+<div class="quick-modal-overlay" id="quickModal">
+  <div class="quick-modal">
+    <div class="qm-header">
+      <span class="qm-timer" id="qmTimer">⏱ 0s</span>
+      <div class="qm-title">⚡ Tunnel en 30 secondes</div>
+      <div class="qm-sub">Remplis 3 champs — l'IA fait le reste</div>
+    </div>
+    <div class="qm-body">
+      <!-- TYPE PRODUIT -->
+      <label class="qm-label">Type de produit</label>
+      <div class="qm-types" id="qmTypes">
+        <div class="qm-type selected" onclick="selectQMType('formation',this)"><div class="qm-type-icon">📚</div><div class="qm-type-label">Formation</div></div>
+        <div class="qm-type" onclick="selectQMType('ebook',this)"><div class="qm-type-icon">📖</div><div class="qm-type-label">Ebook</div></div>
+        <div class="qm-type" onclick="selectQMType('coaching',this)"><div class="qm-type-icon">🎯</div><div class="qm-type-label">Coaching</div></div>
+        <div class="qm-type" onclick="selectQMType('service',this)"><div class="qm-type-icon">⚒️</div><div class="qm-type-label">Service</div></div>
+        <div class="qm-type" onclick="selectQMType('produit',this)"><div class="qm-type-icon">📦</div><div class="qm-type-label">Produit</div></div>
+        <div class="qm-type" onclick="selectQMType('autre',this)"><div class="qm-type-icon">✨</div><div class="qm-type-label">Autre</div></div>
+      </div>
+
+      <!-- NOM PRODUIT -->
+      <label class="qm-label">Nom de ton produit *</label>
+      <input class="qm-input" id="qmName" placeholder="Ex: Formation Excel Pro, Ebook Finance..." oninput="onQMInput()" autofocus>
+      <button class="qm-ia-btn" onclick="generateQMWithAI()" id="qmIABtn">
+        🤖 Générer avec l'IA →
+      </button>
+
+      <!-- PRIX -->
+      <label class="qm-label">Prix (FCFA)</label>
+      <input class="qm-input" id="qmPrice" type="number" placeholder="Ex: 4900" min="100" oninput="onQMInput()">
+
+      <!-- TÉLÉPHONE WHATSAPP -->
+      <label class="qm-label">Ton numéro WhatsApp</label>
+      <input class="qm-input" id="qmPhone" type="tel" placeholder="Ex: 22996830775" oninput="onQMInput()">
+    </div>
+    <div class="qm-footer">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeQuickModal()">Annuler</button>
+      <button class="btn btn-primary" id="qmSubmitBtn" style="flex:2;justify-content:center;opacity:.5;" onclick="submitQuickTunnel()" disabled>
+        🚀 Créer et publier →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/chat-widget.js"></script>
 </body>
 </html>
