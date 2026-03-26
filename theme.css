@@ -1,0 +1,243 @@
+/* ============================================================
+   FunnelAfrica — Thème Shopify (Clair par défaut + Dark auto)
+   Fichier UNIQUE — appliqué via js/config.js sur toute l'app
+   NE PAS MODIFIER LES FICHIERS HTML — tout est ici
+   ============================================================ */
+
+/* ══════════════════════════════════════════
+   THÈME CLAIR — Par défaut (comme Shopify)
+   ══════════════════════════════════════════ */
+:root {
+  /* Fonds */
+  --bg:        #F6F6F1 !important; /* Shopify beige clair */
+  --surface:   #FFFFFF !important;
+  --surface2:  #F1F1EF !important;
+
+  /* Bordures */
+  --border:    #E3E3E0 !important;
+
+  /* Textes */
+  --text:      #1A1A1A !important; /* Shopify noir profond */
+  --muted:     #6D7175 !important; /* Shopify gris */
+
+  /* Vert Shopify exact */
+  --green:     #95BF47 !important;
+  --green2:    #5E8E3E !important;
+  --green-dim: #95BF4715 !important;
+
+  /* Or/Gold */
+  --gold:      #C07D2A !important;
+  --gold-dim:  #C07D2A15 !important;
+
+  /* Autres */
+  --danger:    #D82C0D !important; /* Shopify rouge */
+  --blue:      #006FBB !important; /* Shopify bleu */
+  --purple:    #7B5EA7 !important;
+  --pink:      #E5484D !important;
+  --wa:        #25D366 !important;
+  --fb:        #1877F2 !important;
+
+  /* Couleurs figées pour les boutons */
+  --btn-text:  #FFFFFF !important;
+  --card-shadow: 0 1px 4px rgba(0,0,0,.08) !important;
+}
+
+/* Corps + fond général */
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+/* Topbar */
+.topbar, .topbar-dashboard {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* Cards */
+.card, .stat-card, .kpi, .table-card, .broadcast-card {
+  background: #FFFFFF !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+/* Inputs */
+.form-input, .form-select, .search-input, .qm-input, input, select, textarea {
+  background: #FFFFFF !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Nav items */
+.nav-item:hover, .nav-item.active {
+  background: #F1F1EF !important;
+}
+.nav-item.active { color: var(--green) !important; }
+
+/* Boutons primaires */
+.btn-primary, .btn-quick, .cta-btn, .cta-main,
+button[style*="background:var(--green)"],
+button[style*="background:#96bf48"],
+button[style*="background:#00c896"] {
+  background: var(--green) !important;
+  color: #FFFFFF !important;
+}
+
+/* Bouton ghost */
+.btn-ghost {
+  background: #FFFFFF !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+}
+
+/* Quick buttons dashboard */
+.quick-btn {
+  background: #F6F6F1 !important;
+  border-color: var(--border) !important;
+}
+.quick-btn:hover {
+  background: #EBF3D8 !important;
+  border-color: var(--green) !important;
+}
+
+/* Modals */
+.modal {
+  background: #FFFFFF !important;
+  border-color: var(--border) !important;
+}
+.modal-overlay { background: rgba(0,0,0,0.5) !important; }
+
+/* Surface2 elements */
+.surface2, [style*="#182030"], [style*="#1e2530"],
+[style*="#121a22"], [style*="#0d1318"] {
+  background: #F1F1EF !important;
+}
+
+/* Stats cards couleurs */
+.stat-card.green { background: linear-gradient(135deg,#EBF3D8,#F6F6F1) !important; border-color: #95BF4730 !important; }
+.stat-card.gold  { background: linear-gradient(135deg,#FFF3E0,#F6F6F1) !important; }
+.stat-card.blue  { background: linear-gradient(135deg,#E3F0FF,#F6F6F1) !important; }
+.stat-card.pink  { background: linear-gradient(135deg,#FFE8E8,#F6F6F1) !important; }
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, #E3E3E0 25%, #F1F1EF 50%, #E3E3E0 75%) !important;
+  background-size: 200% 100% !important;
+}
+
+/* Tableaux */
+.vendor-row.header, .vendor-row:nth-child(even) {
+  background: #F6F6F1 !important;
+}
+
+/* Plan pills */
+.plan-pill.starter { background: #F1F1EF !important; color: #6D7175 !important; }
+.plan-pill.pro     { background: #EBF3D8 !important; color: #5E8E3E !important; border-color: #95BF4740 !important; }
+.plan-pill.scale   { background: #FFF3E0 !important; color: #C07D2A !important; border-color: #C07D2A40 !important; }
+
+/* Logo mark */
+.logo-mark span, .logo-dot {
+  background: linear-gradient(135deg, #95BF47, #5E8E3E) !important;
+  color: #FFFFFF !important;
+}
+
+/* Badges verts */
+.badge-green, [class*="badge"] {
+  background: #EBF3D8 !important;
+  color: #5E8E3E !important;
+  border-color: #95BF4740 !important;
+}
+
+/* Footer */
+footer, .card-footer {
+  background: #F6F6F1 !important;
+  border-color: var(--border) !important;
+}
+
+/* Tunnel items */
+.tunnel-item:hover { background: #F6F6F1 !important; }
+
+/* Quick start banner */
+.quick-start-banner {
+  background: linear-gradient(135deg,#EBF3D8,#F6F6F1) !important;
+  border-color: #95BF4750 !important;
+}
+
+/* Progress bars */
+.qs-progress, .xp-bar { background: #E3E3E0 !important; }
+.qs-progress-fill, .xp-fill {
+  background: linear-gradient(90deg, #95BF47, #5E8E3E) !important;
+}
+
+/* Action buttons */
+.action-btn:hover { background: var(--green) !important; color: #FFFFFF !important; }
+
+/* Toasts */
+#__toast[style*="bg:#00"] { background: #EBF3D8 !important; }
+
+/* WA sticky */
+.wa-fab { background: #25D366 !important; }
+
+/* Overlay sidebar mobile */
+.overlay { background: rgba(0,0,0,0.4) !important; }
+
+/* ══════════════════════════════════════════
+   THÈME SOMBRE AUTO — si Android en mode nuit
+   ══════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #0A0F14 !important;
+    --surface:   #111820 !important;
+    --surface2:  #182030 !important;
+    --border:    #1E2A38 !important;
+    --text:      #E8F0F8 !important;
+    --muted:     #6B7E93 !important;
+    --green:     #95BF47 !important;
+    --green2:    #7A9E35 !important;
+    --green-dim: #95BF4718 !important;
+    --gold:      #F5A623 !important;
+    --gold-dim:  #F5A62318 !important;
+    --danger:    #FF4D6D !important;
+    --blue:      #4DA6FF !important;
+    --card-shadow: 0 1px 4px rgba(0,0,0,.4) !important;
+  }
+
+  body { background: #0A0F14 !important; color: #E8F0F8 !important; }
+
+  .sidebar, .topbar, .card, .stat-card, .kpi,
+  .table-card, .modal, .broadcast-card {
+    background: #111820 !important;
+    border-color: #1E2A38 !important;
+  }
+
+  .quick-btn       { background: #182030 !important; border-color: #1E2A38 !important; }
+  .nav-item:hover, .nav-item.active { background: #182030 !important; }
+  .vendor-row.header { background: #182030 !important; }
+  .skeleton        { background: linear-gradient(90deg,#182030 25%,#1E2A38 50%,#182030 75%) !important; }
+
+  .form-input, .form-select, .search-input, input, select, textarea {
+    background: #182030 !important;
+    border-color: #1E2A38 !important;
+    color: #E8F0F8 !important;
+  }
+
+  .stat-card.green { background: linear-gradient(135deg,#0D2010,#111820) !important; }
+  .stat-card.gold  { background: linear-gradient(135deg,#1A1200,#111820) !important; }
+  .stat-card.blue  { background: linear-gradient(135deg,#001830,#111820) !important; }
+  .stat-card.pink  { background: linear-gradient(135deg,#200010,#111820) !important; }
+
+  .quick-start-banner { background: linear-gradient(135deg,#0D2010,#0A1A18) !important; }
+  footer, .card-footer { background: #0D1318 !important; }
+
+  .btn-ghost {
+    background: transparent !important;
+    border-color: #1E2A38 !important;
+    color: #6B7E93 !important;
+  }
+}
