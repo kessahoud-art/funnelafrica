@@ -8,7 +8,7 @@
 //  SUPABASE_SERVICE_KEY = clé service_role
 //  APP_URL              = https://funnelafrica.vercel.app
 // ============================================================
-
+console.log("🚨 WEBHOOK HIT");
 const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async function handler(req, res) {
